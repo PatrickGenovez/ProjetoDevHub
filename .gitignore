@@ -7,11 +7,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Environment
-.env
-*.env
-backend/.env
-frontend/.env
 
 # Next.js
 .next/
