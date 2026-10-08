@@ -1,27 +1,38 @@
-﻿# Node
+# Node & Dependencies
 node_modules/
+**/node_modules/
+
+# Next.js & Build outputs
+.next/
+**/.next/
+out/
+**/out/
+.vercel/
+**/.vercel/
+build/
+dist/
+
+# Environment files
+.env
+.env*.local
+**/.env
+**/.env*.local
+!.env.example
+!**/ex.env
+!**/ex.env.*
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-
-# Next.js
-.next/
-out/
-.vercel/
-
-# Build outputs
-build/
-dist/
-
-# OS
+# OS & Temp
 .DS_Store
 Thumbs.db
+powershell.cmd
 
 # Misc
 coverage/
 *.local
-*.log

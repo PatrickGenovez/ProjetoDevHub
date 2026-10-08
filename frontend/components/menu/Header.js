@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { Settings, MessageCircle, User, Shield, Building2 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './Header.module.css';
-import EditProfileModal from './EditProfileModal';
 import ThemeToggle from './ThemeToggle';
 
 // Hook personalizado para detectar o tema atual
@@ -182,8 +181,8 @@ export default function Header({ auth }) {
           <div className={styles.leftSection}>
             <div className={styles.logo}>
               <Image
-                src={isDark ? "/img/logo-aura8-branca.png" : "/img/logo-aura8.png"}
-                alt="Aura8"
+                src="/img/logo.svg"
+                alt="Logo"
                 width={140}
                 height={32}
                 className={styles.logoImage}
@@ -291,13 +290,6 @@ export default function Header({ auth }) {
         </div>
       </header>
 
-      {/* Modal de Edição de Perfil */}
-      <EditProfileModal
-        isOpen={showEditProfileModal}
-        onClose={() => setShowEditProfileModal(false)}
-        user={user}
-        onSuccess={handleProfileUpdateSuccess}
-      />
     </>
   );
 }

@@ -1,4 +1,4 @@
-# Dockerfile para o projeto Front-Aura8 (Next.js)
+# Dockerfile para o projeto Frontend (Next.js)
 # Baseado no Node.js 18 Alpine para otimização de tamanho
 FROM node:18-alpine AS base
 
