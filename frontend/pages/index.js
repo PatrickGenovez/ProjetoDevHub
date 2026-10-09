@@ -35,7 +35,12 @@ import {
   Compass,
   Quote,
   Clock,
-  Award
+  Award,
+  SlidersHorizontal,
+  Film,
+  Check,
+  Clapperboard,
+  Sliders
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
@@ -164,6 +169,19 @@ const DEFAULT_BOOKS = [
   }
 ];
 
+// Lista de gêneros disponíveis com ícones e descrições para personalização
+const AVAILABLE_GENRES = [
+  { id: 'Ficção Científica', name: 'Ficção Científica', icon: '🚀', desc: 'Exploração espacial, futuros e distopias' },
+  { id: 'Fantasia', name: 'Fantasia', icon: '🧙‍♂️', desc: 'Mundos mágicos, seres épicos e lendas' },
+  { id: 'Distopia', name: 'Distopia', icon: '🏙️', desc: 'Sociedades futuristas e regimes totalitários' },
+  { id: 'Tecnologia', name: 'Tecnologia & Código', icon: '💻', desc: 'Programação, engenharia de software e IA' },
+  { id: 'Suspense', name: 'Suspense & Mistério', icon: '🕵️', desc: 'Investigações, thrillers e enigmas' },
+  { id: 'Clássicos', name: 'Clássicos da Literatura', icon: '📜', desc: 'Obras fundamentais e imortais' },
+  { id: 'Cinema & Adaptações', name: 'Cinema & Adaptações', icon: '🎬', desc: 'Grandes obras adaptadas para filmes e séries' },
+  { id: 'Romance', name: 'Romance', icon: '💖', desc: 'Relações humanas, dramas e paixões' },
+  { id: 'Aventura', name: 'Ação & Aventura', icon: '🧭', desc: 'Jornadas eletrizantes e grandes jornadas' }
+];
+
 export default function BookLibrary() {
   const [books, setBooks] = useState(DEFAULT_BOOKS);
   const [searchSource, setSearchSource] = useState('local'); // 'local' | 'google' | 'openlibrary'
@@ -175,6 +193,11 @@ export default function BookLibrary() {
   const [favorites, setFavorites] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Estados de Gêneros Preferidos do Usuário
+  const [preferredGenres, setPreferredGenres] = useState([]);
+  const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const [filterOnlyPreferred, setFilterOnlyPreferred] = useState(false);
 
   // Estados de APIs Externas
   const [apiBooks, setApiBooks] = useState([]);
@@ -194,7 +217,7 @@ export default function BookLibrary() {
     coverImage: ''
   });
 
-  // Carregar catálogo local e usuário autenticado
+  // Carregar catálogo local, favoritos, usuário e preferências
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -228,6 +251,13 @@ export default function BookLibrary() {
       const storedUser = localStorage.getItem('userData');
       if (storedUser) {
         setCurrentUser(JSON.parse(storedUser));
+      }
+    } catch (e) {}
+
+    try {
+      const savedPrefs = JSON.parse(localStorage.getItem('library_preferred_genres') || '[]');
+      if (Array.isArray(savedPrefs) && savedPrefs.length > 0) {
+        setPreferredGenres(savedPrefs);
       }
     } catch (e) {}
   }, []);
@@ -283,6 +313,43 @@ export default function BookLibrary() {
         ? `Você pegou "${book.title}" emprestado!`
         : `"${book.title}" foi devolvido para a estante!`
     );
+  };
+
+  // Alternar seleção de gênero preferido
+  const togglePreferredGenre = (genreId) => {
+    const isSelected = preferredGenres.includes(genreId);
+    const updated = isSelected
+      ? preferredGenres.filter((g) => g !== genreId)
+      : [...preferredGenres, genreId];
+    setPreferredGenres(updated);
+    try {
+      localStorage.setItem('library_preferred_genres', JSON.stringify(updated));
+    } catch (e) {}
+  };
+
+  // Salvar e aplicar filtro de gêneros preferidos
+  const applyPreferredGenres = () => {
+    if (preferredGenres.length === 0) {
+      showToast('Selecione pelo menos um gênero para filtrar.');
+      return;
+    }
+    try {
+      localStorage.setItem('library_preferred_genres', JSON.stringify(preferredGenres));
+    } catch (e) {}
+    setFilterOnlyPreferred(true);
+    setSelectedGenre('Todos');
+    setIsPreferencesModalOpen(false);
+    showToast(`Filtro aplicado: ${preferredGenres.length} gêneros favoritos!`);
+  };
+
+  // Limpar gêneros preferidos
+  const clearPreferredGenres = () => {
+    setPreferredGenres([]);
+    setFilterOnlyPreferred(false);
+    try {
+      localStorage.removeItem('library_preferred_genres');
+    } catch (e) {}
+    showToast('Preferências de gêneros redefinidas.');
   };
 
   // 1. INTEGRAÇÃO GOOGLE BOOKS API
@@ -504,6 +571,20 @@ export default function BookLibrary() {
   const filteredLocalBooks = useMemo(() => {
     return books
       .filter((book) => {
+        // Se o usuário ativou o filtro pelos gêneros marcados como preferidos
+        if (filterOnlyPreferred && preferredGenres.length > 0) {
+          const matchPref = preferredGenres.some((g) => {
+            const gLower = g.toLowerCase();
+            const bLower = book.genre.toLowerCase();
+            if (bLower === gLower) return true;
+            if (g === 'Cinema & Adaptações' && (bLower.includes('ficção') || bLower.includes('fantasia') || bLower.includes('distopia') || bLower.includes('suspense') || bLower.includes('clássicos'))) return true;
+            if (g === 'Suspense' && (bLower.includes('suspense') || bLower.includes('terror') || bLower.includes('mistério'))) return true;
+            if (g === 'Aventura' && (bLower.includes('aventura') || bLower.includes('fantasia'))) return true;
+            return false;
+          });
+          if (!matchPref) return false;
+        }
+
         const matchesGenre =
           selectedGenre === 'Todos' || book.genre.toLowerCase() === selectedGenre.toLowerCase();
         const q = searchTerm.toLowerCase();
@@ -519,7 +600,7 @@ export default function BookLibrary() {
         if (sortBy === 'year') return b.year - a.year;
         return 0;
       });
-  }, [books, selectedGenre, searchTerm, sortBy]);
+  }, [books, selectedGenre, searchTerm, sortBy, filterOnlyPreferred, preferredGenres]);
 
   const displayedBooks = searchSource === 'local' ? filteredLocalBooks : apiBooks;
 
@@ -938,7 +1019,7 @@ export default function BookLibrary() {
               </div>
             </div>
 
-            {/* Search & Sort Bar */}
+            {/* Search & Sort Bar + Preferências de Gênero */}
             <div className={styles.searchBarContainer}>
               <div className={styles.searchInputWrapper}>
                 <Search size={20} className={styles.searchIcon} />
@@ -968,18 +1049,36 @@ export default function BookLibrary() {
               </div>
 
               {searchSource === 'local' && (
-                <div className={styles.sortSelectWrapper}>
-                  <ArrowUpDown size={16} className={styles.sortIcon} />
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className={styles.sortSelect}
-                    id="sort-select"
+                <div className={styles.searchControlsRight}>
+                  {/* Botão Ícone de Gêneros Preferidos */}
+                  <button
+                    className={`${styles.btnGenrePreferences} ${
+                      filterOnlyPreferred ? styles.btnGenrePreferencesActive : ''
+                    }`}
+                    onClick={() => setIsPreferencesModalOpen(true)}
+                    title="Personalizar meus gêneros favoritos"
+                    id="btn-genre-preferences"
                   >
-                    <option value="rating">Melhor Avaliados</option>
-                    <option value="title">Título (A-Z)</option>
-                    <option value="year">Ano de Lançamento</option>
-                  </select>
+                    <Film size={17} className={styles.prefIcon} />
+                    <span>Gêneros Preferidos</span>
+                    {preferredGenres.length > 0 && (
+                      <span className={styles.prefCountBadge}>{preferredGenres.length}</span>
+                    )}
+                  </button>
+
+                  <div className={styles.sortSelectWrapper}>
+                    <ArrowUpDown size={16} className={styles.sortIcon} />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className={styles.sortSelect}
+                      id="sort-select"
+                    >
+                      <option value="rating">Melhor Avaliados</option>
+                      <option value="title">Título (A-Z)</option>
+                      <option value="year">Ano de Lançamento</option>
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
@@ -992,13 +1091,46 @@ export default function BookLibrary() {
                   Gêneros:
                 </span>
                 <div className={styles.genrePillsList}>
+                  {/* Pílula Especial de Gêneros Marcados como Preferidos */}
+                  <button
+                    className={`${styles.genrePill} ${styles.genrePillPreferred} ${
+                      filterOnlyPreferred ? styles.genrePillActivePreferred : ''
+                    }`}
+                    onClick={() => {
+                      if (preferredGenres.length === 0) {
+                        setIsPreferencesModalOpen(true);
+                      } else {
+                        const next = !filterOnlyPreferred;
+                        setFilterOnlyPreferred(next);
+                        if (next) {
+                          setSelectedGenre('Todos');
+                          showToast(`Filtrando por ${preferredGenres.length} gêneros preferidos!`);
+                        } else {
+                          showToast('Exibindo catálogo completo');
+                        }
+                      }
+                    }}
+                    title="Filtrar pelos seus gêneros marcados"
+                  >
+                    <Film size={14} />
+                    <span>⭐ Meus Gêneros</span>
+                    {preferredGenres.length > 0 ? (
+                      <span className={styles.genrePillCount}>{preferredGenres.length}</span>
+                    ) : (
+                      <span className={styles.genrePillConfigHint}>Configurar</span>
+                    )}
+                  </button>
+
                   {genresList.map((genre) => (
                     <button
                       key={genre}
                       className={`${styles.genrePill} ${
-                        selectedGenre === genre ? styles.genrePillActive : ''
+                        !filterOnlyPreferred && selectedGenre === genre ? styles.genrePillActive : ''
                       }`}
-                      onClick={() => setSelectedGenre(genre)}
+                      onClick={() => {
+                        setFilterOnlyPreferred(false);
+                        setSelectedGenre(genre);
+                      }}
                     >
                       <span>{genre}</span>
                       <span className={styles.genrePillCount}>
@@ -1016,7 +1148,9 @@ export default function BookLibrary() {
               <div>
                 <h3 className={styles.sectionTitle}>
                   {searchSource === 'local'
-                    ? selectedGenre === 'Todos'
+                    ? filterOnlyPreferred
+                      ? `⭐ Catálogo Personalizado (${preferredGenres.length} gêneros marcados)`
+                      : selectedGenre === 'Todos'
                       ? 'Todos os Livros Cadastrados'
                       : `Gênero: ${selectedGenre}`
                     : searchSource === 'google'
@@ -1025,7 +1159,9 @@ export default function BookLibrary() {
                 </h3>
                 <p className={styles.sectionSubtitle}>
                   {searchSource === 'local'
-                    ? `Exibindo ${displayedBooks.length} obras no catálogo`
+                    ? filterOnlyPreferred
+                      ? `Exibindo ${displayedBooks.length} obras nos seus gêneros preferidos: ${preferredGenres.join(', ')}`
+                      : `Exibindo ${displayedBooks.length} obras no catálogo`
                     : `Pesquisa online em tempo real via ${
                         searchSource === 'google' ? 'Google Books' : 'Open Library'
                       }`}
@@ -1639,6 +1775,98 @@ export default function BookLibrary() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE SELEÇÃO DE GÊNEROS / TEMAS PREFERIDOS */}
+      {isPreferencesModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsPreferencesModalOpen(false)}>
+          <div className={styles.modalCardMedium} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.formHeader}>
+              <div className={styles.formHeaderTitleGroup}>
+                <div className={styles.prefModalIconBox}>
+                  <Film size={22} />
+                </div>
+                <div>
+                  <h3 className={styles.formTitle}>Meus Gêneros & Estilos Favoritos</h3>
+                  <p className={styles.formSubtitle}>Marque seus gêneros preferidos para personalizar o catálogo na hora</p>
+                </div>
+              </div>
+              <button
+                className={styles.modalCloseBtn}
+                onClick={() => setIsPreferencesModalOpen(false)}
+                title="Fechar"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.prefModalIntro}>
+              <span>Selecione abaixo os temas de filmes e livros que mais combinam com o seu gosto:</span>
+            </div>
+
+            {/* Grid de Cards de Gêneros Interativos */}
+            <div className={styles.prefGenresGrid}>
+              {AVAILABLE_GENRES.map((g) => {
+                const isSelected = preferredGenres.includes(g.id);
+                return (
+                  <div
+                    key={g.id}
+                    className={`${styles.prefGenreCard} ${
+                      isSelected ? styles.prefGenreCardSelected : ''
+                    }`}
+                    onClick={() => togglePreferredGenre(g.id)}
+                  >
+                    <div className={styles.prefGenreHeader}>
+                      <span className={styles.prefGenreEmoji}>{g.icon}</span>
+                      <div
+                        className={`${styles.prefCheckbox} ${
+                          isSelected ? styles.prefCheckboxChecked : ''
+                        }`}
+                      >
+                        {isSelected && <Check size={13} strokeWidth={3} />}
+                      </div>
+                    </div>
+                    <h4 className={styles.prefGenreName}>{g.name}</h4>
+                    <p className={styles.prefGenreDesc}>{g.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className={styles.prefModalFooter}>
+              <div className={styles.prefSelectedCounter}>
+                <span><strong>{preferredGenres.length}</strong> de {AVAILABLE_GENRES.length} gêneros marcados</span>
+                {preferredGenres.length > 0 && (
+                  <button
+                    type="button"
+                    className={styles.btnPrefClear}
+                    onClick={clearPreferredGenres}
+                  >
+                    Limpar tudo
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.prefModalActions}>
+                <button
+                  type="button"
+                  className={styles.btnFormCancel}
+                  onClick={() => setIsPreferencesModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnFormSubmit}
+                  onClick={applyPreferredGenres}
+                >
+                  <Sparkles size={16} />
+                  <span>Aplicar & Abrir Catálogo</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
