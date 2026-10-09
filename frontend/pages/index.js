@@ -1,157 +1,634 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  Layers,
-  Server,
-  Zap,
-  Code2,
+  Library,
+  BookOpen,
+  Star,
+  Search,
+  Plus,
+  Filter,
   CheckCircle2,
-  Copy,
-  Check,
-  Terminal,
-  FolderGit2,
-  Cpu,
-  ShieldCheck,
-  Database,
-  ExternalLink,
+  Bookmark,
+  Calendar,
+  User,
+  FileText,
+  X,
   ChevronRight,
   Sparkles,
-  Activity,
-  ArrowUpRight,
-  PackageCheck,
-  Boxes,
-  FileCode
+  Heart,
+  ArrowUpDown,
+  Globe,
+  Download,
+  ExternalLink,
+  Wand2,
+  Loader2
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState('structure');
-  const [copiedCommand, setCopiedCommand] = useState(null);
-  const [apiStatus, setApiStatus] = useState('checking'); // 'online' | 'offline' | 'checking'
-  const [counter, setCounter] = useState(0);
+// Catálogo inicial padrão
+const DEFAULT_BOOKS = [
+  {
+    id: 1,
+    title: 'Duna',
+    author: 'Frank Herbert',
+    genre: 'Ficção Científica',
+    rating: 4.9,
+    reviewsCount: 1840,
+    synopsis: 'Em um futuro distante, o jovem Paul Atreides é herdeiro de uma família nobre enviada para governar o inóspito planeta desértico Arrakis, a única fonte da substância mais valiosa do universo, a especiaria mélange.',
+    year: 1965,
+    pages: 680,
+    status: 'Disponível',
+    coverImage: 'https://books.google.com/books/content?id=B1hSGwAACAAJ&printsec=frontcover&img=1&zoom=1',
+    coverGradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)',
+    accentColor: '#f59e0b'
+  },
+  {
+    id: 2,
+    title: 'O Senhor dos Anéis: A Sociedade do Anel',
+    author: 'J.R.R. Tolkien',
+    genre: 'Fantasia',
+    rating: 5.0,
+    reviewsCount: 2410,
+    synopsis: 'Frodo Bolseiro, um hobbit da pacata Comarca, herda um anel mágico ancestral e descobre que ele tem o poder de escravizar toda a Terra-média nas mãos do Senhor do Escuro, Sauron.',
+    year: 1954,
+    pages: 576,
+    status: 'Disponível',
+    coverImage: 'https://covers.openlibrary.org/b/id/14547565-M.jpg',
+    coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+    accentColor: '#10b981'
+  },
+  {
+    id: 3,
+    title: '1984',
+    author: 'George Orwell',
+    genre: 'Distopia',
+    rating: 4.8,
+    reviewsCount: 3150,
+    synopsis: 'Em uma sociedade totalitária dominada pelo Partido e pelo onipresente Grande Irmão, Winston Smith trabalha no Ministério da Verdade reescrevendo a história, mas começa secretamente a questionar o regime.',
+    year: 1949,
+    pages: 336,
+    status: 'Disponível',
+    coverImage: 'https://covers.openlibrary.org/b/id/7222246-M.jpg',
+    coverGradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
+    accentColor: '#ef4444'
+  },
+  {
+    id: 4,
+    title: 'Código Limpo (Clean Code)',
+    author: 'Robert C. Martin',
+    genre: 'Tecnologia',
+    rating: 4.7,
+    reviewsCount: 980,
+    synopsis: 'Um guia fundamental sobre boas práticas de engenharia de software, mostrando como escrever código legível, modular e de fácil manutenção através de princípios de refatoração, nomes significativos e testes.',
+    year: 2008,
+    pages: 464,
+    status: 'Disponível',
+    coverImage: '',
+    coverGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
+    accentColor: '#3b82f6'
+  },
+  {
+    id: 5,
+    title: 'O Hobbit',
+    author: 'J.R.R. Tolkien',
+    genre: 'Fantasia',
+    rating: 4.9,
+    reviewsCount: 1620,
+    synopsis: 'Bilbo Bolseiro vive uma vida tranquila no Condado até ser surpreendido pelo mago Gandalf e uma companhia de treze anões para recuperar um tesouro guardado pelo temível dragão Smaug.',
+    year: 1937,
+    pages: 310,
+    status: 'Emprestado',
+    coverImage: 'https://covers.openlibrary.org/b/id/12003528-M.jpg',
+    coverGradient: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 50%, #134e4a 100%)',
+    accentColor: '#14b8a6'
+  },
+  {
+    id: 6,
+    title: 'Neuromancer',
+    author: 'William Gibson',
+    genre: 'Ficção Científica',
+    rating: 4.6,
+    reviewsCount: 890,
+    synopsis: 'Case é um cowboy do ciberespaço que foi banido da rede neural após trair seus empregadores. Uma oportunidade misteriosa surge para recuperar sua conexão em troca de uma última invasão hacker de alto risco.',
+    year: 1984,
+    pages: 320,
+    status: 'Disponível',
+    coverImage: '',
+    coverGradient: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
+    accentColor: '#8b5cf6'
+  },
+  {
+    id: 7,
+    title: 'O Silêncio dos Inocentes',
+    author: 'Thomas Harris',
+    genre: 'Suspense',
+    rating: 4.8,
+    reviewsCount: 1120,
+    synopsis: 'A jovem estagiária do FBI Clarice Starling deve interrogar o brilhante psiquiatra e assassino em série Dr. Hannibal Lecter para obter pistas sobre um novo criminoso que aterroriza o país.',
+    year: 1988,
+    pages: 368,
+    status: 'Disponível',
+    coverImage: '',
+    coverGradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
+    accentColor: '#ec4899'
+  },
+  {
+    id: 8,
+    title: 'O Pequeno Príncipe',
+    author: 'Antoine de Saint-Exupéry',
+    genre: 'Clássicos',
+    rating: 4.9,
+    reviewsCount: 4300,
+    synopsis: 'Um piloto cai no deserto do Saara e encontra um menino misterioso vindo de um asteroide distante. Uma fábula poética sobre amizade, amor, perda e o que é verdadeiramente essencial aos olhos.',
+    year: 1943,
+    pages: 96,
+    status: 'Disponível',
+    coverImage: 'https://covers.openlibrary.org/b/id/10574187-M.jpg',
+    coverGradient: 'linear-gradient(135deg, #6366f1 0%, #4338ca 50%, #1e1b4b 100%)',
+    accentColor: '#6366f1'
+  }
+];
 
-  // Verifica conectividade com o backend ao carregar
+export default function BookLibrary() {
+  const [books, setBooks] = useState(DEFAULT_BOOKS);
+  const [searchSource, setSearchSource] = useState('local'); // 'local' | 'google' | 'openlibrary'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('Todos');
+  const [sortBy, setSortBy] = useState('rating'); // 'rating' | 'title' | 'year'
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // Estados de APIs Externas
+  const [apiBooks, setApiBooks] = useState([]);
+  const [isApiLoading, setIsApiLoading] = useState(false);
+  const [autofillQuery, setAutofillQuery] = useState('');
+  const [isAutofilling, setIsAutofilling] = useState(false);
+
+  // Form para novo livro
+  const [newBookForm, setNewBookForm] = useState({
+    title: '',
+    author: '',
+    genre: 'Ficção Científica',
+    rating: '5.0',
+    synopsis: '',
+    year: '2024',
+    pages: '300',
+    coverImage: ''
+  });
+
+  // Carregar catálogo local
   useEffect(() => {
-    const checkBackend = async () => {
+    const fetchBooks = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(apiUrl, { method: 'GET' });
+        const res = await fetch(`${apiUrl}/books`);
         if (res.ok) {
-          setApiStatus('online');
-        } else {
-          setApiStatus('offline');
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            setBooks(json.data);
+            return;
+          }
         }
       } catch (err) {
-        setApiStatus('offline');
+        // Fallback silencioso
+      }
+
+      const saved = localStorage.getItem('library_books');
+      if (saved) {
+        try {
+          setBooks(JSON.parse(saved));
+        } catch (e) {}
       }
     };
 
-    checkBackend();
+    fetchBooks();
+
+    try {
+      const savedFavs = JSON.parse(localStorage.getItem('library_favs') || '[]');
+      setFavorites(savedFavs);
+    } catch (e) {}
   }, []);
 
-  const handleCopy = (text, key) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCommand(key);
-    setTimeout(() => setCopiedCommand(null), 2000);
+  // Salvar no localStorage quando catálogo local mudar
+  const updateBooks = (updatedList) => {
+    setBooks(updatedList);
+    try {
+      localStorage.setItem('library_books', JSON.stringify(updatedList));
+    } catch (e) {}
   };
 
-  const stackFrontend = [
-    { name: 'Next.js 15', desc: 'Framework React com suporte a SSR, SSG e rotas de API.', icon: Code2 },
-    { name: 'React 19', desc: 'Versão mais recente com suporte a Hooks e renderização rápida.', icon: Cpu },
-    { name: 'Lucide Icons', desc: 'Conjunto de ícones leves, consistentes e modernos.', icon: Sparkles },
-    { name: 'CSS Tokens & Temas', desc: 'Suporte completo a Dark Mode e Light Mode nativo.', icon: Zap },
-    { name: 'Axios & Fetch', desc: 'Comunicação HTTP pré-configurada para o backend.', icon: Activity },
-    { name: 'Rich UI Suite', desc: 'Recharts, Chart.js, TipTap, DnD-Kit e React-Toastify inclusos.', icon: Boxes }
-  ];
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
-  const stackBackend = [
-    { name: 'Express.js', desc: 'Servidor Node.js modular, rápido e estruturado em rotas.', icon: Server },
-    { name: 'Autenticação JWT', desc: 'Fluxos de login, cadastro e recuperação de senha já prontos.', icon: ShieldCheck },
-    { name: 'Bcryptjs', desc: 'Criptografia segura de senhas integrada com salt rounds.', icon: ShieldCheck },
-    { name: 'MySQL2 & PG', desc: 'Pool de conexões para bancos relacionais configurado.', icon: Database },
-    { name: 'Cloudinary', desc: 'Upload e gestão de arquivos em nuvem preparado.', icon: PackageCheck },
-    { name: 'Docker & Compose', desc: 'Containers prontos para ambiente de dev e produção.', icon: Terminal }
-  ];
+  // Favoritar
+  const toggleFavorite = (bookId, e) => {
+    if (e) e.stopPropagation();
+    const isFav = favorites.includes(bookId);
+    const updated = isFav ? favorites.filter((id) => id !== bookId) : [...favorites, bookId];
+    setFavorites(updated);
+    try {
+      localStorage.setItem('library_favs', JSON.stringify(updated));
+    } catch (e) {}
+    showToast(isFav ? 'Removido dos favoritos' : 'Adicionado aos favoritos!');
+  };
 
-  const folderStructure = [
-    {
-      dir: 'frontend/',
-      desc: 'Aplicação web Next.js',
-      items: [
-        'pages/ (Páginas e rotas da aplicação)',
-        'components/ (Componentes reutilizáveis e menu/temas)',
-        'styles/ (globals.css com tokens de tema e módulos CSS)',
-        'utils/ (Hooks como useAuth e clientes utilitários)',
-        'public/ (Imagens, ícones SVG e arquivos estáticos)',
-        'Dockerfile & docker-compose.yml (Configuração de contêineres)'
-      ]
-    },
-    {
-      dir: 'backend/',
-      desc: 'API REST Node.js Express',
-      items: [
-        'src/server.js (Inicialização do servidor e middlewares CORS/JSON)',
-        'src/routes/ (Rotas modulares: auth.js, index.js)',
-        'src/middlewares/ (Middleware de proteção por token JWT)',
-        'src/config/ (Configuração de pool MySQL e Cloudinary)',
-        '.env (Configuração de banco, porta e segredo JWT)',
-        'vercel.json (Deploy serverless compatível)'
-      ]
+  // Empréstimo
+  const toggleBorrowStatus = (book) => {
+    const newStatus = book.status === 'Disponível' ? 'Emprestado' : 'Disponível';
+    const updated = books.map((b) => (b.id === book.id ? { ...b, status: newStatus } : b));
+    updateBooks(updated);
+
+    if (selectedBook && selectedBook.id === book.id) {
+      setSelectedBook({ ...selectedBook, status: newStatus });
     }
-  ];
 
-  const apiEndpoints = [
-    { method: 'POST', path: '/auth/register', desc: 'Cadastro de novo usuário com hash de senha', body: '{ email, password, full_name }' },
-    { method: 'POST', path: '/auth/login', desc: 'Autenticação e geração de token JWT', body: '{ email, password }' },
-    { method: 'POST', path: '/auth/reset-password', desc: 'Redefinição segura de senha de usuário', body: '{ email, newPassword, confirmPassword }' },
-    { method: 'GET', path: '/', desc: 'Healthcheck da API (retorna confirmação de funcionamento)', body: 'Nenhum' }
-  ];
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      fetch(`${apiUrl}/books/${book.id}/toggle-status`, { method: 'PATCH' }).catch(() => {});
+    } catch (e) {}
+
+    showToast(
+      newStatus === 'Emprestado'
+        ? `Você pegou "${book.title}" emprestado!`
+        : `"${book.title}" foi devolvido para a estante!`
+    );
+  };
+
+  // 1. INTEGRAÇÃO COM GOOGLE BOOKS API
+  const searchGoogleBooks = useCallback(async (query) => {
+    if (!query.trim()) {
+      setApiBooks([]);
+      return;
+    }
+    setIsApiLoading(true);
+    try {
+      const res = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=16`
+      );
+      const data = await res.json();
+      if (data.items && data.items.length > 0) {
+        const formatted = data.items.map((item, idx) => {
+          const info = item.volumeInfo || {};
+          const categories = info.categories ? info.categories[0] : 'Literatura';
+          const thumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
+          // Substituir http por https no Google Books para evitar mixed content
+          const safeThumbnail = thumbnail.replace(/^http:\/\//i, 'https://');
+
+          return {
+            id: `gb-${item.id || idx}`,
+            title: info.title || 'Título Desconhecido',
+            author: info.authors ? info.authors.join(', ') : 'Autor Desconhecido',
+            genre: categories.split('/')[0].trim(),
+            rating: info.averageRating || 4.5,
+            reviewsCount: info.ratingsCount || 50,
+            synopsis: info.description || 'Sinopse não informada pelo Google Books.',
+            year: info.publishedDate ? parseInt(info.publishedDate.substring(0, 4)) : 2020,
+            pages: info.pageCount || 250,
+            status: 'Disponível',
+            coverImage: safeThumbnail,
+            coverGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
+            accentColor: '#3b82f6',
+            externalLink: info.infoLink || info.previewLink || ''
+          };
+        });
+        setApiBooks(formatted);
+      } else {
+        setApiBooks([]);
+      }
+    } catch (err) {
+      console.error('Erro ao consultar Google Books API:', err);
+      showToast('Erro ao buscar no Google Books');
+    } finally {
+      setIsApiLoading(false);
+    }
+  }, []);
+
+  // 2. INTEGRAÇÃO COM OPEN LIBRARY API
+  const searchOpenLibrary = useCallback(async (query) => {
+    if (!query.trim()) {
+      setApiBooks([]);
+      return;
+    }
+    setIsApiLoading(true);
+    try {
+      const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=16`);
+      const data = await res.json();
+      if (data.docs && data.docs.length > 0) {
+        const formatted = data.docs.map((doc, idx) => {
+          const coverUrl = doc.cover_i
+            ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+            : '';
+          const subject = doc.subject && doc.subject.length > 0 ? doc.subject[0] : 'Geral';
+
+          return {
+            id: `ol-${doc.key || idx}`,
+            title: doc.title || 'Título Desconhecido',
+            author: doc.author_name ? doc.author_name.join(', ') : 'Autor Desconhecido',
+            genre: subject.split(',')[0].trim(),
+            rating: doc.ratings_average ? parseFloat(doc.ratings_average.toFixed(1)) : 4.6,
+            reviewsCount: doc.ratings_count || 120,
+            synopsis:
+              doc.first_sentence && doc.first_sentence.length > 0
+                ? doc.first_sentence[0]
+                : `Obra catalogada na Open Library. Edições disponíveis: ${doc.edition_count || 1}.`,
+            year: doc.first_publish_year || 2000,
+            pages: doc.number_of_pages_median || 280,
+            status: 'Disponível',
+            coverImage: coverUrl,
+            coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+            accentColor: '#10b981',
+            externalLink: doc.key ? `https://openlibrary.org${doc.key}` : ''
+          };
+        });
+        setApiBooks(formatted);
+      } else {
+        setApiBooks([]);
+      }
+    } catch (err) {
+      console.error('Erro ao consultar Open Library API:', err);
+      showToast('Erro ao buscar na Open Library');
+    } finally {
+      setIsApiLoading(false);
+    }
+  }, []);
+
+  // Efeito para disparar busca nas APIs externas com debounce
+  useEffect(() => {
+    if (searchSource === 'local') return;
+
+    if (!searchTerm.trim()) {
+      setApiBooks([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (searchSource === 'google') {
+        searchGoogleBooks(searchTerm);
+      } else if (searchSource === 'openlibrary') {
+        searchOpenLibrary(searchTerm);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, searchSource, searchGoogleBooks, searchOpenLibrary]);
+
+  // Importar livro de API externa para o catálogo local
+  const importBookToLocal = (book) => {
+    const genreGradients = {
+      'Ficção Científica': 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
+      Fantasia: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+      Distopia: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
+      Tecnologia: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
+      Suspense: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
+      Clássicos: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)'
+    };
+
+    const newBook = {
+      ...book,
+      id: Date.now(),
+      status: 'Disponível',
+      coverGradient: genreGradients[book.genre] || 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
+    };
+
+    // Salvar no backend
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      fetch(`${apiUrl}/books`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBook)
+      }).catch(() => {});
+    } catch (e) {}
+
+    updateBooks([newBook, ...books]);
+    showToast(`"${book.title}" importado para seu catálogo com sucesso!`);
+  };
+
+  // Autopreenchimento mágico no formulário
+  const handleAutofillForm = async (e) => {
+    e.preventDefault();
+    if (!autofillQuery.trim()) return;
+
+    setIsAutofilling(true);
+    try {
+      // Tentar no Google Books primeiro
+      const res = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(autofillQuery)}&maxResults=1`
+      );
+      const data = await res.json();
+
+      if (data.items && data.items.length > 0) {
+        const info = data.items[0].volumeInfo || {};
+        const thumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
+        const safeThumbnail = thumbnail.replace(/^http:\/\//i, 'https://');
+
+        setNewBookForm({
+          title: info.title || '',
+          author: info.authors ? info.authors.join(', ') : '',
+          genre: info.categories ? info.categories[0].split('/')[0].trim() : 'Ficção Científica',
+          rating: info.averageRating ? info.averageRating.toString() : '4.8',
+          synopsis: info.description || '',
+          year: info.publishedDate ? info.publishedDate.substring(0, 4) : '2024',
+          pages: info.pageCount ? info.pageCount.toString() : '300',
+          coverImage: safeThumbnail
+        });
+        showToast('Dados do livro preenchidos via Google Books!');
+      } else {
+        showToast('Nenhum resultado encontrado para autopreencher.');
+      }
+    } catch (err) {
+      showToast('Erro ao buscar dados do livro.');
+    } finally {
+      setIsAutofilling(false);
+    }
+  };
+
+  // Criar novo livro manualmente
+  const handleCreateBook = async (e) => {
+    e.preventDefault();
+    if (!newBookForm.title || !newBookForm.author || !newBookForm.synopsis) {
+      alert('Por favor, preencha o título, autor e sinopse.');
+      return;
+    }
+
+    const genreGradients = {
+      'Ficção Científica': 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
+      Fantasia: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+      Distopia: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
+      Tecnologia: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
+      Suspense: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
+      Clássicos: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)',
+      Romance: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #881337 100%)'
+    };
+
+    const newBook = {
+      id: Date.now(),
+      title: newBookForm.title,
+      author: newBookForm.author,
+      genre: newBookForm.genre,
+      rating: parseFloat(newBookForm.rating) || 5.0,
+      reviewsCount: 1,
+      synopsis: newBookForm.synopsis,
+      year: parseInt(newBookForm.year) || new Date().getFullYear(),
+      pages: parseInt(newBookForm.pages) || 280,
+      status: 'Disponível',
+      coverImage: newBookForm.coverImage || '',
+      coverGradient:
+        genreGradients[newBookForm.genre] || 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+      accentColor: '#8b5cf6'
+    };
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      fetch(`${apiUrl}/books`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBook)
+      }).catch(() => {});
+    } catch (e) {}
+
+    updateBooks([newBook, ...books]);
+    setIsAddModalOpen(false);
+    setNewBookForm({
+      title: '',
+      author: '',
+      genre: 'Ficção Científica',
+      rating: '5.0',
+      synopsis: '',
+      year: '2024',
+      pages: '300',
+      coverImage: ''
+    });
+    setAutofillQuery('');
+    showToast(`Livro "${newBook.title}" cadastrado com sucesso!`);
+  };
+
+  // Lista de Gêneros
+  const genresList = useMemo(() => {
+    const set = new Set(books.map((b) => b.genre));
+    return ['Todos', ...Array.from(set)];
+  }, [books]);
+
+  // Filtragem e Ordenação Local
+  const filteredLocalBooks = useMemo(() => {
+    return books
+      .filter((book) => {
+        const matchesGenre =
+          selectedGenre === 'Todos' || book.genre.toLowerCase() === selectedGenre.toLowerCase();
+        const q = searchTerm.toLowerCase();
+        const matchesSearch =
+          book.title.toLowerCase().includes(q) ||
+          book.author.toLowerCase().includes(q) ||
+          book.synopsis.toLowerCase().includes(q);
+        return matchesGenre && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'rating') return b.rating - a.rating;
+        if (sortBy === 'title') return a.title.localeCompare(b.title);
+        if (sortBy === 'year') return b.year - a.year;
+        return 0;
+      });
+  }, [books, selectedGenre, searchTerm, sortBy]);
+
+  // Livros a serem exibidos (Local ou API)
+  const displayedBooks = searchSource === 'local' ? filteredLocalBooks : apiBooks;
+
+  // Estatísticas
+  const stats = useMemo(() => {
+    const total = books.length;
+    const available = books.filter((b) => b.status === 'Disponível').length;
+    const avgRating =
+      total > 0 ? (books.reduce((acc, b) => acc + b.rating, 0) / total).toFixed(1) : '5.0';
+    const genresCount = new Set(books.map((b) => b.genre)).size;
+    return { total, available, avgRating, genresCount };
+  }, [books]);
+
+  // Renderizar estrelas
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Star
+          key={i}
+          size={14}
+          className={i <= fullStars ? styles.starFilled : styles.starEmpty}
+        />
+      );
+    }
+    return stars;
+  };
 
   return (
     <div className={styles.pageWrapper}>
       <Head>
-        <title>Modelo Base • Boilerplate Fullstack</title>
+        <title>Biblioteca Virtual • Catálogo, Avaliações & APIs</title>
         <meta
           name="description"
-          content="Projeto base fullstack moderno configurado com Next.js, Node.js Express, Autenticação JWT, Dark Mode e Docker."
+          content="Biblioteca virtual completa integrada ao Google Books e Open Library com avaliações, gêneros literários e sinopses."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      {/* Top Navigation */}
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={styles.toast}>
+          <CheckCircle2 size={18} className={styles.toastIcon} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
       <header className={styles.header}>
         <div className={styles.container}>
           <div className={styles.headerContent}>
+            {/* Logo */}
             <div className={styles.logoGroup}>
               <div className={styles.logoBadge}>
-                <Layers size={22} className={styles.logoIcon} />
+                <Library size={24} className={styles.logoIcon} />
               </div>
               <div className={styles.logoTitleBlock}>
-                <span className={styles.logoTitle}>MODELO BASE</span>
-                <span className={styles.logoSubtitle}>Boilerplate Fullstack</span>
+                <span className={styles.logoTitle}>BIBLIOTECA VIRTUAL</span>
+                <span className={styles.logoSubtitle}>Catálogo & Avaliações</span>
               </div>
             </div>
 
-            <nav className={styles.navMenu}>
-              <a href="#overview" className={styles.navLink}>Visão Geral</a>
-              <a href="#stack" className={styles.navLink}>Stack & Recursos</a>
-              <a href="#arquitetura" className={styles.navLink}>Arquitetura</a>
-              <a href="#quickstart" className={styles.navLink}>Começar</a>
-            </nav>
+            {/* Quick Stats */}
+            <div className={styles.headerStats}>
+              <div className={styles.statMini}>
+                <span className={styles.statMiniValue}>{stats.total}</span>
+                <span className={styles.statMiniLabel}>Livros</span>
+              </div>
+              <div className={styles.statDividerMini}></div>
+              <div className={styles.statMini}>
+                <span className={styles.statMiniValue}>{stats.available}</span>
+                <span className={styles.statMiniLabel}>Disponíveis</span>
+              </div>
+              <div className={styles.statDividerMini}></div>
+              <div className={styles.statMini}>
+                <span className={styles.statMiniValue}>★ {stats.avgRating}</span>
+                <span className={styles.statMiniLabel}>Média</span>
+              </div>
+            </div>
 
+            {/* Header Actions */}
             <div className={styles.headerActions}>
+              <button
+                className={styles.btnAddBook}
+                onClick={() => setIsAddModalOpen(true)}
+                id="btn-add-book"
+              >
+                <Plus size={16} />
+                <span>Adicionar Livro</span>
+              </button>
               <div className={styles.themeToggleWrapper}>
                 <ThemeToggle />
               </div>
-              <a
-                href="#quickstart"
-                className={styles.ctaButtonHeader}
-                id="header-start-btn"
-              >
-                <span>Usar Modelo</span>
-                <ChevronRight size={16} />
-              </a>
             </div>
           </div>
         </div>
@@ -159,345 +636,675 @@ export default function Home() {
 
       <main>
         {/* Hero Section */}
-        <section id="overview" className={styles.heroSection}>
+        <section className={styles.heroSection}>
           <div className={styles.heroGlow}></div>
           <div className={styles.container}>
             <div className={styles.heroBadge}>
-              <span className={styles.pulseDot}></span>
-              <span>Estrutura Base Pronta para o Seu Projeto</span>
+              <Sparkles size={14} />
+              <span>Explore Milhares de Histórias</span>
             </div>
-
             <h1 className={styles.heroTitle}>
-              Base sólida para criar seu{' '}
-              <span className={styles.gradientText}>novo projeto fullstack</span>
+              Descubra seu próximo livro com{' '}
+              <span className={styles.gradientText}>avaliações e sinopses</span>
             </h1>
-
             <p className={styles.heroDescription}>
-              Todas as configurações essenciais, arquitetura limpa, dependências prontas, autenticação JWT, sistema de temas (Light & Dark) e Docker configurados para você começar a programar imediatamente.
+              Navegue pelo catálogo local ou pesquise diretamente no <strong>Google Books</strong> e na <strong>Open Library</strong> com capas reais e resumos detalhados.
             </p>
 
-            {/* Quick Action Chips */}
-            <div className={styles.heroActions}>
-              <a href="#quickstart" className={styles.btnPrimary} id="hero-quickstart-btn">
-                <span>Instruções de Inicialização</span>
-                <ArrowUpRight size={18} />
-              </a>
-              <a href="#arquitetura" className={styles.btnSecondary} id="hero-architecture-btn">
-                <span>Explorar Arquitetura</span>
-                <FolderGit2 size={18} />
-              </a>
-            </div>
+            {/* Selector Tabs: Catálogo Local vs Google Books vs Open Library */}
+            <div className={styles.sourceTabsWrapper}>
+              <div className={styles.sourceTabs}>
+                <button
+                  className={`${styles.sourceTabBtn} ${
+                    searchSource === 'local' ? styles.sourceTabActive : ''
+                  }`}
+                  onClick={() => setSearchSource('local')}
+                >
+                  <BookOpen size={16} />
+                  <span>Minha Biblioteca</span>
+                  <span className={styles.sourceTabBadge}>{books.length}</span>
+                </button>
 
-            {/* System Status Banner */}
-            <div className={styles.statusCard}>
-              <div className={styles.statusItem}>
-                <span className={styles.statusLabel}>Backend Status</span>
-                <div className={styles.statusValue}>
-                  <span
-                    className={`${styles.indicatorDot} ${
-                      apiStatus === 'online'
-                        ? styles.dotOnline
-                        : apiStatus === 'offline'
-                        ? styles.dotOffline
-                        : styles.dotChecking
-                    }`}
-                  ></span>
-                  <span>
-                    {apiStatus === 'online'
-                      ? 'Online (Porta 5000)'
-                      : apiStatus === 'offline'
-                      ? 'Aguardando inicialização (npm run dev no backend)'
-                      : 'Verificando conexão...'}
-                  </span>
-                </div>
-              </div>
+                <button
+                  className={`${styles.sourceTabBtn} ${
+                    searchSource === 'google' ? styles.sourceTabActive : ''
+                  }`}
+                  onClick={() => setSearchSource('google')}
+                >
+                  <Globe size={16} />
+                  <span>Google Books API</span>
+                </button>
 
-              <div className={styles.statusDivider}></div>
-
-              <div className={styles.statusItem}>
-                <span className={styles.statusLabel}>Frontend Framework</span>
-                <div className={styles.statusValue}>
-                  <span className={styles.techTag}>Next.js 15.1</span>
-                  <span className={styles.techTag}>React 19</span>
-                </div>
-              </div>
-
-              <div className={styles.statusDivider}></div>
-
-              <div className={styles.statusItem}>
-                <span className={styles.statusLabel}>Autenticação</span>
-                <div className={styles.statusValue}>
-                  <ShieldCheck size={18} className={styles.shieldIcon} />
-                  <span>JWT + Bcrypt configurados</span>
-                </div>
+                <button
+                  className={`${styles.sourceTabBtn} ${
+                    searchSource === 'openlibrary' ? styles.sourceTabActive : ''
+                  }`}
+                  onClick={() => setSearchSource('openlibrary')}
+                >
+                  <Library size={16} />
+                  <span>Open Library API</span>
+                </button>
               </div>
             </div>
+
+            {/* Search & Sort Bar */}
+            <div className={styles.searchBarContainer}>
+              <div className={styles.searchInputWrapper}>
+                <Search size={20} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder={
+                    searchSource === 'local'
+                      ? 'Pesquisar na biblioteca por título, autor ou tema...'
+                      : searchSource === 'google'
+                      ? 'Buscar qualquer livro no Google Books (Ex: Harry Potter, Stephen King)...'
+                      : 'Buscar qualquer livro na Open Library (Ex: Tolkien, Orwell, Machado)...'
+                  }
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                  id="search-input"
+                />
+                {searchTerm && (
+                  <button
+                    className={styles.clearSearchBtn}
+                    onClick={() => setSearchTerm('')}
+                    title="Limpar busca"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              {searchSource === 'local' && (
+                <div className={styles.sortSelectWrapper}>
+                  <ArrowUpDown size={16} className={styles.sortIcon} />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className={styles.sortSelect}
+                    id="sort-select"
+                  >
+                    <option value="rating">Melhor Avaliados</option>
+                    <option value="title">Título (A-Z)</option>
+                    <option value="year">Ano de Lançamento</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Genre Pills (somente no catálogo local) */}
+            {searchSource === 'local' && (
+              <div className={styles.genreFiltersContainer}>
+                <span className={styles.genreFilterLabel}>
+                  <Filter size={14} />
+                  Gêneros:
+                </span>
+                <div className={styles.genrePillsList}>
+                  {genresList.map((genre) => (
+                    <button
+                      key={genre}
+                      className={`${styles.genrePill} ${
+                        selectedGenre === genre ? styles.genrePillActive : ''
+                      }`}
+                      onClick={() => setSelectedGenre(genre)}
+                    >
+                      <span>{genre}</span>
+                      <span className={styles.genrePillCount}>
+                        {genre === 'Todos'
+                          ? books.length
+                          : books.filter((b) => b.genre.toLowerCase() === genre.toLowerCase()).length}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Stack Highlights Section */}
-        <section id="stack" className={styles.section}>
+        {/* Books Grid Section */}
+        <section className={styles.booksSection}>
           <div className={styles.container}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionBadge}>TECNOLOGIAS INCLUÍDAS</span>
-              <h2 className={styles.sectionTitle}>Tudo o que você precisa já configurado</h2>
-              <p className={styles.sectionSubtitle}>
-                Economize horas de setup inicial com as dependências e integrações já prontas para uso.
-              </p>
+            <div className={styles.sectionHeaderRow}>
+              <div>
+                <h2 className={styles.sectionTitle}>
+                  {searchSource === 'local'
+                    ? selectedGenre === 'Todos'
+                      ? 'Todos os Livros do Catálogo'
+                      : `Gênero: ${selectedGenre}`
+                    : searchSource === 'google'
+                    ? 'Resultados do Google Books API'
+                    : 'Resultados da Open Library API'}
+                </h2>
+                <p className={styles.sectionSubtitle}>
+                  {searchSource === 'local'
+                    ? `Exibindo ${displayedBooks.length} obras cadastradas`
+                    : `Pesquisa online em tempo real via ${
+                        searchSource === 'google' ? 'Google Books' : 'Open Library'
+                      }`}
+                </p>
+              </div>
             </div>
 
-            <div className={styles.stackGrid}>
-              {/* Frontend Card */}
-              <div className={styles.stackCard}>
-                <div className={styles.stackCardHeader}>
-                  <div className={styles.stackIconWrapper}>
-                    <Code2 size={24} className={styles.stackHeaderIcon} />
-                  </div>
-                  <div>
-                    <h3 className={styles.stackCardTitle}>Frontend (Next.js)</h3>
-                    <p className={styles.stackCardSubtitle}>Interface moderna, rápida e responsiva</p>
-                  </div>
+            {/* Loading state para APIs externas */}
+            {isApiLoading ? (
+              <div className={styles.loadingState}>
+                <div className={styles.loadingSpinner}></div>
+                <h3 className={styles.emptyTitle}>Buscando livros na API...</h3>
+                <p className={styles.emptyDesc}>Conectando aos servidores e carregando capas e sinopses.</p>
+              </div>
+            ) : displayedBooks.length === 0 ? (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIconBox}>
+                  <BookOpen size={36} />
                 </div>
+                <h3 className={styles.emptyTitle}>
+                  {searchSource !== 'local' && !searchTerm
+                    ? 'Digite algo para pesquisar na API'
+                    : 'Nenhum livro encontrado'}
+                </h3>
+                <p className={styles.emptyDesc}>
+                  {searchSource !== 'local' && !searchTerm
+                    ? 'Use a barra de busca acima para pesquisar qualquer livro publicado no mundo.'
+                    : 'Tente alterar os termos da sua busca ou selecionar outro gênero literário.'}
+                </p>
+                {searchSource === 'local' && (
+                  <button
+                    className={styles.btnResetSearch}
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedGenre('Todos');
+                    }}
+                  >
+                    Limpar Filtros
+                  </button>
+                )}
+              </div>
+            ) : (
+              /* GRID DE CARDS DOS LIVROS */
+              <div className={styles.booksGrid}>
+                {displayedBooks.map((book) => {
+                  const isFav = favorites.includes(book.id);
+                  const isExternal = searchSource !== 'local';
 
-                <div className={styles.stackItemsList}>
-                  {stackFrontend.map((item, idx) => {
-                    const Icon = item.icon;
-                    return (
-                      <div key={idx} className={styles.stackFeatureItem}>
-                        <div className={styles.featureIconBox}>
-                          <Icon size={16} />
-                        </div>
-                        <div>
-                          <h4 className={styles.featureItemTitle}>{item.name}</h4>
-                          <p className={styles.featureItemDesc}>{item.desc}</p>
-                        </div>
+                  return (
+                    <article
+                      key={book.id}
+                      className={styles.bookCard}
+                      onClick={() => setSelectedBook(book)}
+                    >
+                      {/* Top: Capa do Livro estilizada ou imagem real */}
+                      <div className={styles.coverWrapper}>
+                        {book.coverImage ? (
+                          <div className={styles.bookCover}>
+                            <img
+                              src={book.coverImage}
+                              alt={book.title}
+                              className={styles.bookCoverImage}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                            <div className={styles.coverImageOverlay}>
+                              <div className={styles.coverHeader}>
+                                <BookOpen size={20} className={styles.coverBookIcon} />
+                                <span className={styles.coverYearBadge}>{book.year}</span>
+                              </div>
+                              <div className={styles.coverFooter}>
+                                <span className={styles.coverPages}>{book.pages} págs</span>
+                                <span
+                                  className={`${styles.statusBadge} ${
+                                    book.status === 'Disponível'
+                                      ? styles.statusAvailable
+                                      : styles.statusBorrowed
+                                  }`}
+                                >
+                                  {book.status}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            className={styles.bookCover}
+                            style={{ background: book.coverGradient }}
+                          >
+                            <div className={styles.coverPattern}></div>
+                            <div className={styles.coverSpine}></div>
+
+                            <div className={styles.coverHeader}>
+                              <BookOpen size={22} className={styles.coverBookIcon} />
+                              <span className={styles.coverYearBadge}>{book.year}</span>
+                            </div>
+
+                            <div className={styles.coverTitleBlock}>
+                              <h3 className={styles.coverTitle}>{book.title}</h3>
+                              <p className={styles.coverAuthor}>{book.author}</p>
+                            </div>
+
+                            <div className={styles.coverFooter}>
+                              <span className={styles.coverPages}>{book.pages} págs</span>
+                              <span
+                                className={`${styles.statusBadge} ${
+                                  book.status === 'Disponível'
+                                    ? styles.statusAvailable
+                                    : styles.statusBorrowed
+                                }`}
+                              >
+                                {book.status}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Botão Favoritar no card */}
+                        {!isExternal && (
+                          <button
+                            className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
+                            onClick={(e) => toggleFavorite(book.id, e)}
+                            title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                          >
+                            <Heart size={16} fill={isFav ? '#ef4444' : 'none'} />
+                          </button>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Backend Card */}
-              <div className={styles.stackCard}>
-                <div className={styles.stackCardHeader}>
-                  <div className={styles.stackIconWrapper}>
-                    <Server size={24} className={styles.stackHeaderIcon} />
-                  </div>
-                  <div>
-                    <h3 className={styles.stackCardTitle}>Backend (Node.js & Express)</h3>
-                    <p className={styles.stackCardSubtitle}>API REST segura e escalável</p>
-                  </div>
-                </div>
-
-                <div className={styles.stackItemsList}>
-                  {stackBackend.map((item, idx) => {
-                    const Icon = item.icon;
-                    return (
-                      <div key={idx} className={styles.stackFeatureItem}>
-                        <div className={styles.featureIconBox}>
-                          <Icon size={16} />
-                        </div>
-                        <div>
-                          <h4 className={styles.featureItemTitle}>{item.name}</h4>
-                          <p className={styles.featureItemDesc}>{item.desc}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Architecture & Interactive Explorer */}
-        <section id="arquitetura" className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionBadge}>ESTRUTURA DO CÓDIGO</span>
-              <h2 className={styles.sectionTitle}>Organização do Projeto</h2>
-              <p className={styles.sectionSubtitle}>
-                Navegue pelas pastas e rotas disponíveis para entender como o projeto está estruturado.
-              </p>
-            </div>
-
-            <div className={styles.explorerContainer}>
-              {/* Tab Navigation */}
-              <div className={styles.explorerTabs}>
-                <button
-                  className={`${styles.explorerTabBtn} ${activeTab === 'structure' ? styles.tabActive : ''}`}
-                  onClick={() => setActiveTab('structure')}
-                  id="tab-structure"
-                >
-                  <FolderGit2 size={18} />
-                  <span>Estrutura de Pastas</span>
-                </button>
-                <button
-                  className={`${styles.explorerTabBtn} ${activeTab === 'api' ? styles.tabActive : ''}`}
-                  onClick={() => setActiveTab('api')}
-                  id="tab-api"
-                >
-                  <Server size={18} />
-                  <span>Rotas da API Prontas</span>
-                </button>
-                <button
-                  className={`${styles.explorerTabBtn} ${activeTab === 'interactive' ? styles.tabActive : ''}`}
-                  onClick={() => setActiveTab('interactive')}
-                  id="tab-interactive"
-                >
-                  <Sparkles size={18} />
-                  <span>Teste Interativo de UI</span>
-                </button>
-              </div>
-
-              {/* Tab Content */}
-              <div className={styles.tabContentArea}>
-                {activeTab === 'structure' && (
-                  <div className={styles.foldersGrid}>
-                    {folderStructure.map((folder, idx) => (
-                      <div key={idx} className={styles.folderCard}>
-                        <div className={styles.folderCardHeader}>
-                          <FolderGit2 size={20} className={styles.folderIcon} />
-                          <div>
-                            <span className={styles.folderName}>{folder.dir}</span>
-                            <span className={styles.folderDesc}>{folder.desc}</span>
+                      {/* Conteúdo do Card */}
+                      <div className={styles.bookCardBody}>
+                        {/* 1. Nome do Livro e Autor */}
+                        <div className={styles.bookInfoTop}>
+                          <h3 className={styles.bookTitle} title={book.title}>
+                            {book.title}
+                          </h3>
+                          <div className={styles.bookAuthorRow}>
+                            <User size={13} className={styles.authorIcon} />
+                            <span className={styles.bookAuthor}>{book.author}</span>
                           </div>
                         </div>
-                        <ul className={styles.folderItems}>
-                          {folder.items.map((item, itemIdx) => (
-                            <li key={itemIdx} className={styles.folderItemLi}>
-                              <FileCode size={14} className={styles.fileIcon} />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
 
-                {activeTab === 'api' && (
-                  <div className={styles.apiEndpointsList}>
-                    <div className={styles.apiNotice}>
-                      <span>As rotas de autenticação abaixo estão implementadas em <code>backend/src/routes/auth.js</code>:</span>
-                    </div>
-                    {apiEndpoints.map((ep, idx) => (
-                      <div key={idx} className={styles.endpointCard}>
-                        <div className={styles.endpointTop}>
-                          <span className={styles.httpBadge}>{ep.method}</span>
-                          <code className={styles.endpointPath}>{ep.path}</code>
-                          <span className={styles.endpointDesc}>{ep.desc}</span>
+                        {/* 2. NA PARTE DE BAIXO: O GÊNERO DO LIVRO */}
+                        <div className={styles.genreSection}>
+                          <span className={styles.genreBadge}>
+                            <Bookmark size={12} className={styles.genreIcon} />
+                            {book.genre}
+                          </span>
                         </div>
-                        <div className={styles.endpointBottom}>
-                          <span className={styles.bodyLabel}>Payload aceito:</span>
-                          <code className={styles.bodyCode}>{ep.body}</code>
+
+                        {/* 3. LOGO ABAIXO: A AVALIAÇÃO DO LIVRO */}
+                        <div className={styles.ratingSection}>
+                          <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
+                          <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
+                          <span className={styles.reviewsCount}>
+                            ({book.reviewsCount.toLocaleString('pt-BR')} avaliações)
+                          </span>
+                        </div>
+
+                        {/* 4. LOGO ABAIXO: O RESUMO DA SINOPSE DO LIVRO */}
+                        <div className={styles.synopsisSection}>
+                          <p className={styles.synopsisText}>{book.synopsis}</p>
+                        </div>
+
+                        {/* Ações do Card */}
+                        <div className={styles.cardActions}>
+                          {isExternal ? (
+                            <button
+                              className={styles.btnImportBook}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                importBookToLocal(book);
+                              }}
+                            >
+                              <Download size={14} />
+                              <span>Adicionar à Biblioteca</span>
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                className={styles.btnCardDetails}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedBook(book);
+                                }}
+                              >
+                                <span>Ver Detalhes</span>
+                                <ChevronRight size={14} />
+                              </button>
+                              <button
+                                className={`${styles.btnCardBorrow} ${
+                                  book.status === 'Disponível'
+                                    ? styles.btnBorrow
+                                    : styles.btnReturn
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleBorrowStatus(book);
+                                }}
+                              >
+                                {book.status === 'Disponível' ? 'Emprestar' : 'Devolver'}
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-
-                {activeTab === 'interactive' && (
-                  <div className={styles.interactiveBox}>
-                    <div className={styles.interactiveCard}>
-                      <h4 className={styles.interactiveTitle}>Validação de Estado e React Hooks</h4>
-                      <p className={styles.interactiveDesc}>
-                        Este componente simples testa a reatividade, os tokens CSS do tema ativo e a integridade do ambiente Next.js.
-                      </p>
-
-                      <div className={styles.counterControl}>
-                        <button
-                          className={styles.counterBtn}
-                          onClick={() => setCounter(Math.max(0, counter - 1))}
-                        >
-                          -
-                        </button>
-                        <div className={styles.counterDisplay}>
-                          <span className={styles.counterValue}>{counter}</span>
-                          <span className={styles.counterLabel}>cliques</span>
-                        </div>
-                        <button
-                          className={styles.counterBtn}
-                          onClick={() => setCounter(counter + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <div className={styles.interactiveNote}>
-                        <CheckCircle2 size={16} className={styles.checkIcon} />
-                        <span>Reatividade do React 19 funcionando perfeitamente</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    </article>
+                  );
+                })}
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Quickstart Guide */}
-        <section id="quickstart" className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionBadge}>INÍCIO RÁPIDO</span>
-              <h2 className={styles.sectionTitle}>Como executar seu novo projeto</h2>
-              <p className={styles.sectionSubtitle}>
-                Execute o projeto localmente com os comandos abaixo no seu terminal.
-              </p>
-            </div>
-
-            <div className={styles.stepsGrid}>
-              <div className={styles.stepCard}>
-                <div className={styles.stepNumber}>01</div>
-                <h3 className={styles.stepTitle}>Configurar Variáveis</h3>
-                <p className={styles.stepDesc}>
-                  Abra <code>backend/.env</code> e configure suas credenciais de banco e segredo JWT. No frontend, verifique <code>frontend/.env</code>.
-                </p>
-                <div className={styles.codeSnippetBox}>
-                  <code>JWT_SECRET=sua_chave_aqui</code>
-                </div>
-              </div>
-
-              <div className={styles.stepCard}>
-                <div className={styles.stepNumber}>02</div>
-                <h3 className={styles.stepTitle}>Iniciar o Backend</h3>
-                <p className={styles.stepDesc}>
-                  Acesse a pasta do backend e inicie o servidor com nodemon ou node.
-                </p>
-                <div className={styles.commandBox}>
-                  <code>cd backend && npm run dev</code>
-                  <button
-                    className={styles.copyBtn}
-                    onClick={() => handleCopy('cd backend && npm run dev', 'cmd-back')}
-                    title="Copiar comando"
-                  >
-                    {copiedCommand === 'cmd-back' ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.stepCard}>
-                <div className={styles.stepNumber}>03</div>
-                <h3 className={styles.stepTitle}>Iniciar o Frontend</h3>
-                <p className={styles.stepDesc}>
-                  Acesse a pasta do frontend e suba o servidor Next.js em modo de desenvolvimento.
-                </p>
-                <div className={styles.commandBox}>
-                  <code>cd frontend && npm run dev</code>
-                  <button
-                    className={styles.copyBtn}
-                    onClick={() => handleCopy('cd frontend && npm run dev', 'cmd-front')}
-                    title="Copiar comando"
-                  >
-                    {copiedCommand === 'cmd-front' ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </section>
       </main>
+
+      {/* MODAL DE DETALHES DO LIVRO */}
+      {selectedBook && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedBook(null)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.modalCloseBtn}
+              onClick={() => setSelectedBook(null)}
+              title="Fechar"
+            >
+              <X size={20} />
+            </button>
+
+            <div className={styles.modalGrid}>
+              {/* Capa */}
+              <div
+                className={styles.modalCover}
+                style={{
+                  background: selectedBook.coverImage
+                    ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url(${selectedBook.coverImage}) center/cover no-repeat`
+                    : selectedBook.coverGradient
+                }}
+              >
+                <div className={styles.coverPattern}></div>
+                <BookOpen size={44} className={styles.coverBookIcon} />
+                <h3 className={styles.modalCoverTitle}>{selectedBook.title}</h3>
+                <p className={styles.modalCoverAuthor}>{selectedBook.author}</p>
+                <span className={styles.modalCoverYear}>{selectedBook.year}</span>
+              </div>
+
+              {/* Detalhes */}
+              <div className={styles.modalDetails}>
+                <div className={styles.modalGenreRow}>
+                  <span className={styles.genreBadge}>
+                    <Bookmark size={13} className={styles.genreIcon} />
+                    {selectedBook.genre}
+                  </span>
+                  <span
+                    className={`${styles.statusBadge} ${
+                      selectedBook.status === 'Disponível'
+                        ? styles.statusAvailable
+                        : styles.statusBorrowed
+                    }`}
+                  >
+                    {selectedBook.status}
+                  </span>
+                </div>
+
+                <h2 className={styles.modalTitle}>{selectedBook.title}</h2>
+                <div className={styles.modalAuthorRow}>
+                  <User size={16} />
+                  <span>Por {selectedBook.author}</span>
+                </div>
+
+                {/* Avaliação */}
+                <div className={styles.modalRatingRow}>
+                  <div className={styles.modalStarsBox}>{renderStars(selectedBook.rating)}</div>
+                  <span className={styles.modalRatingScore}>
+                    {selectedBook.rating.toFixed(1)} de 5.0
+                  </span>
+                  <span className={styles.reviewsCount}>
+                    • {selectedBook.reviewsCount.toLocaleString('pt-BR')} avaliações
+                  </span>
+                </div>
+
+                {/* Metadados */}
+                <div className={styles.modalMetaGrid}>
+                  <div className={styles.modalMetaItem}>
+                    <Calendar size={18} />
+                    <div>
+                      <span className={styles.metaLabel}>Publicação</span>
+                      <span className={styles.metaValue}>{selectedBook.year}</span>
+                    </div>
+                  </div>
+                  <div className={styles.modalMetaItem}>
+                    <FileText size={18} />
+                    <div>
+                      <span className={styles.metaLabel}>Extensão</span>
+                      <span className={styles.metaValue}>{selectedBook.pages} páginas</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sinopse Completa */}
+                <div className={styles.modalSynopsisBox}>
+                  <h4 className={styles.synopsisHeaderTitle}>Resumo da Sinopse:</h4>
+                  <p className={styles.modalSynopsisParagraph}>{selectedBook.synopsis}</p>
+                </div>
+
+                {/* Ações */}
+                <div className={styles.modalActions}>
+                  {typeof selectedBook.id === 'string' && selectedBook.id.startsWith('gb-') ||
+                  (typeof selectedBook.id === 'string' && selectedBook.id.startsWith('ol-')) ? (
+                    <button
+                      className={styles.btnModalBorrow}
+                      onClick={() => {
+                        importBookToLocal(selectedBook);
+                        setSelectedBook(null);
+                      }}
+                    >
+                      <Download size={18} />
+                      <span>Salvar na Minha Biblioteca</span>
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className={`${styles.btnModalPrimary} ${
+                          selectedBook.status === 'Disponível'
+                            ? styles.btnModalBorrow
+                            : styles.btnModalReturn
+                        }`}
+                        onClick={() => toggleBorrowStatus(selectedBook)}
+                      >
+                        <BookOpen size={18} />
+                        <span>
+                          {selectedBook.status === 'Disponível'
+                            ? 'Pegar Livro Emprestado'
+                            : 'Devolver à Biblioteca'}
+                        </span>
+                      </button>
+                      <button
+                        className={`${styles.btnModalFav} ${
+                          favorites.includes(selectedBook.id) ? styles.btnModalFavActive : ''
+                        }`}
+                        onClick={(e) => toggleFavorite(selectedBook.id, e)}
+                      >
+                        <Heart
+                          size={18}
+                          fill={favorites.includes(selectedBook.id) ? '#ef4444' : 'none'}
+                        />
+                        <span>
+                          {favorites.includes(selectedBook.id) ? 'Favoritado' : 'Favoritar'}
+                        </span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CADASTRAR NOVO LIVRO COM AUTOFILL DE API */}
+      {isAddModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsAddModalOpen(false)}>
+          <div className={styles.modalCardSmall} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.formHeader}>
+              <div className={styles.formHeaderTitleGroup}>
+                <div className={styles.formIconBox}>
+                  <Plus size={20} />
+                </div>
+                <div>
+                  <h3 className={styles.formTitle}>Cadastrar Novo Livro</h3>
+                  <p className={styles.formSubtitle}>Adicione uma obra à biblioteca virtual</p>
+                </div>
+              </div>
+              <button
+                className={styles.modalCloseBtn}
+                onClick={() => setIsAddModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Barra de Autopreenchimento Inteligente via Google Books API */}
+            <div className={styles.apiAutofillBox}>
+              <span className={styles.apiAutofillTitle}>
+                <Wand2 size={14} />
+                Autopreencher via Google Books API
+              </span>
+              <div className={styles.apiAutofillRow}>
+                <input
+                  type="text"
+                  placeholder="Digite o título do livro (Ex: Harry Potter e a Pedra Filosofal)..."
+                  value={autofillQuery}
+                  onChange={(e) => setAutofillQuery(e.target.value)}
+                  className={styles.apiAutofillInput}
+                />
+                <button
+                  type="button"
+                  onClick={handleAutofillForm}
+                  className={styles.btnAutofill}
+                  disabled={isAutofilling}
+                >
+                  {isAutofilling ? <Loader2 size={14} className={styles.loadingSpinner} /> : <Wand2 size={14} />}
+                  <span>{isAutofilling ? 'Buscando...' : 'Preencher'}</span>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateBook} className={styles.addBookForm}>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Título do Livro *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: O Nome do Vento"
+                  value={newBookForm.title}
+                  onChange={(e) => setNewBookForm({ ...newBookForm, title: e.target.value })}
+                  className={styles.formInput}
+                />
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Autor(a) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Patrick Rothfuss"
+                    value={newBookForm.author}
+                    onChange={(e) => setNewBookForm({ ...newBookForm, author: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Gênero Literário *</label>
+                  <select
+                    value={newBookForm.genre}
+                    onChange={(e) => setNewBookForm({ ...newBookForm, genre: e.target.value })}
+                    className={styles.formSelect}
+                  >
+                    <option value="Ficção Científica">Ficção Científica</option>
+                    <option value="Fantasia">Fantasia</option>
+                    <option value="Distopia">Distopia</option>
+                    <option value="Tecnologia">Tecnologia</option>
+                    <option value="Suspense">Suspense</option>
+                    <option value="Clássicos">Clássicos</option>
+                    <option value="Romance">Romance</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Avaliação (0 a 5)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="5"
+                    value={newBookForm.rating}
+                    onChange={(e) => setNewBookForm({ ...newBookForm, rating: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Ano de Lançamento</label>
+                  <input
+                    type="number"
+                    value={newBookForm.year}
+                    onChange={(e) => setNewBookForm({ ...newBookForm, year: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Páginas</label>
+                  <input
+                    type="number"
+                    value={newBookForm.pages}
+                    onChange={(e) => setNewBookForm({ ...newBookForm, pages: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>URL da Imagem da Capa (Opcional)</label>
+                <input
+                  type="url"
+                  placeholder="https://exemplo.com/capa.jpg"
+                  value={newBookForm.coverImage}
+                  onChange={(e) => setNewBookForm({ ...newBookForm, coverImage: e.target.value })}
+                  className={styles.formInput}
+                />
+              </div>
+
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Resumo da Sinopse *</label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Escreva um breve resumo da história e premissa do livro..."
+                  value={newBookForm.synopsis}
+                  onChange={(e) => setNewBookForm({ ...newBookForm, synopsis: e.target.value })}
+                  className={styles.formTextarea}
+                ></textarea>
+              </div>
+
+              <div className={styles.formFooterActions}>
+                <button
+                  type="button"
+                  className={styles.btnFormCancel}
+                  onClick={() => setIsAddModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.btnFormSubmit}>
+                  Cadastrar Obra
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className={styles.footer}>
@@ -506,33 +1313,32 @@ export default function Home() {
             <div className={styles.footerBrand}>
               <div className={styles.logoGroup}>
                 <div className={styles.logoBadgeSmall}>
-                  <Layers size={18} />
+                  <Library size={18} />
                 </div>
-                <span className={styles.footerLogoTitle}>MODELO BASE</span>
+                <span className={styles.footerLogoTitle}>BIBLIOTECA VIRTUAL</span>
               </div>
               <p className={styles.footerDesc}>
-                Template de projeto limpo, modular e configurado para criação ágil de novas aplicações web.
+                Sistema moderno de catalogação literária integrado com as APIs do Google Books e Open Library. Desenvolvido com Next.js, Express e design premium.
               </p>
             </div>
 
             <div className={styles.footerLinks}>
-              <span className={styles.footerGroupTitle}>Atalhos</span>
-              <a href="#overview">Visão Geral</a>
-              <a href="#stack">Stack</a>
-              <a href="#arquitetura">Arquitetura</a>
-              <a href="#quickstart">Como Executar</a>
+              <span className={styles.footerGroupTitle}>APIs Integradas</span>
+              <span>Google Books API v1</span>
+              <span>Open Library Search & Covers API</span>
+              <span>Backend REST Express API</span>
             </div>
 
             <div className={styles.footerLinks}>
-              <span className={styles.footerGroupTitle}>Ambiente</span>
-              <span>Next.js 15.1</span>
-              <span>Node.js / Express</span>
-              <span>Docker Ready</span>
+              <span className={styles.footerGroupTitle}>Estatísticas</span>
+              <span>{stats.total} Obras Catalogadas</span>
+              <span>{stats.genresCount} Categorias Ativas</span>
+              <span>Média: ★ {stats.avgRating}</span>
             </div>
           </div>
 
           <div className={styles.footerBottom}>
-            <p>&copy; {new Date().getFullYear()} Modelo Base • Boilerplate Fullstack. Pronto para desenvolvimento.</p>
+            <p>&copy; {new Date().getFullYear()} Biblioteca Virtual • Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
