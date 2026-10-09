@@ -1,4 +1,4 @@
-/* ===== BIBLIOTECA VIRTUAL - PALETA VERDE CLARO & BRANCA COM MODO ESCURO NEON ===== */
+/* ===== BIBLIOTECA VIRTUAL - PALETA VERDE CLARO & BRANCA COM MODO ESCURO SUAVE & NEON ===== */
 
 .pageWrapper {
   min-height: 100vh;
@@ -39,10 +39,10 @@
 }
 
 :global([data-theme="dark"]) .toast {
-  background: #0d1a14;
+  background: #182520;
   color: #00ff88;
-  border: 1px solid #00ff88;
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5), inset 0 0 8px rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.4), inset 0 0 8px rgba(0, 255, 136, 0.15);
 }
 
 .toastIcon {
@@ -67,15 +67,15 @@
   z-index: 90;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.92);
   border-bottom: 1.5px solid rgba(16, 185, 129, 0.18);
   transition: all 0.3s ease;
 }
 
 :global([data-theme="dark"]) .header {
-  background-color: rgba(9, 14, 12, 0.88);
-  border-bottom: 1px solid rgba(0, 255, 136, 0.35);
-  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.08);
+  background-color: rgba(18, 26, 22, 0.92);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .headerContent {
@@ -106,10 +106,10 @@
 }
 
 :global([data-theme="dark"]) .logoBadge {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5), inset 0 0 10px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.15);
 }
 
 .logoBadgeSmall {
@@ -124,10 +124,10 @@
 }
 
 :global([data-theme="dark"]) .logoBadgeSmall {
-  background: #112019;
-  border: 1px solid #00ff88;
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.5);
   color: #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .logoIcon {
@@ -147,7 +147,7 @@
 }
 
 :global([data-theme="dark"]) .logoTitle {
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  color: #f1f5f9;
 }
 
 .logoSubtitle {
@@ -160,7 +160,6 @@
 
 :global([data-theme="dark"]) .logoSubtitle {
   color: #00ff88;
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
 }
 
 /* Header Quick Stats */
@@ -175,9 +174,9 @@
 }
 
 :global([data-theme="dark"]) .headerStats {
-  background: rgba(0, 255, 136, 0.05);
-  border: 1px solid rgba(0, 255, 136, 0.3);
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.12);
+  background: #18241f;
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.08);
 }
 
 @media (min-width: 900px) {
@@ -201,7 +200,6 @@
 
 :global([data-theme="dark"]) .statMiniValue {
   color: #00ff88;
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
 }
 
 .statMiniLabel {
@@ -218,7 +216,7 @@
 }
 
 :global([data-theme="dark"]) .statDividerMini {
-  background: rgba(0, 255, 136, 0.3);
+  background: rgba(0, 255, 136, 0.2);
 }
 
 /* Header Actions */
@@ -259,15 +257,15 @@
 }
 
 :global([data-theme="dark"]) .btnLogin {
-  background: rgba(0, 255, 136, 0.06);
-  border: 1.5px solid rgba(0, 255, 136, 0.4);
-  color: #f8fafc;
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.3);
+  color: #f1f5f9;
 }
 
 :global([data-theme="dark"]) .btnLogin:hover {
   border-color: #00ff88;
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
 }
 
 .btnSignup {
@@ -293,16 +291,16 @@
 }
 
 :global([data-theme="dark"]) .btnSignup {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
 }
 
 :global([data-theme="dark"]) .btnSignup:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 25px rgba(0, 255, 136, 0.7);
+  color: #121a16;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
 }
 
 /* User Logged In Group */
@@ -323,9 +321,8 @@
 }
 
 :global([data-theme="dark"]) .userBadge {
-  background: rgba(0, 255, 136, 0.06);
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.15);
+  background: #18241f;
+  border: 1px solid rgba(0, 255, 136, 0.25);
 }
 
 .userAvatar {
@@ -343,8 +340,8 @@
 
 :global([data-theme="dark"]) .userAvatar {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+  color: #121a16;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
 }
 
 .userName {
@@ -399,16 +396,16 @@
 }
 
 :global([data-theme="dark"]) .btnAddBook {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.5);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
 }
 
 :global([data-theme="dark"]) .btnAddBook:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 25px rgba(0, 255, 136, 0.7);
+  color: #121a16;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
 }
 
 .themeToggleWrapper {
@@ -442,7 +439,7 @@
 }
 
 :global([data-theme="dark"]) .heroGlow {
-  background: radial-gradient(circle, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.03) 60%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.12) 0%, transparent 70%);
   filter: blur(60px);
 }
 
@@ -461,10 +458,10 @@
 }
 
 :global([data-theme="dark"]) .heroBadge {
-  background: rgba(0, 255, 136, 0.08);
-  border: 1px solid #00ff88;
+  background: #182520;
+  border: 1px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
 }
 
 .heroTitle {
@@ -492,7 +489,6 @@
   background: linear-gradient(135deg, #00ff88 0%, #34d399 50%, #6ee7b7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
 }
 
 .heroDescription {
@@ -523,9 +519,9 @@
 }
 
 :global([data-theme="dark"]) .sourceTabs {
-  background: #0f1814;
-  border: 1px solid rgba(0, 255, 136, 0.4);
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+  background: #16221d;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .sourceTabBtn {
@@ -558,10 +554,10 @@
 }
 
 :global([data-theme="dark"]) .sourceTabActive {
-  background: #14241d !important;
+  background: #1f3028 !important;
   color: #00ff88 !important;
-  border: 1px solid #00ff88;
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+  border: 1px solid rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
 }
 
 .sourceTabBadge {
@@ -573,7 +569,7 @@
 }
 
 :global([data-theme="dark"]) .sourceTabBadge {
-  background: rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.15);
   color: #00ff88;
 }
 
@@ -627,9 +623,9 @@
 }
 
 :global([data-theme="dark"]) .searchInput {
-  background: #0f1814;
-  border: 1.5px solid rgba(0, 255, 136, 0.4);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.12);
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .searchInput:focus {
@@ -640,7 +636,7 @@
 
 :global([data-theme="dark"]) .searchInput:focus {
   border-color: #00ff88;
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.3), 0 0 25px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.25), 0 0 15px rgba(0, 255, 136, 0.3);
 }
 
 .clearSearchBtn {
@@ -665,12 +661,12 @@
 }
 
 :global([data-theme="dark"]) .clearSearchBtn {
-  background: rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.15);
   color: #00ff88;
 }
 
 :global([data-theme="dark"]) .clearSearchBtn:hover {
-  background: rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.3);
 }
 
 .sortSelectWrapper {
@@ -705,9 +701,9 @@
 }
 
 :global([data-theme="dark"]) .sortSelect {
-  background: #0f1814;
-  border: 1.5px solid rgba(0, 255, 136, 0.4);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.12);
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .sortSelect:focus {
@@ -717,7 +713,7 @@
 
 :global([data-theme="dark"]) .sortSelect:focus {
   border-color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
 }
 
 /* Genre Pills */
@@ -769,13 +765,13 @@
 }
 
 :global([data-theme="dark"]) .genrePill {
-  background: rgba(0, 255, 136, 0.06);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  background: #18241f;
+  border: 1px solid rgba(0, 255, 136, 0.25);
 }
 
 :global([data-theme="dark"]) .genrePill:hover {
   border-color: #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.25);
 }
 
 .genrePillActive {
@@ -786,10 +782,10 @@
 }
 
 :global([data-theme="dark"]) .genrePillActive {
-  background: #112019 !important;
-  border: 1.5px solid #00ff88 !important;
+  background: #1f3028 !important;
+  border: 1.5px solid rgba(0, 255, 136, 0.7) !important;
   color: #00ff88 !important;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5) !important;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.35) !important;
 }
 
 .genrePillCount {
@@ -806,7 +802,7 @@
 }
 
 :global([data-theme="dark"]) .genrePillActive .genrePillCount {
-  background: rgba(0, 255, 136, 0.25);
+  background: rgba(0, 255, 136, 0.2);
   color: #00ff88;
 }
 
@@ -825,7 +821,7 @@
 }
 
 :global([data-theme="dark"]) .sectionHeaderRow {
-  border-bottom: 1px solid rgba(0, 255, 136, 0.25);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 .sectionTitle {
@@ -854,9 +850,8 @@
 
 :global([data-theme="dark"]) .loadingState,
 :global([data-theme="dark"]) .emptyState {
-  background: rgba(0, 255, 136, 0.03);
-  border: 1.5px dashed rgba(0, 255, 136, 0.35);
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+  background: #18241f;
+  border: 1.5px dashed rgba(0, 255, 136, 0.3);
 }
 
 .loadingSpinner {
@@ -872,7 +867,6 @@
 :global([data-theme="dark"]) .loadingSpinner {
   border-color: rgba(0, 255, 136, 0.2);
   border-top-color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
 }
 
 @keyframes spin {
@@ -892,10 +886,10 @@
 }
 
 :global([data-theme="dark"]) .emptyIconBox {
-  background: rgba(0, 255, 136, 0.1);
+  background: #1c2b24;
   color: #00ff88;
-  border: 1px solid #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
 }
 
 .emptyTitle {
@@ -930,10 +924,10 @@
 }
 
 :global([data-theme="dark"]) .btnResetSearch {
-  background: #112019;
-  border: 1px solid #00ff88;
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
 }
 
 /* ===== BOOKS GRID ===== */
@@ -964,9 +958,9 @@
 }
 
 :global([data-theme="dark"]) .bookCard {
-  background: #0f1814;
-  border: 1.5px solid rgba(0, 255, 136, 0.35);
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.12), 0 4px 18px rgba(0, 0, 0, 0.5);
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.25);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
 }
 
 .bookCard:hover {
@@ -977,7 +971,7 @@
 
 :global([data-theme="dark"]) .bookCard:hover {
   border-color: #00ff88;
-  box-shadow: 0 0 25px rgba(0, 255, 136, 0.55), 0 0 50px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Cover Section */
@@ -986,7 +980,7 @@
   width: 100%;
   height: 220px;
   overflow: hidden;
-  background: #0d1512;
+  background: #141f1a;
 }
 
 .bookCover {
@@ -1123,10 +1117,9 @@
 }
 
 :global([data-theme="dark"]) .statusAvailable {
-  background: #112019;
+  background: #1f332a;
   color: #00ff88;
-  border: 1px solid #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+  border: 1px solid rgba(0, 255, 136, 0.6);
 }
 
 .statusBorrowed {
@@ -1135,10 +1128,9 @@
 }
 
 :global([data-theme="dark"]) .statusBorrowed {
-  background: #251805;
+  background: #332410;
   color: #fbbf24;
-  border: 1px solid #f59e0b;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.6);
 }
 
 .favBtn {
@@ -1161,8 +1153,8 @@
 }
 
 :global([data-theme="dark"]) .favBtn {
-  background: rgba(15, 24, 20, 0.9);
-  border: 1px solid rgba(0, 255, 136, 0.4);
+  background: rgba(24, 36, 31, 0.9);
+  border: 1px solid rgba(0, 255, 136, 0.35);
   color: #94a3b8;
 }
 
@@ -1174,7 +1166,7 @@
 
 :global([data-theme="dark"]) .favBtn:hover {
   border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
 }
 
 .favBtnActive {
@@ -1183,9 +1175,9 @@
 }
 
 :global([data-theme="dark"]) .favBtnActive {
-  background: rgba(15, 24, 20, 0.95) !important;
+  background: rgba(24, 36, 31, 0.95) !important;
   border-color: #ef4444 !important;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
 }
 
 /* ===== BOOK CARD BODY ===== */
@@ -1248,10 +1240,9 @@
 }
 
 :global([data-theme="dark"]) .genreBadge {
-  background: rgba(0, 255, 136, 0.08);
+  background: #1c2b24;
   color: #00ff88;
-  border: 1px solid rgba(0, 255, 136, 0.4);
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.35);
 }
 
 .genreIcon {
@@ -1271,8 +1262,8 @@
 }
 
 :global([data-theme="dark"]) .ratingSection {
-  background: rgba(245, 158, 11, 0.05);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: #252014;
+  border-color: rgba(245, 158, 11, 0.25);
 }
 
 .starsWrapper {
@@ -1291,7 +1282,7 @@
 }
 
 :global([data-theme="dark"]) .starEmpty {
-  color: #374151;
+  color: #4b5563;
 }
 
 .ratingNumber {
@@ -1335,7 +1326,7 @@
 }
 
 :global([data-theme="dark"]) .cardActions {
-  border-top: 1px solid rgba(0, 255, 136, 0.2);
+  border-top: 1px solid rgba(0, 255, 136, 0.15);
 }
 
 .btnCardDetails {
@@ -1361,14 +1352,14 @@
 }
 
 :global([data-theme="dark"]) .btnCardDetails {
-  background: rgba(0, 255, 136, 0.06);
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.3);
   color: #00ff88;
 }
 
 :global([data-theme="dark"]) .btnCardDetails:hover {
   border-color: #00ff88;
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .btnCardBorrow {
@@ -1391,15 +1382,15 @@
 }
 
 :global([data-theme="dark"]) .btnBorrow {
-  background: #112019;
-  border: 1px solid #00ff88;
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
 }
 
 :global([data-theme="dark"]) .btnBorrow:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+  color: #121a16;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
 }
 
 .btnReturn {
@@ -1412,8 +1403,8 @@
 }
 
 :global([data-theme="dark"]) .btnReturn {
-  background: #251805;
-  border: 1px solid #f59e0b;
+  background: #332410;
+  border: 1px solid rgba(245, 158, 11, 0.6);
   color: #fbbf24;
 }
 
@@ -1440,23 +1431,23 @@
 }
 
 :global([data-theme="dark"]) .btnImportBook {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
 }
 
 :global([data-theme="dark"]) .btnImportBook:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 25px rgba(0, 255, 136, 0.7);
+  color: #121a16;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
 }
 
 /* ===== MODAL ===== */
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
@@ -1485,9 +1476,9 @@
 }
 
 :global([data-theme="dark"]) .modalCard {
-  background: #0f1814;
-  border: 1.5px solid #00ff88;
-  box-shadow: 0 0 35px rgba(0, 255, 136, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.25), 0 25px 50px -12px rgba(0, 0, 0, 0.8);
 }
 
 .modalCardSmall {
@@ -1505,9 +1496,9 @@
 }
 
 :global([data-theme="dark"]) .modalCardSmall {
-  background: #0f1814;
-  border: 1.5px solid #00ff88;
-  box-shadow: 0 0 30px rgba(0, 255, 136, 0.35);
+  background: #18241f;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.25);
 }
 
 @keyframes scaleUp {
@@ -1534,7 +1525,7 @@
 }
 
 :global([data-theme="dark"]) .modalCloseBtn {
-  background: rgba(0, 255, 136, 0.1);
+  background: #23352c;
   border: 1px solid rgba(0, 255, 136, 0.3);
   color: #00ff88;
 }
@@ -1632,6 +1623,11 @@
   flex-wrap: wrap;
 }
 
+:global([data-theme="dark"]) .modalRatingRow {
+  background: #252014;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
 .modalStarsBox {
   display: flex;
   gap: 3px;
@@ -1666,8 +1662,8 @@
 }
 
 :global([data-theme="dark"]) .modalMetaItem {
-  background: rgba(0, 255, 136, 0.05);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.25);
   color: #00ff88;
 }
 
@@ -1695,8 +1691,8 @@
 }
 
 :global([data-theme="dark"]) .modalSynopsisBox {
-  background: rgba(0, 255, 136, 0.04);
-  border: 1px solid rgba(0, 255, 136, 0.25);
+  background: #14201b;
+  border: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 .synopsisHeaderTitle {
@@ -1740,16 +1736,16 @@
 }
 
 :global([data-theme="dark"]) .btnModalBorrow {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.7);
   color: #00ff88;
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.45);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
 }
 
 :global([data-theme="dark"]) .btnModalBorrow:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 30px rgba(0, 255, 136, 0.7);
+  color: #121a16;
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
 }
 
 .btnModalReturn {
@@ -1774,8 +1770,8 @@
 }
 
 :global([data-theme="dark"]) .btnModalFav {
-  background: rgba(0, 255, 136, 0.06);
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .btnModalFavActive {
@@ -1795,7 +1791,7 @@
 }
 
 :global([data-theme="dark"]) .formHeader {
-  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.25);
 }
 
 .formHeaderTitleGroup {
@@ -1816,10 +1812,10 @@
 }
 
 :global([data-theme="dark"]) .formIconBox {
-  background: rgba(0, 255, 136, 0.1);
-  border: 1px solid #00ff88;
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
 }
 
 .formTitle {
@@ -1873,8 +1869,8 @@
 :global([data-theme="dark"]) .formInput,
 :global([data-theme="dark"]) .formSelect,
 :global([data-theme="dark"]) .formTextarea {
-  background: #121c17;
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  background: #141f1a;
+  border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .formInput:focus,
@@ -1889,7 +1885,7 @@
 :global([data-theme="dark"]) .formSelect:focus,
 :global([data-theme="dark"]) .formTextarea:focus {
   border-color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .formFooterActions {
@@ -1902,7 +1898,7 @@
 }
 
 :global([data-theme="dark"]) .formFooterActions {
-  border-top: 1px solid rgba(0, 255, 136, 0.25);
+  border-top: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 .btnFormCancel {
@@ -1930,16 +1926,16 @@
 }
 
 :global([data-theme="dark"]) .btnFormSubmit {
-  background: #112019;
-  border: 1.5px solid #00ff88;
+  background: #1c2b24;
+  border: 1.5px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
 }
 
 :global([data-theme="dark"]) .btnFormSubmit:hover {
   background: #00ff88;
-  color: #090e0c;
-  box-shadow: 0 0 25px rgba(0, 255, 136, 0.7);
+  color: #121a16;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
 }
 
 /* API Autocomplete Bar inside Modal */
@@ -1952,8 +1948,8 @@
 }
 
 :global([data-theme="dark"]) .apiAutofillBox {
-  background: rgba(0, 255, 136, 0.05);
-  border: 1px dashed rgba(0, 255, 136, 0.45);
+  background: #141f1a;
+  border: 1px dashed rgba(0, 255, 136, 0.35);
 }
 
 .apiAutofillTitle {
@@ -1986,8 +1982,8 @@
 }
 
 :global([data-theme="dark"]) .apiAutofillInput {
-  background: #121c17;
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  background: #18241f;
+  border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .btnAutofill {
@@ -2006,10 +2002,10 @@
 }
 
 :global([data-theme="dark"]) .btnAutofill {
-  background: #112019;
-  border: 1px solid #00ff88;
+  background: #1c2b24;
+  border: 1px solid rgba(0, 255, 136, 0.6);
   color: #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
 }
 
 /* ===== FOOTER ===== */
@@ -2021,9 +2017,8 @@
 }
 
 :global([data-theme="dark"]) .footer {
-  background: #090e0c;
-  border-top: 1px solid rgba(0, 255, 136, 0.3);
-  box-shadow: 0 -4px 20px rgba(0, 255, 136, 0.05);
+  background: #0f1613;
+  border-top: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 .footerContent {
@@ -2053,7 +2048,6 @@
 
 :global([data-theme="dark"]) .footerLogoTitle {
   color: #00ff88;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
 }
 
 .footerDesc {
@@ -2091,5 +2085,5 @@
 }
 
 :global([data-theme="dark"]) .footerBottom {
-  border-top: 1px solid rgba(0, 255, 136, 0.2);
+  border-top: 1px solid rgba(0, 255, 136, 0.15);
 }

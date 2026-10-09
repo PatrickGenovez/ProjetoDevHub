@@ -42,41 +42,41 @@
   --shadow-neon: 0 0 15px rgba(16, 185, 129, 0.35);
 }
 
-/* Variáveis CSS para modo escuro (Dark com Contornos Neon) */
+/* Variáveis CSS para modo escuro (Preto Suave & Confortável com Contorno Neon Elegante) */
 [data-theme="dark"] {
-  /* Cores Primárias Neon */
+  /* Cores Primárias Neon Suavizadas */
   --color-primary: #00ff88;
-  --color-primary-hover: #10b981;
+  --color-primary-hover: #34d399;
   --color-primary-light: #6ee7b7;
   --color-primary-gradient-start: #00ff88;
-  --color-primary-gradient-end: #059669;
+  --color-primary-gradient-end: #10b981;
   --color-neon-accent: #00ff88;
   
-  /* Cores de Fundo (Obsidiana / Grafite Escuro com Subtom Verde) */
-  --color-bg-primary: #090e0c;
-  --color-bg-secondary: #0f1814;
-  --color-bg-tertiary: #14241d;
+  /* Cores de Fundo Suaves (Charcoal/Grafite Suave Aconchegante) */
+  --color-bg-primary: #121a16;
+  --color-bg-secondary: #18231e;
+  --color-bg-tertiary: #1f2e27;
   
   /* Cores de Texto */
-  --color-text-primary: #F8FAFC;
+  --color-text-primary: #F1F5F9;
   --color-text-secondary: #94A3B8;
   --color-text-muted: #64748B;
   
   /* Campos de Formulário */
-  --color-form-bg: #121c17;
-  --color-form-border: rgba(0, 255, 136, 0.4);
+  --color-form-bg: #1a2721;
+  --color-form-border: rgba(0, 255, 136, 0.3);
   
   /* Botões */
   --color-button-normal: #00ff88;
   --color-button-hover: #10b981;
   --color-button-pressed: #059669;
   
-  /* Sombras Neon */
-  --shadow-sm: 0 0 8px rgba(0, 255, 136, 0.2);
-  --shadow-md: 0 0 18px rgba(0, 255, 136, 0.25);
-  --shadow-lg: 0 0 30px rgba(0, 255, 136, 0.35);
-  --shadow-xl: 0 0 45px rgba(0, 255, 136, 0.45);
-  --shadow-neon: 0 0 20px rgba(0, 255, 136, 0.5), inset 0 0 10px rgba(0, 255, 136, 0.15);
+  /* Sombras Neon Suaves */
+  --shadow-sm: 0 0 8px rgba(0, 255, 136, 0.15);
+  --shadow-md: 0 0 16px rgba(0, 255, 136, 0.2);
+  --shadow-lg: 0 0 25px rgba(0, 255, 136, 0.28);
+  --shadow-xl: 0 0 35px rgba(0, 255, 136, 0.35);
+  --shadow-neon: 0 0 15px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
 }
 
 /* ===== RESET E ESTILOS BASE ===== */
@@ -115,8 +115,8 @@ body {
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 136, 0.4);
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  background: rgba(0, 255, 136, 0.35);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
