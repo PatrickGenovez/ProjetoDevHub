@@ -177,7 +177,7 @@ router.post('/', (req, res) => {
 });
 
 // Alternar status de empréstimo
-router.patch('/:id/toggle-status', (req, res) => {
+router.patch('/:id/toggle-status'1, (req, res) => {
   const { id } = req.params;
   const bookIndex = books.findIndex(b => b.id === parseInt(id));
 
