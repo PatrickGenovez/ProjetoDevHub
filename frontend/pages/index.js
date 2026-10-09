@@ -25,12 +25,22 @@ import {
   Loader2,
   LogIn,
   LogOut,
-  UserPlus
+  UserPlus,
+  BookMarked,
+  Layers,
+  ArrowRight,
+  Shield,
+  Zap,
+  Users,
+  Compass,
+  Quote,
+  Clock,
+  Award
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
 
-// Catálogo inicial padrão
+// Catálogo inicial padrão da biblioteca
 const DEFAULT_BOOKS = [
   {
     id: 1,
@@ -44,8 +54,8 @@ const DEFAULT_BOOKS = [
     pages: 680,
     status: 'Disponível',
     coverImage: 'https://books.google.com/books/content?id=B1hSGwAACAAJ&printsec=frontcover&img=1&zoom=1',
-    coverGradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)',
-    accentColor: '#f59e0b'
+    coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+    accentColor: '#10b981'
   },
   {
     id: 2,
@@ -59,8 +69,8 @@ const DEFAULT_BOOKS = [
     pages: 576,
     status: 'Disponível',
     coverImage: 'https://covers.openlibrary.org/b/id/14547565-M.jpg',
-    coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
-    accentColor: '#10b981'
+    coverGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #065f46 100%)',
+    accentColor: '#34d399'
   },
   {
     id: 3,
@@ -74,8 +84,8 @@ const DEFAULT_BOOKS = [
     pages: 336,
     status: 'Disponível',
     coverImage: 'https://covers.openlibrary.org/b/id/7222246-M.jpg',
-    coverGradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
-    accentColor: '#ef4444'
+    coverGradient: 'linear-gradient(135deg, #059669 0%, #047857 50%, #022c22 100%)',
+    accentColor: '#059669'
   },
   {
     id: 4,
@@ -84,13 +94,13 @@ const DEFAULT_BOOKS = [
     genre: 'Tecnologia',
     rating: 4.7,
     reviewsCount: 980,
-    synopsis: 'Um guia fundamental sobre boas práticas de engenharia de software, mostrando como escrever código legível, modular e de fácil manutenção através de princípios de refatoração, nomes significativos e testes.',
+    synopsis: 'Um guia fundamental sobre boas práticas de engenharia de software, mostrando como escrever código legível, modular e de fácil manutenção através de princípios de refatoração, nomes significativos e testes automatizados.',
     year: 2008,
     pages: 464,
     status: 'Disponível',
     coverImage: '',
-    coverGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
-    accentColor: '#3b82f6'
+    coverGradient: 'linear-gradient(135deg, #10b981 0%, #047857 50%, #064e3b 100%)',
+    accentColor: '#10b981'
   },
   {
     id: 5,
@@ -119,8 +129,8 @@ const DEFAULT_BOOKS = [
     pages: 320,
     status: 'Disponível',
     coverImage: '',
-    coverGradient: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
-    accentColor: '#8b5cf6'
+    coverGradient: 'linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%)',
+    accentColor: '#059669'
   },
   {
     id: 7,
@@ -134,8 +144,8 @@ const DEFAULT_BOOKS = [
     pages: 368,
     status: 'Disponível',
     coverImage: '',
-    coverGradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
-    accentColor: '#ec4899'
+    coverGradient: 'linear-gradient(135deg, #047857 0%, #065f46 50%, #022c22 100%)',
+    accentColor: '#047857'
   },
   {
     id: 8,
@@ -149,8 +159,8 @@ const DEFAULT_BOOKS = [
     pages: 96,
     status: 'Disponível',
     coverImage: 'https://covers.openlibrary.org/b/id/10574187-M.jpg',
-    coverGradient: 'linear-gradient(135deg, #6366f1 0%, #4338ca 50%, #1e1b4b 100%)',
-    accentColor: '#6366f1'
+    coverGradient: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #065f46 100%)',
+    accentColor: '#10b981'
   }
 ];
 
@@ -184,7 +194,7 @@ export default function BookLibrary() {
     coverImage: ''
   });
 
-  // Carregar catálogo local
+  // Carregar catálogo local e usuário autenticado
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -197,9 +207,7 @@ export default function BookLibrary() {
             return;
           }
         }
-      } catch (err) {
-        // Fallback silencioso
-      }
+      } catch (err) {}
 
       const saved = localStorage.getItem('library_books');
       if (saved) {
@@ -216,7 +224,6 @@ export default function BookLibrary() {
       setFavorites(savedFavs);
     } catch (e) {}
 
-    // Carregar usuário logado se houver
     try {
       const storedUser = localStorage.getItem('userData');
       if (storedUser) {
@@ -232,7 +239,6 @@ export default function BookLibrary() {
     showToast('Você saiu da sua conta.');
   };
 
-  // Salvar no localStorage quando catálogo local mudar
   const updateBooks = (updatedList) => {
     setBooks(updatedList);
     try {
@@ -279,7 +285,7 @@ export default function BookLibrary() {
     );
   };
 
-  // 1. INTEGRAÇÃO COM GOOGLE BOOKS API
+  // 1. INTEGRAÇÃO GOOGLE BOOKS API
   const searchGoogleBooks = useCallback(async (query) => {
     if (!query.trim()) {
       setApiBooks([]);
@@ -296,7 +302,6 @@ export default function BookLibrary() {
           const info = item.volumeInfo || {};
           const categories = info.categories ? info.categories[0] : 'Literatura';
           const thumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
-          // Substituir http por https no Google Books para evitar mixed content
           const safeThumbnail = thumbnail.replace(/^http:\/\//i, 'https://');
 
           return {
@@ -311,8 +316,8 @@ export default function BookLibrary() {
             pages: info.pageCount || 250,
             status: 'Disponível',
             coverImage: safeThumbnail,
-            coverGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
-            accentColor: '#3b82f6',
+            coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+            accentColor: '#10b981',
             externalLink: info.infoLink || info.previewLink || ''
           };
         });
@@ -321,14 +326,13 @@ export default function BookLibrary() {
         setApiBooks([]);
       }
     } catch (err) {
-      console.error('Erro ao consultar Google Books API:', err);
       showToast('Erro ao buscar no Google Books');
     } finally {
       setIsApiLoading(false);
     }
   }, []);
 
-  // 2. INTEGRAÇÃO COM OPEN LIBRARY API
+  // 2. INTEGRAÇÃO OPEN LIBRARY API
   const searchOpenLibrary = useCallback(async (query) => {
     if (!query.trim()) {
       setApiBooks([]);
@@ -360,8 +364,8 @@ export default function BookLibrary() {
             pages: doc.number_of_pages_median || 280,
             status: 'Disponível',
             coverImage: coverUrl,
-            coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
-            accentColor: '#10b981',
+            coverGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #064e3b 100%)',
+            accentColor: '#34d399',
             externalLink: doc.key ? `https://openlibrary.org${doc.key}` : ''
           };
         });
@@ -370,52 +374,32 @@ export default function BookLibrary() {
         setApiBooks([]);
       }
     } catch (err) {
-      console.error('Erro ao consultar Open Library API:', err);
       showToast('Erro ao buscar na Open Library');
     } finally {
       setIsApiLoading(false);
     }
   }, []);
 
-  // Efeito para disparar busca nas APIs externas com debounce
   useEffect(() => {
     if (searchSource === 'local') return;
-
     if (!searchTerm.trim()) {
       setApiBooks([]);
       return;
     }
-
     const timer = setTimeout(() => {
-      if (searchSource === 'google') {
-        searchGoogleBooks(searchTerm);
-      } else if (searchSource === 'openlibrary') {
-        searchOpenLibrary(searchTerm);
-      }
+      if (searchSource === 'google') searchGoogleBooks(searchTerm);
+      else if (searchSource === 'openlibrary') searchOpenLibrary(searchTerm);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [searchTerm, searchSource, searchGoogleBooks, searchOpenLibrary]);
 
-  // Importar livro de API externa para o catálogo local
   const importBookToLocal = (book) => {
-    const genreGradients = {
-      'Ficção Científica': 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
-      Fantasia: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
-      Distopia: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
-      Tecnologia: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
-      Suspense: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
-      Clássicos: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)'
-    };
-
     const newBook = {
       ...book,
       id: Date.now(),
       status: 'Disponível',
-      coverGradient: genreGradients[book.genre] || 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
+      coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
     };
-
-    // Salvar no backend
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       fetch(`${apiUrl}/books`, {
@@ -426,22 +410,18 @@ export default function BookLibrary() {
     } catch (e) {}
 
     updateBooks([newBook, ...books]);
-    showToast(`"${book.title}" importado para seu catálogo com sucesso!`);
+    showToast(`"${book.title}" importado para a biblioteca com sucesso!`);
   };
 
-  // Autopreenchimento mágico no formulário
   const handleAutofillForm = async (e) => {
     e.preventDefault();
     if (!autofillQuery.trim()) return;
-
     setIsAutofilling(true);
     try {
-      // Tentar no Google Books primeiro
       const res = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(autofillQuery)}&maxResults=1`
       );
       const data = await res.json();
-
       if (data.items && data.items.length > 0) {
         const info = data.items[0].volumeInfo || {};
         const thumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
@@ -468,23 +448,12 @@ export default function BookLibrary() {
     }
   };
 
-  // Criar novo livro manualmente
   const handleCreateBook = async (e) => {
     e.preventDefault();
     if (!newBookForm.title || !newBookForm.author || !newBookForm.synopsis) {
       alert('Por favor, preencha o título, autor e sinopse.');
       return;
     }
-
-    const genreGradients = {
-      'Ficção Científica': 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #312e81 100%)',
-      Fantasia: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
-      Distopia: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 50%, #450a0a 100%)',
-      Tecnologia: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #172554 100%)',
-      Suspense: 'linear-gradient(135deg, #ec4899 0%, #be185d 50%, #500724 100%)',
-      Clássicos: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%)',
-      Romance: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #881337 100%)'
-    };
 
     const newBook = {
       id: Date.now(),
@@ -498,9 +467,8 @@ export default function BookLibrary() {
       pages: parseInt(newBookForm.pages) || 280,
       status: 'Disponível',
       coverImage: newBookForm.coverImage || '',
-      coverGradient:
-        genreGradients[newBookForm.genre] || 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-      accentColor: '#8b5cf6'
+      coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      accentColor: '#10b981'
     };
 
     try {
@@ -528,13 +496,11 @@ export default function BookLibrary() {
     showToast(`Livro "${newBook.title}" cadastrado com sucesso!`);
   };
 
-  // Lista de Gêneros
   const genresList = useMemo(() => {
     const set = new Set(books.map((b) => b.genre));
     return ['Todos', ...Array.from(set)];
   }, [books]);
 
-  // Filtragem e Ordenação Local
   const filteredLocalBooks = useMemo(() => {
     return books
       .filter((book) => {
@@ -555,10 +521,8 @@ export default function BookLibrary() {
       });
   }, [books, selectedGenre, searchTerm, sortBy]);
 
-  // Livros a serem exibidos (Local ou API)
   const displayedBooks = searchSource === 'local' ? filteredLocalBooks : apiBooks;
 
-  // Estatísticas
   const stats = useMemo(() => {
     const total = books.length;
     const available = books.filter((b) => b.status === 'Disponível').length;
@@ -568,7 +532,8 @@ export default function BookLibrary() {
     return { total, available, avgRating, genresCount };
   }, [books]);
 
-  // Renderizar estrelas
+  const featuredBook = books[0] || DEFAULT_BOOKS[0];
+
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -584,13 +549,18 @@ export default function BookLibrary() {
     return stars;
   };
 
+  const scrollToCatalog = () => {
+    const el = document.getElementById('catalogo-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Head>
-        <title>Biblioteca Virtual • Catálogo, Avaliações & APIs</title>
+        <title>Biblioteca Virtual • Explore Livros, Avaliações e Sinopses</title>
         <meta
           name="description"
-          content="Biblioteca virtual completa integrada ao Google Books e Open Library com avaliações, gêneros literários e sinopses."
+          content="Sua biblioteca digital inteligente integrada com Google Books e Open Library. Encontre grandes obras, leia resumos e gerencie seus empréstimos."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -618,23 +588,13 @@ export default function BookLibrary() {
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className={styles.headerStats}>
-              <div className={styles.statMini}>
-                <span className={styles.statMiniValue}>{stats.total}</span>
-                <span className={styles.statMiniLabel}>Livros</span>
-              </div>
-              <div className={styles.statDividerMini}></div>
-              <div className={styles.statMini}>
-                <span className={styles.statMiniValue}>{stats.available}</span>
-                <span className={styles.statMiniLabel}>Disponíveis</span>
-              </div>
-              <div className={styles.statDividerMini}></div>
-              <div className={styles.statMini}>
-                <span className={styles.statMiniValue}>★ {stats.avgRating}</span>
-                <span className={styles.statMiniLabel}>Média</span>
-              </div>
-            </div>
+            {/* Menu Nav Links */}
+            <nav className={styles.navLinks}>
+              <a href="#como-funciona" className={styles.navItem}>Como Funciona</a>
+              <a href="#beneficios" className={styles.navItem}>Benefícios</a>
+              <a href="#catalogo-section" className={styles.navItem}>Catálogo</a>
+              <a href="#depoimentos" className={styles.navItem}>Depoimentos</a>
+            </nav>
 
             {/* Header Actions: Log in e Sign up */}
             <div className={styles.headerActions}>
@@ -693,21 +653,254 @@ export default function BookLibrary() {
       </header>
 
       <main>
-        {/* Hero Section */}
+        {/* ===== 1. HERO SECTION (INSTITUCIONAL & IMPACTO) ===== */}
         <section className={styles.heroSection}>
           <div className={styles.heroGlow}></div>
           <div className={styles.container}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={14} />
-              <span>Explore Milhares de Histórias</span>
+            <div className={styles.heroGrid}>
+              {/* Coluna Esquerda: Texto e Chamadas para Ação */}
+              <div className={styles.heroTextCol}>
+                <div className={styles.heroBadge}>
+                  <Sparkles size={15} />
+                  <span>A Sua Biblioteca Digital Inteligente</span>
+                </div>
+
+                <h1 className={styles.heroTitle}>
+                  Descubra, avalie e leia com{' '}
+                  <span className={styles.gradientText}>sinopses completas</span>
+                </h1>
+
+                <p className={styles.heroDescription}>
+                  Acesso ilimitado ao catálogo local e integração em tempo real com milhões de livros do <strong>Google Books</strong> e <strong>Open Library</strong>. Encontre sua próxima grande história com notas e resumos da comunidade.
+                </p>
+
+                <div className={styles.heroCtaGroup}>
+                  <button onClick={scrollToCatalog} className={styles.btnCtaPrimary}>
+                    <Compass size={18} />
+                    <span>Explorar Catálogo</span>
+                  </button>
+                  <Link href="/login?tab=signup" className={styles.btnCtaSecondary}>
+                    <span>Criar Conta Grátis</span>
+                    <ArrowRight size={18} />
+                  </Link>
+                </div>
+
+                {/* Métricas Rápidas */}
+                <div className={styles.heroStatsRow}>
+                  <div className={styles.heroStatItem}>
+                    <span className={styles.heroStatValue}>{stats.total}+</span>
+                    <span className={styles.heroStatLabel}>Obras no Acervo</span>
+                  </div>
+                  <div className={styles.heroStatDivider}></div>
+                  <div className={styles.heroStatItem}>
+                    <span className={styles.heroStatValue}>★ {stats.avgRating}</span>
+                    <span className={styles.heroStatLabel}>Média de Avaliações</span>
+                  </div>
+                  <div className={styles.heroStatDivider}></div>
+                  <div className={styles.heroStatItem}>
+                    <span className={styles.heroStatValue}>2</span>
+                    <span className={styles.heroStatLabel}>APIs Mundiais</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coluna Direita: Card 3D do Livro em Destaque */}
+              <div className={styles.heroCardCol}>
+                <div className={styles.featuredCard} onClick={() => setSelectedBook(featuredBook)}>
+                  <div className={styles.featuredBadgeTop}>
+                    <Award size={14} />
+                    <span>Destaque da Semana</span>
+                  </div>
+
+                  <div className={styles.featuredCoverWrapper}>
+                    {featuredBook.coverImage ? (
+                      <img
+                        src={featuredBook.coverImage}
+                        alt={featuredBook.title}
+                        className={styles.featuredCoverImg}
+                      />
+                    ) : (
+                      <div className={styles.featuredCoverGradient} style={{ background: featuredBook.coverGradient }}>
+                        <BookOpen size={48} />
+                        <h4>{featuredBook.title}</h4>
+                        <p>{featuredBook.author}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.featuredContent}>
+                    <div className={styles.genreBadge}>
+                      <Bookmark size={12} />
+                      {featuredBook.genre}
+                    </div>
+                    <h3 className={styles.featuredTitle}>{featuredBook.title}</h3>
+                    <p className={styles.featuredAuthor}>Por {featuredBook.author}</p>
+
+                    <div className={styles.ratingSection}>
+                      <div className={styles.starsWrapper}>{renderStars(featuredBook.rating)}</div>
+                      <span className={styles.ratingNumber}>{featuredBook.rating.toFixed(1)}</span>
+                      <span className={styles.reviewsCount}>({featuredBook.reviewsCount} avaliações)</span>
+                    </div>
+
+                    <p className={styles.featuredSynopsis}>{featuredBook.synopsis}</p>
+
+                    <div className={styles.featuredBtnRow}>
+                      <span className={styles.btnFeaturedAction}>
+                        <span>Ver Sinopse Completa</span>
+                        <ChevronRight size={16} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h1 className={styles.heroTitle}>
-              Descubra seu próximo livro com{' '}
-              <span className={styles.gradientText}>avaliações e sinopses</span>
-            </h1>
-            <p className={styles.heroDescription}>
-              Navegue pelo catálogo local ou pesquise diretamente no <strong>Google Books</strong> e na <strong>Open Library</strong> com capas reais e resumos detalhados.
-            </p>
+          </div>
+        </section>
+
+        {/* ===== 2. SEÇÃO COMO FUNCIONA ===== */}
+        <section id="como-funciona" className={styles.howItWorksSection}>
+          <div className={styles.container}>
+            <div className={styles.sectionHeadingCenter}>
+              <span className={styles.subHeadingBadge}>Passo a Passo</span>
+              <h2 className={styles.mainSectionTitle}>Como funciona a Biblioteca Virtual</h2>
+              <p className={styles.mainSectionDesc}>
+                Uma experiência fluida e intuitiva pensada para quem ama literatura e praticidade.
+              </p>
+            </div>
+
+            <div className={styles.stepsGrid}>
+              <div className={styles.stepCard}>
+                <div className={styles.stepNumberBadge}>01</div>
+                <div className={styles.stepIconBox}>
+                  <Compass size={24} />
+                </div>
+                <h3 className={styles.stepTitle}>Explore o Acervo</h3>
+                <p className={styles.stepDesc}>
+                  Navegue pelo catálogo local filtrando por gênero literário, ordem alfabética ou melhores avaliações.
+                </p>
+              </div>
+
+              <div className={styles.stepCard}>
+                <div className={styles.stepNumberBadge}>02</div>
+                <div className={styles.stepIconBox}>
+                  <Globe size={24} />
+                </div>
+                <h3 className={styles.stepTitle}>Conecte com APIs</h3>
+                <p className={styles.stepDesc}>
+                  Pesquise ao vivo no Google Books e na Open Library para encontrar capas e sinopses de milhões de obras.
+                </p>
+              </div>
+
+              <div className={styles.stepCard}>
+                <div className={styles.stepNumberBadge}>03</div>
+                <div className={styles.stepIconBox}>
+                  <BookMarked size={24} />
+                </div>
+                <h3 className={styles.stepTitle}>Leia a Sinopse</h3>
+                <p className={styles.stepDesc}>
+                  Confira as notas da comunidade e o resumo antes de iniciar sua próxima jornada de leitura.
+                </p>
+              </div>
+
+              <div className={styles.stepCard}>
+                <div className={styles.stepNumberBadge}>04</div>
+                <div className={styles.stepIconBox}>
+                  <Heart size={24} />
+                </div>
+                <h3 className={styles.stepTitle}>Empreste & Favorite</h3>
+                <p className={styles.stepDesc}>
+                  Controle seus livros favoritos e alterne o status de empréstimo em apenas um clique.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 3. SEÇÃO BENEFÍCIOS ===== */}
+        <section id="beneficios" className={styles.benefitsSection}>
+          <div className={styles.container}>
+            <div className={styles.sectionHeadingCenter}>
+              <span className={styles.subHeadingBadge}>Diferenciais</span>
+              <h2 className={styles.mainSectionTitle}>Por que usar nossa Biblioteca?</h2>
+              <p className={styles.mainSectionDesc}>
+                Tudo o que você precisa para catalogar, descobrir e acompanhar suas leituras.
+              </p>
+            </div>
+
+            <div className={styles.benefitsGrid}>
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Zap size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Google Books & Open Library</h3>
+                <p className={styles.benefitDesc}>
+                  Integração direta com as duas maiores bases bibliográficas do planeta para autopreenchimento e capas reais.
+                </p>
+              </div>
+
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Star size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Avaliações e Notas Reais</h3>
+                <p className={styles.benefitDesc}>
+                  Notas pontuadas com estrelas e contagem de avaliações para você escolher livros consagrados pelo público.
+                </p>
+              </div>
+
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <FileText size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Sinopses em Destaque</h3>
+                <p className={styles.benefitDesc}>
+                  Resumos objetivos nos cards com expansão completa para você conhecer o enredo sem spoilers.
+                </p>
+              </div>
+
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Layers size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Gêneros & Categorias</h3>
+                <p className={styles.benefitDesc}>
+                  Ficção Científica, Fantasia, Distopia, Tecnologia, Suspense e Clássicos organizados em pílulas inteligentes.
+                </p>
+              </div>
+
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Shield size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Gestão de Empréstimos</h3>
+                <p className={styles.benefitDesc}>
+                  Acompanhamento instantâneo de disponibilidade entre "Disponível" e "Emprestado" com notificações em tempo real.
+                </p>
+              </div>
+
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Sparkles size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Design Neon Confortável</h3>
+                <p className={styles.benefitDesc}>
+                  Paleta em verde claro e branco durante o dia e modo escuro aveludado com contornos neon elegantes à noite.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 4. SEÇÃO DO CATÁLOGO DE LIVROS INTEGRADO ===== */}
+        <section id="catalogo-section" className={styles.booksSection}>
+          <div className={styles.container}>
+            <div className={styles.sectionHeadingCenter}>
+              <span className={styles.subHeadingBadge}>Catálogo Interativo</span>
+              <h2 className={styles.mainSectionTitle}>Explore a Estante Virtual</h2>
+              <p className={styles.mainSectionDesc}>
+                Pesquise no acervo interno ou busque online através das APIs integradas.
+              </p>
+            </div>
 
             {/* Selector Tabs: Catálogo Local vs Google Books vs Open Library */}
             <div className={styles.sourceTabsWrapper}>
@@ -791,7 +984,7 @@ export default function BookLibrary() {
               )}
             </div>
 
-            {/* Genre Pills (somente no catálogo local) */}
+            {/* Genre Pills */}
             {searchSource === 'local' && (
               <div className={styles.genreFiltersContainer}>
                 <span className={styles.genreFilterLabel}>
@@ -818,26 +1011,21 @@ export default function BookLibrary() {
                 </div>
               </div>
             )}
-          </div>
-        </section>
 
-        {/* Books Grid Section */}
-        <section className={styles.booksSection}>
-          <div className={styles.container}>
             <div className={styles.sectionHeaderRow}>
               <div>
-                <h2 className={styles.sectionTitle}>
+                <h3 className={styles.sectionTitle}>
                   {searchSource === 'local'
                     ? selectedGenre === 'Todos'
-                      ? 'Todos os Livros do Catálogo'
+                      ? 'Todos os Livros Cadastrados'
                       : `Gênero: ${selectedGenre}`
                     : searchSource === 'google'
                     ? 'Resultados do Google Books API'
                     : 'Resultados da Open Library API'}
-                </h2>
+                </h3>
                 <p className={styles.sectionSubtitle}>
                   {searchSource === 'local'
-                    ? `Exibindo ${displayedBooks.length} obras cadastradas`
+                    ? `Exibindo ${displayedBooks.length} obras no catálogo`
                     : `Pesquisa online em tempo real via ${
                         searchSource === 'google' ? 'Google Books' : 'Open Library'
                       }`}
@@ -856,7 +1044,7 @@ export default function BookLibrary() {
               )}
             </div>
 
-            {/* Loading state para APIs externas */}
+            {/* Loading / Empty State */}
             {isApiLoading ? (
               <div className={styles.loadingState}>
                 <div className={styles.loadingSpinner}></div>
@@ -1064,6 +1252,86 @@ export default function BookLibrary() {
             )}
           </div>
         </section>
+
+        {/* ===== 5. SEÇÃO DEPOIMENTOS DOS LEITORES ===== */}
+        <section id="depoimentos" className={styles.testimonialsSection}>
+          <div className={styles.container}>
+            <div className={styles.sectionHeadingCenter}>
+              <span className={styles.subHeadingBadge}>Comunidade</span>
+              <h2 className={styles.mainSectionTitle}>O que dizem nossos leitores</h2>
+              <p className={styles.mainSectionDesc}>
+                Milhares de pessoas já transformaram seus hábitos de leitura com nossa biblioteca digital.
+              </p>
+            </div>
+
+            <div className={styles.testimonialsGrid}>
+              <div className={styles.testimonialCard}>
+                <Quote size={28} className={styles.testimonialQuoteIcon} />
+                <p className={styles.testimonialText}>
+                  "A biblioteca facilitou muito a escolha do meu próximo livro. As sinopses detalhadas e a integração com o Google Books são fantásticas!"
+                </p>
+                <div className={styles.testimonialAuthorGroup}>
+                  <div className={styles.testimonialAvatar}>M</div>
+                  <div>
+                    <h4 className={styles.testimonialName}>Mariana Costa</h4>
+                    <span className={styles.testimonialRole}>Estudante de Letras</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.testimonialCard}>
+                <Quote size={28} className={styles.testimonialQuoteIcon} />
+                <p className={styles.testimonialText}>
+                  "O modo escuro suave com os contornos neon é perfeito para leituras noturnas. A experiência visual e a rapidez da estante impressionam!"
+                </p>
+                <div className={styles.testimonialAuthorGroup}>
+                  <div className={styles.testimonialAvatar}>L</div>
+                  <div>
+                    <h4 className={styles.testimonialName}>Lucas Silveira</h4>
+                    <span className={styles.testimonialRole}>Desenvolvedor de Software</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.testimonialCard}>
+                <Quote size={28} className={styles.testimonialQuoteIcon} />
+                <p className={styles.testimonialText}>
+                  "O controle de empréstimos e a lista de favoritos me ajudaram a organizar minha meta de ler 30 livros neste ano. Recomendo a todos!"
+                </p>
+                <div className={styles.testimonialAuthorGroup}>
+                  <div className={styles.testimonialAvatar}>C</div>
+                  <div>
+                    <h4 className={styles.testimonialName}>Camila Nogueira</h4>
+                    <span className={styles.testimonialRole}>Professora & Leitora Ávida</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 6. BANNER CTA FINAL ===== */}
+        <section className={styles.ctaBannerSection}>
+          <div className={styles.container}>
+            <div className={styles.ctaBannerCard}>
+              <div className={styles.ctaGlow}></div>
+              <Sparkles size={32} className={styles.ctaIconBadge} />
+              <h2 className={styles.ctaTitle}>Pronto para começar sua próxima leitura?</h2>
+              <p className={styles.ctaDesc}>
+                Crie sua conta em poucos segundos, favorite os melhores livros e explore sinopses de clássicos e novidades do mundo literário.
+              </p>
+              <div className={styles.ctaActions}>
+                <Link href="/login?tab=signup" className={styles.btnCtaBannerPrimary}>
+                  <span>Criar Conta Gratuita</span>
+                  <ArrowRight size={18} />
+                </Link>
+                <button onClick={scrollToCatalog} className={styles.btnCtaBannerSecondary}>
+                  <span>Ver Catálogo</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* MODAL DE DETALHES DO LIVRO */}
@@ -1156,8 +1424,8 @@ export default function BookLibrary() {
 
                 {/* Ações */}
                 <div className={styles.modalActions}>
-                  {typeof selectedBook.id === 'string' && selectedBook.id.startsWith('gb-') ||
-                  (typeof selectedBook.id === 'string' && selectedBook.id.startsWith('ol-')) ? (
+                  {typeof selectedBook.id === 'string' &&
+                  (selectedBook.id.startsWith('gb-') || selectedBook.id.startsWith('ol-')) ? (
                     <button
                       className={styles.btnModalBorrow}
                       onClick={() => {
@@ -1387,15 +1655,23 @@ export default function BookLibrary() {
                 <span className={styles.footerLogoTitle}>BIBLIOTECA VIRTUAL</span>
               </div>
               <p className={styles.footerDesc}>
-                Sistema moderno de catalogação literária integrado com as APIs do Google Books e Open Library. Desenvolvido com Next.js, Express e design premium.
+                Sua plataforma moderna para catalogar obras, ler sinopses detalhadas e explorar o mundo da literatura com suporte ao Google Books e Open Library.
               </p>
+            </div>
+
+            <div className={styles.footerLinks}>
+              <span className={styles.footerGroupTitle}>Navegação</span>
+              <a href="#como-funciona" className={styles.footerLinkItem}>Como Funciona</a>
+              <a href="#beneficios" className={styles.footerLinkItem}>Benefícios</a>
+              <a href="#catalogo-section" className={styles.footerLinkItem}>Estante Virtual</a>
+              <a href="#depoimentos" className={styles.footerLinkItem}>Depoimentos</a>
             </div>
 
             <div className={styles.footerLinks}>
               <span className={styles.footerGroupTitle}>APIs Integradas</span>
               <span>Google Books API v1</span>
-              <span>Open Library Search & Covers API</span>
-              <span>Backend REST Express API</span>
+              <span>Open Library Search API</span>
+              <span>Backend REST Express</span>
             </div>
 
             <div className={styles.footerLinks}>
