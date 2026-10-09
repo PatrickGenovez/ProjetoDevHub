@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Library,
@@ -21,7 +22,10 @@ import {
   Download,
   ExternalLink,
   Wand2,
-  Loader2
+  Loader2,
+  LogIn,
+  LogOut,
+  UserPlus
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
@@ -160,6 +164,7 @@ export default function BookLibrary() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Estados de APIs Externas
   const [apiBooks, setApiBooks] = useState([]);
@@ -210,7 +215,22 @@ export default function BookLibrary() {
       const savedFavs = JSON.parse(localStorage.getItem('library_favs') || '[]');
       setFavorites(savedFavs);
     } catch (e) {}
+
+    // Carregar usuário logado se houver
+    try {
+      const storedUser = localStorage.getItem('userData');
+      if (storedUser) {
+        setCurrentUser(JSON.parse(storedUser));
+      }
+    } catch (e) {}
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    setCurrentUser(null);
+    showToast('Você saiu da sua conta.');
+  };
 
   // Salvar no localStorage quando catálogo local mudar
   const updateBooks = (updatedList) => {
@@ -616,16 +636,54 @@ export default function BookLibrary() {
               </div>
             </div>
 
-            {/* Header Actions */}
+            {/* Header Actions: Log in e Sign up */}
             <div className={styles.headerActions}>
-              <button
-                className={styles.btnAddBook}
-                onClick={() => setIsAddModalOpen(true)}
-                id="btn-add-book"
-              >
-                <Plus size={16} />
-                <span>Adicionar Livro</span>
-              </button>
+              {!currentUser ? (
+                <div className={styles.authButtonGroup}>
+                  <Link href="/login?tab=login" className={styles.btnLogin} id="btn-login">
+                    <LogIn size={15} />
+                    <span>Log in</span>
+                  </Link>
+                  <Link href="/login?tab=signup" className={styles.btnSignup} id="btn-signup">
+                    <UserPlus size={15} />
+                    <span>Sign up</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className={styles.userLoggedGroup}>
+                  <div className={styles.userBadge}>
+                    <div className={styles.userAvatar}>
+                      {currentUser.full_name
+                        ? currentUser.full_name[0].toUpperCase()
+                        : currentUser.email
+                        ? currentUser.email[0].toUpperCase()
+                        : 'U'}
+                    </div>
+                    <span className={styles.userName}>
+                      {currentUser.full_name || currentUser.email}
+                    </span>
+                  </div>
+
+                  <button
+                    className={styles.btnAddBook}
+                    onClick={() => setIsAddModalOpen(true)}
+                    id="btn-add-book"
+                    title="Cadastrar nova obra"
+                  >
+                    <Plus size={15} />
+                    <span>Adicionar Livro</span>
+                  </button>
+
+                  <button
+                    className={styles.btnLogout}
+                    onClick={handleLogout}
+                    title="Sair da conta"
+                  >
+                    <LogOut size={16} />
+                  </button>
+                </div>
+              )}
+
               <div className={styles.themeToggleWrapper}>
                 <ThemeToggle />
               </div>
@@ -785,6 +843,17 @@ export default function BookLibrary() {
                       }`}
                 </p>
               </div>
+
+              {searchSource === 'local' && (
+                <button
+                  className={styles.btnAddBook}
+                  onClick={() => setIsAddModalOpen(true)}
+                  id="btn-add-book-section"
+                >
+                  <Plus size={16} />
+                  <span>Cadastrar Obra</span>
+                </button>
+              )}
             </div>
 
             {/* Loading state para APIs externas */}
