@@ -14,14 +14,16 @@ import {
   AlertCircle,
   Loader2,
   BookOpen,
-  Sparkles
+  Sparkles,
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'signup'
+  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'signup' | 'forgot'
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -41,12 +43,20 @@ export default function LoginPage() {
     confirmPassword: ''
   });
 
+  const [forgotForm, setForgotForm] = useState({
+    email: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
   // Checar query param da URL
   useEffect(() => {
     if (router.query.tab === 'signup') {
       setActiveTab('signup');
     } else if (router.query.tab === 'login') {
       setActiveTab('login');
+    } else if (router.query.tab === 'forgot') {
+      setActiveTab('forgot');
     }
   }, [router.query.tab]);
 
@@ -83,18 +93,23 @@ export default function LoginPage() {
 
       // Salvar dados no localStorage
       localStorage.setItem('token', data.token || 'demo-token');
-      localStorage.setItem('userData', JSON.stringify(data.user || {
-        id: 1,
-        email: loginForm.email,
-        full_name: loginForm.email.split('@')[0]
-      }));
+      localStorage.setItem(
+        'userData',
+        JSON.stringify(
+          data.user || {
+            id: 1,
+            email: loginForm.email,
+            full_name: loginForm.email.split('@')[0]
+          }
+        )
+      );
 
       setSuccessMsg('Login realizado com sucesso! Redirecionando...');
       setTimeout(() => {
         router.push('/');
-      }, 1200);
+      }, 1000);
     } catch (err) {
-      // Fallback amigável de demonstração caso o banco SQL não esteja online
+      // Fallback amigável de demonstração caso o backend ou banco não estejam online
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         const demoUser = {
           id: Date.now(),
@@ -106,7 +121,7 @@ export default function LoginPage() {
         setSuccessMsg('Bem-vindo(a) à Biblioteca! Redirecionando...');
         setTimeout(() => {
           router.push('/');
-        }, 1200);
+        }, 1000);
       } else {
         setErrorMsg(err.message || 'Erro ao fazer login.');
       }
@@ -158,7 +173,6 @@ export default function LoginPage() {
       }, 1500);
     } catch (err) {
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-        // Fallback demo
         const demoUser = {
           id: Date.now(),
           email: signupForm.email,
@@ -169,9 +183,65 @@ export default function LoginPage() {
         setSuccessMsg('Conta criada com sucesso! Redirecionando...');
         setTimeout(() => {
           router.push('/');
-        }, 1200);
+        }, 1000);
       } else {
         setErrorMsg(err.message || 'Erro ao registrar usuário.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Submit Esqueceu a Senha / Redefinir Senha
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (forgotForm.newPassword !== forgotForm.confirmPassword) {
+      setErrorMsg('A confirmação de senha não coincide com a nova senha.');
+      return;
+    }
+
+    if (forgotForm.newPassword.length < 6) {
+      setErrorMsg('A nova senha deve conter no mínimo 6 caracteres.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: forgotForm.email,
+          newPassword: forgotForm.newPassword,
+          confirmPassword: forgotForm.confirmPassword
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao redefinir a senha.');
+      }
+
+      setSuccessMsg(data.message || 'Senha redefinida com sucesso! Você já pode entrar.');
+      setLoginForm({ ...loginForm, email: forgotForm.email });
+      setTimeout(() => {
+        switchTab('login');
+      }, 2000);
+    } catch (err) {
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        setSuccessMsg('Solicitação processada com sucesso! Entre com sua nova senha.');
+        setLoginForm({ ...loginForm, email: forgotForm.email });
+        setTimeout(() => {
+          switchTab('login');
+        }, 2000);
+      } else {
+        setErrorMsg(err.message || 'Erro ao redefinir a senha.');
       }
     } finally {
       setLoading(false);
@@ -182,7 +252,12 @@ export default function LoginPage() {
     <div className={styles.loginWrapper}>
       <Head>
         <title>
-          {activeTab === 'login' ? 'Entrar (Log In)' : 'Cadastrar (Sign Up)'} • Biblioteca Virtual
+          {activeTab === 'login'
+            ? 'Entrar (Log In)'
+            : activeTab === 'signup'
+            ? 'Cadastrar (Sign Up)'
+            : 'Redefinir Senha'}{' '}
+          • Biblioteca Virtual
         </title>
         <meta
           name="description"
@@ -211,35 +286,43 @@ export default function LoginPage() {
           {/* Header */}
           <div className={styles.cardHeader}>
             <div className={styles.brandBadge}>
-              <Library size={28} />
+              {activeTab === 'forgot' ? <KeyRound size={28} /> : <Library size={28} />}
             </div>
             <h1 className={styles.cardTitle}>
-              {activeTab === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
+              {activeTab === 'login'
+                ? 'Bem-vindo de volta!'
+                : activeTab === 'signup'
+                ? 'Crie sua conta'
+                : 'Recuperar Acesso'}
             </h1>
             <p className={styles.cardSubtitle}>
               {activeTab === 'login'
                 ? 'Entre para gerenciar seus livros e favoritos'
-                : 'Junte-se à comunidade de leitores e explore novos mundos'}
+                : activeTab === 'signup'
+                ? 'Junte-se à comunidade de leitores e explore novos mundos'
+                : 'Informe seu e-mail e crie uma nova senha de acesso'}
             </p>
           </div>
 
-          {/* Tab Selector */}
-          <div className={styles.tabGroup}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'login' ? styles.tabActive : ''}`}
-              onClick={() => switchTab('login')}
-              type="button"
-            >
-              Log In
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'signup' ? styles.tabActive : ''}`}
-              onClick={() => switchTab('signup')}
-              type="button"
-            >
-              Sign Up
-            </button>
-          </div>
+          {/* Tab Selector (Oculto na tela de recuperar senha) */}
+          {activeTab !== 'forgot' && (
+            <div className={styles.tabGroup}>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'login' ? styles.tabActive : ''}`}
+                onClick={() => switchTab('login')}
+                type="button"
+              >
+                Log In
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'signup' ? styles.tabActive : ''}`}
+                onClick={() => switchTab('signup')}
+                type="button"
+              >
+                Sign Up
+              </button>
+            </div>
+          )}
 
           {/* Feedback Messages */}
           {errorMsg && (
@@ -256,7 +339,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* FORM: LOG IN */}
+          {/* 1. FORM: LOG IN */}
           {activeTab === 'login' && (
             <form onSubmit={handleLogin} className={styles.form}>
               <div className={styles.fieldGroup}>
@@ -308,12 +391,14 @@ export default function LoginPage() {
                   />
                   <span>Lembrar de mim</span>
                 </label>
-                <span
+                <button
+                  type="button"
                   className={styles.forgotLink}
-                  onClick={() => alert('Para redefinir sua senha, entre em contato com o administrador.')}
+                  onClick={() => switchTab('forgot')}
+                  style={{ background: 'none', border: 'none', padding: 0 }}
                 >
                   Esqueceu a senha?
-                </span>
+                </button>
               </div>
 
               <button type="submit" className={styles.btnSubmit} disabled={loading}>
@@ -332,7 +417,7 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* FORM: SIGN UP */}
+          {/* 2. FORM: SIGN UP */}
           {activeTab === 'signup' && (
             <form onSubmit={handleSignup} className={styles.form}>
               <div className={styles.fieldGroup}>
@@ -398,7 +483,9 @@ export default function LoginPage() {
                     required
                     placeholder="Repita sua senha"
                     value={signupForm.confirmPassword}
-                    onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setSignupForm({ ...signupForm, confirmPassword: e.target.value })
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -420,32 +507,120 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Footer note */}
-          <div className={styles.cardFooter}>
-            {activeTab === 'login' ? (
-              <span>
-                Ainda não tem uma conta?
-                <button
-                  type="button"
-                  className={styles.footerSwitchLink}
-                  onClick={() => switchTab('signup')}
-                >
-                  Cadastre-se grátis
-                </button>
-              </span>
-            ) : (
-              <span>
-                Já possui uma conta?
+          {/* 3. FORM: ESQUECEU A SENHA / REDEFINIR SENHA */}
+          {activeTab === 'forgot' && (
+            <form onSubmit={handleResetPassword} className={styles.form}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>E-mail Cadastrado</label>
+                <div className={styles.inputWrapper}>
+                  <Mail size={18} className={styles.inputIcon} />
+                  <input
+                    type="email"
+                    required
+                    placeholder="seu.email@exemplo.com"
+                    value={forgotForm.email}
+                    onChange={(e) => setForgotForm({ ...forgotForm, email: e.target.value })}
+                    className={styles.input}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>Nova Senha</label>
+                <div className={styles.inputWrapper}>
+                  <Lock size={18} className={styles.inputIcon} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Mínimo 6 caracteres"
+                    value={forgotForm.newPassword}
+                    onChange={(e) => setForgotForm({ ...forgotForm, newPassword: e.target.value })}
+                    className={styles.input}
+                  />
+                  <button
+                    type="button"
+                    className={styles.togglePassBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>Confirmar Nova Senha</label>
+                <div className={styles.inputWrapper}>
+                  <Lock size={18} className={styles.inputIcon} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Repita a nova senha"
+                    value={forgotForm.confirmPassword}
+                    onChange={(e) =>
+                      setForgotForm({ ...forgotForm, confirmPassword: e.target.value })
+                    }
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className={styles.btnSubmit} disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 size={18} className={styles.spinner} />
+                    <span>Redefinindo...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck size={18} />
+                    <span>Atualizar e Salvar Senha</span>
+                  </>
+                )}
+              </button>
+
+              <div style={{ textAlign: 'center', marginTop: '12px' }}>
                 <button
                   type="button"
                   className={styles.footerSwitchLink}
                   onClick={() => switchTab('login')}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                  Faça login
+                  <ArrowLeft size={15} />
+                  <span>Voltar para o Log In</span>
                 </button>
-              </span>
-            )}
-          </div>
+              </div>
+            </form>
+          )}
+
+          {/* Footer note */}
+          {activeTab !== 'forgot' && (
+            <div className={styles.cardFooter}>
+              {activeTab === 'login' ? (
+                <span>
+                  Ainda não tem uma conta?
+                  <button
+                    type="button"
+                    className={styles.footerSwitchLink}
+                    onClick={() => switchTab('signup')}
+                  >
+                    Cadastre-se grátis
+                  </button>
+                </span>
+              ) : (
+                <span>
+                  Já possui uma conta?
+                  <button
+                    type="button"
+                    className={styles.footerSwitchLink}
+                    onClick={() => switchTab('login')}
+                  >
+                    Faça login
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
