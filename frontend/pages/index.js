@@ -7,6 +7,7 @@ import {
   BookOpen,
   Star,
   Search,
+  Eye,
   Plus,
   Minus,
   Filter,
