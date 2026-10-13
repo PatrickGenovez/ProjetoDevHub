@@ -105,8 +105,9 @@ export default function LoginPage() {
       );
 
       setSuccessMsg('Login realizado com sucesso! Redirecionando...');
+      const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/');
       setTimeout(() => {
-        router.push('/');
+        router.push(target);
       }, 1000);
     } catch (err) {
       // Fallback amigável de demonstração caso o backend ou banco não estejam online
@@ -119,8 +120,9 @@ export default function LoginPage() {
         localStorage.setItem('token', 'demo-jwt-token');
         localStorage.setItem('userData', JSON.stringify(demoUser));
         setSuccessMsg('Bem-vindo(a) à Bibliotech! Redirecionando...');
+        const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/');
         setTimeout(() => {
-          router.push('/');
+          router.push(target);
         }, 1000);
       } else {
         setErrorMsg(err.message || 'Erro ao fazer login.');
@@ -181,8 +183,9 @@ export default function LoginPage() {
         localStorage.setItem('token', 'demo-jwt-token');
         localStorage.setItem('userData', JSON.stringify(demoUser));
         setSuccessMsg('Conta criada com sucesso! Redirecionando...');
+        const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/');
         setTimeout(() => {
-          router.push('/');
+          router.push(target);
         }, 1000);
       } else {
         setErrorMsg(err.message || 'Erro ao registrar usuário.');
@@ -303,6 +306,30 @@ export default function LoginPage() {
                 : 'Informe seu e-mail e crie uma nova senha de acesso'}
             </p>
           </div>
+
+          {/* Aviso especial caso tenha vindo da pesquisa de recomendação */}
+          {router.query.redirect === 'survey' && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '10px',
+                padding: '12px 16px',
+                marginBottom: '16px',
+                color: '#10b981',
+                fontSize: '0.88rem',
+                lineHeight: '1.4'
+              }}
+            >
+              <Sparkles size={18} style={{ flexShrink: 0 }} />
+              <span>
+                Faça login ou crie sua conta para responder à pesquisa de gostos literários e receber recomendações sob medida!
+              </span>
+            </div>
+          )}
 
           {/* Tab Selector (Oculto na tela de recuperar senha) */}
           {activeTab !== 'forgot' && (
