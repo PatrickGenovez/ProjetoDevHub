@@ -118,7 +118,7 @@ export default function LoginPage() {
         };
         localStorage.setItem('token', 'demo-jwt-token');
         localStorage.setItem('userData', JSON.stringify(demoUser));
-        setSuccessMsg('Bem-vindo(a) à Biblioteca! Redirecionando...');
+        setSuccessMsg('Bem-vindo(a) à Bibliotech! Redirecionando...');
         setTimeout(() => {
           router.push('/');
         }, 1000);
@@ -257,11 +257,11 @@ export default function LoginPage() {
             : activeTab === 'signup'
             ? 'Cadastrar (Sign Up)'
             : 'Redefinir Senha'}{' '}
-          • Biblioteca Virtual
+          • Bibliotech
         </title>
         <meta
           name="description"
-          content="Acesse ou crie sua conta na Biblioteca Virtual para gerenciar livros, favoritos e empréstimos."
+          content="Acesse ou crie sua conta na Bibliotech para gerenciar livros, favoritos e empréstimos."
         />
       </Head>
 
