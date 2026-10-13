@@ -554,6 +554,122 @@ const AVAILABLE_GENRES = [
   { id: 'Aventura', name: 'Ação & Aventura', icon: '🧭', desc: 'Jornadas eletrizantes e grandes expedições' }
 ];
 
+
+// Posts Iniciais da Comunidade e Clube de Leitores
+const INITIAL_COMMUNITY_POSTS = [
+  {
+    id: 1,
+    authorName: 'Mariana Silva',
+    authorAvatar: 'M',
+    authorBadge: 'Compra Verificada',
+    createdAt: 'há 2 horas',
+    timestamp: Date.now() - 2 * 3600 * 1000,
+    bookId: 1,
+    bookTitle: 'Duna',
+    bookAuthor: 'Frank Herbert',
+    bookCover: 'https://covers.openlibrary.org/b/id/11149234-L.jpg',
+    bookPrice: 59.90,
+    category: 'Resenha Completa',
+    rating: 5,
+    title: 'Uma obra-prima visceral que redefine ficção científica!',
+    content: 'Comprei a edição em capa dura aqui na Bibliotech e chegou impecável em 2 dias. A construção do ecossistema de Arrakis, a política das grandes casas e a jornada de Paul Atreides te prendem do início ao fim. Vale cada centavo!',
+    quote: 'Não devo ter medo. O medo é o assassino da mente.',
+    likes: 28,
+    replies: [
+      {
+        id: 101,
+        authorName: 'Pedro Alencar',
+        authorAvatar: 'P',
+        createdAt: 'há 1 hora',
+        content: 'Concordo plenamente Mariana! O segundo livro O Messias de Duna também mantém esse nível impressionante.'
+      },
+      {
+        id: 102,
+        authorName: 'Carla Nogueira',
+        authorAvatar: 'C',
+        createdAt: 'há 30 min',
+        content: 'Essa edição física é maravilhosa mesmo, a folha amarelada não cansa a vista!'
+      }
+    ]
+  },
+  {
+    id: 2,
+    authorName: 'Lucas Ferreira',
+    authorAvatar: 'L',
+    authorBadge: 'Membro do Clube',
+    createdAt: 'há 5 horas',
+    timestamp: Date.now() - 5 * 3600 * 1000,
+    bookId: 3,
+    bookTitle: '1984',
+    bookAuthor: 'George Orwell',
+    bookCover: 'https://covers.openlibrary.org/b/id/9267242-L.jpg',
+    bookPrice: 34.90,
+    category: 'Discussão & Teorias',
+    rating: 5,
+    title: 'Mais atual e urgente do que nunca: o impacto da Novilíngua',
+    content: 'O que mais me chamou a atenção nessa releitura foi o conceito da Novilíngua — como o controle do vocabulário limita a capacidade de formular pensamentos dissidentes. Qual parte do livro mais mexeu com vocês?',
+    quote: 'Guerra é paz. Liberdade é escravidão. Ignorância é força.',
+    likes: 45,
+    replies: [
+      {
+        id: 201,
+        authorName: 'Fernando Dias',
+        authorAvatar: 'F',
+        createdAt: 'há 3 horas',
+        content: 'A cena do diário secreto de Winston logo no começo me deixou com o coração acelerado.'
+      }
+    ]
+  },
+  {
+    id: 3,
+    authorName: 'Camila Rocha',
+    authorAvatar: 'C',
+    authorBadge: 'Engenheira de Software',
+    createdAt: 'ontem',
+    timestamp: Date.now() - 24 * 3600 * 1000,
+    bookId: 4,
+    bookTitle: 'Código Limpo (Clean Code)',
+    bookAuthor: 'Robert C. Martin',
+    bookCover: 'https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg',
+    bookPrice: 84.90,
+    category: 'Dica de Leitura',
+    rating: 5,
+    title: 'Transformou meus pull requests e a comunicação no time',
+    content: 'Recomendo para todo desenvolvedor, do estagiário ao tech lead. O capítulo sobre nomes expressivos e funções pequenas e modulares mudou completamente a clareza do meu código diário.',
+    quote: 'Qualquer tolo pode escrever código que um computador entenda. Bons programadores escrevem código que humanos entendem.',
+    likes: 39,
+    replies: [
+      {
+        id: 301,
+        authorName: 'Rodrigo Antunes',
+        authorAvatar: 'R',
+        createdAt: 'ontem',
+        content: 'Junto com O Programador Pragmático forma a dupla definitiva da estante de qualquer dev!'
+      }
+    ]
+  },
+  {
+    id: 4,
+    authorName: 'Thiago Mendes',
+    authorAvatar: 'T',
+    authorBadge: 'Compra Verificada',
+    createdAt: 'há 2 dias',
+    timestamp: Date.now() - 48 * 3600 * 1000,
+    bookId: 2,
+    bookTitle: 'O Senhor dos Anéis: A Sociedade do Anel',
+    bookAuthor: 'J.R.R. Tolkien',
+    bookCover: 'https://covers.openlibrary.org/b/id/14547565-L.jpg',
+    bookPrice: 69.90,
+    category: 'Citação Favorita',
+    rating: 5,
+    title: 'A jornada de Frodo e a sabedoria eterna de Gandalf',
+    content: 'A ambientação de Moria e de Lothlórien é poesia pura. Livro indispensável para quem ama o gênero de fantasia com profundidade e mitologia própria.',
+    quote: 'Tudo o que temos de decidir é o que fazer com o tempo que nos é dado.',
+    likes: 52,
+    replies: []
+  }
+];
+
 export default function BookStore() {
   const router = useRouter();
   const [books, setBooks] = useState(DEFAULT_BOOKS);
@@ -621,6 +737,24 @@ export default function BookStore() {
     pages: '320',
     coverImage: ''
   });
+
+  // Estados da Comunidade & Clube de Leitores
+  const [communityPosts, setCommunityPosts] = useState(INITIAL_COMMUNITY_POSTS);
+  const [communityLikes, setCommunityLikes] = useState([]);
+  const [communityFilter, setCommunityFilter] = useState('all'); // 'all' | 'reviews' | 'discussions' | 'quotes' | 'trending'
+  const [selectedCommunityBook, setSelectedCommunityBook] = useState('all');
+  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+  const [expandedReplies, setExpandedReplies] = useState({ 1: true });
+  const [replyDrafts, setReplyDrafts] = useState({});
+
+  // Formulário de Nova Resenha
+  const [newPostBookId, setNewPostBookId] = useState(1);
+  const [newPostRating, setNewPostRating] = useState(5);
+  const [newPostCategory, setNewPostCategory] = useState('Resenha Completa');
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [newPostQuote, setNewPostQuote] = useState('');
+
 
   // Carregar dados salvos no localStorage e disparar a pesquisa de preferências se for nova visita
   useEffect(() => {
@@ -720,6 +854,21 @@ export default function BookStore() {
       if (Array.isArray(savedCart)) {
         setCart(savedCart);
       }
+
+    try {
+      const savedCommunity = localStorage.getItem('bibliotech_community_posts');
+      if (savedCommunity) {
+        const parsed = JSON.parse(savedCommunity);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCommunityPosts(parsed);
+        }
+      }
+      const savedLikes = localStorage.getItem('bibliotech_community_likes');
+      if (savedLikes) {
+        setCommunityLikes(JSON.parse(savedLikes));
+      }
+    } catch (e) {}
+
     } catch (e) {}
   }, []);
 
@@ -1364,6 +1513,157 @@ export default function BookStore() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToCommunity = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const el = document.getElementById('comunidade-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const saveCommunityPosts = (newPosts) => {
+    setCommunityPosts(newPosts);
+    try {
+      localStorage.setItem('bibliotech_community_posts', JSON.stringify(newPosts));
+    } catch (e) {}
+  };
+
+  const handleToggleCommunityLike = (postId) => {
+    const isLiked = communityLikes.includes(postId);
+    const updatedLikes = isLiked
+      ? communityLikes.filter((id) => id !== postId)
+      : [...communityLikes, postId];
+    setCommunityLikes(updatedLikes);
+    try {
+      localStorage.setItem('bibliotech_community_likes', JSON.stringify(updatedLikes));
+    } catch (e) {}
+
+    const updatedPosts = communityPosts.map((p) => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          likes: isLiked ? Math.max(0, p.likes - 1) : p.likes + 1
+        };
+      }
+      return p;
+    });
+    saveCommunityPosts(updatedPosts);
+    showToast(isLiked ? 'Curtida removida.' : 'Você curtiu esta publicação! ❤️');
+  };
+
+  const handleToggleReplies = (postId) => {
+    setExpandedReplies((prev) => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleReplyChange = (postId, text) => {
+    setReplyDrafts((prev) => ({
+      ...prev,
+      [postId]: text
+    }));
+  };
+
+  const handleSendReply = (postId) => {
+    const text = (replyDrafts[postId] || '').trim();
+    if (!text) return;
+    if (!currentUser) {
+      showToast('Faça login para responder aos membros da comunidade.');
+      router.push('/login?tab=login');
+      return;
+    }
+
+    const newReply = {
+      id: Date.now(),
+      authorName: currentUser.full_name || currentUser.email.split('@')[0],
+      authorAvatar: (currentUser.full_name ? currentUser.full_name[0] : currentUser.email[0]).toUpperCase(),
+      createdAt: 'Agora',
+      content: text
+    };
+
+    const updatedPosts = communityPosts.map((p) => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          replies: [...(p.replies || []), newReply]
+        };
+      }
+      return p;
+    });
+
+    saveCommunityPosts(updatedPosts);
+    setReplyDrafts((prev) => ({ ...prev, [postId]: '' }));
+    setExpandedReplies((prev) => ({ ...prev, [postId]: true }));
+    showToast('Sua resposta foi publicada no debate!');
+  };
+
+  const handleOpenNewPost = () => {
+    if (!currentUser) {
+      showToast('Faça login para compartilhar sua resenha com a comunidade.');
+      router.push('/login?tab=login');
+      return;
+    }
+    setIsNewPostModalOpen(true);
+  };
+
+  const handleSubmitNewPost = (e) => {
+    e.preventDefault();
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
+      showToast('Preencha o título e o texto da sua resenha.');
+      return;
+    }
+
+    const targetBook = books.find((b) => b.id === Number(newPostBookId)) || books[0];
+    const newPost = {
+      id: Date.now(),
+      authorName: currentUser.full_name || currentUser.email.split('@')[0],
+      authorAvatar: (currentUser.full_name ? currentUser.full_name[0] : currentUser.email[0]).toUpperCase(),
+      authorBadge: 'Compra Verificada',
+      createdAt: 'Agora',
+      timestamp: Date.now(),
+      bookId: targetBook.id,
+      bookTitle: targetBook.title,
+      bookAuthor: targetBook.author,
+      bookCover: targetBook.coverImage,
+      bookPrice: targetBook.price || 49.90,
+      category: newPostCategory,
+      rating: newPostRating,
+      title: newPostTitle.trim(),
+      content: newPostContent.trim(),
+      quote: newPostQuote.trim() || null,
+      likes: 1,
+      replies: []
+    };
+
+    const updated = [newPost, ...communityPosts];
+    saveCommunityPosts(updated);
+    setCommunityLikes((prev) => [...prev, newPost.id]);
+    setIsNewPostModalOpen(false);
+    setNewPostTitle('');
+    setNewPostContent('');
+    setNewPostQuote('');
+    showToast('🎉 Resenha publicada com sucesso na Comunidade Bibliotech!');
+    scrollToCommunity();
+  };
+
+  const filteredCommunityPosts = useMemo(() => {
+    return communityPosts
+      .filter((post) => {
+        if (selectedCommunityBook !== 'all' && post.bookId !== Number(selectedCommunityBook)) {
+          return false;
+        }
+        if (communityFilter === 'reviews' && post.category !== 'Resenha Completa') return false;
+        if (communityFilter === 'discussions' && post.category !== 'Discussão & Teorias') return false;
+        if (communityFilter === 'quotes' && post.category !== 'Citação Favorita') return false;
+        return true;
+      })
+      .sort((a, b) => {
+        if (communityFilter === 'trending') {
+          return (b.likes + (b.replies?.length || 0)) - (a.likes + (a.replies?.length || 0));
+        }
+        return (b.timestamp || b.id) - (a.timestamp || a.id);
+      });
+  }, [communityPosts, communityFilter, selectedCommunityBook]);
+
   return (
     <div className={styles.pageWrapper}>
       <Head>
@@ -1403,6 +1703,7 @@ export default function BookStore() {
               <a href="#catalogo-section" className={styles.navItem} onClick={scrollToCatalog}>Catálogo</a>
               <a href="#recomendados-section" className={styles.navItem} onClick={scrollToRecs}>Recomendações</a>
               <a href="#planos-section" className={styles.navItem} onClick={scrollToPlans}>Clube do Livro</a>
+              <a href="#comunidade-section" className={styles.navItem} onClick={scrollToCommunity}>Comunidade</a>
             </nav>
 
             {/* Header Actions: Sacola + Auth + Theme */}
@@ -2230,6 +2531,138 @@ export default function BookStore() {
       </main>
 
       {/* ===== MODAL DE PESQUISA DE GÊNEROS FAVORITOS (ONBOARDING & RECOMENDAÇÃO) ===== */}
+      
+      {/* ===== MODAL DE PUBLICAR RESENHA NA COMUNIDADE ===== */}
+      {isNewPostModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsNewPostModalOpen(false)}>
+          <div className={styles.newPostModalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.newPostModalHeader}>
+              <div className={styles.modalHeaderTitleGroup}>
+                <span className={styles.subHeadingBadge}>Comunidade Bibliotech</span>
+                <h2 className={styles.newPostModalTitle}>Compartilhar Resenha ou Debate</h2>
+              </div>
+              <button
+                className={styles.closeBtn}
+                onClick={() => setIsNewPostModalOpen(false)}
+                title="Fechar"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitNewPost} className={styles.newPostForm}>
+              {/* Seleção do Livro */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Qual livro você está avaliando?</label>
+                <select
+                  className={styles.formSelect}
+                  value={newPostBookId}
+                  onChange={(e) => setNewPostBookId(Number(e.target.value))}
+                  required
+                >
+                  {books.map(b => (
+                    <option key={b.id} value={b.id}>{b.title} — {b.author}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Categoria e Avaliação */}
+              <div className={styles.formRowTwoCols}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Tipo de Publicação</label>
+                  <select
+                    className={styles.formSelect}
+                    value={newPostCategory}
+                    onChange={(e) => setNewPostCategory(e.target.value)}
+                  >
+                    <option value="Resenha Completa">⭐ Resenha Completa</option>
+                    <option value="Discussão & Teorias">💬 Discussão & Teorias</option>
+                    <option value="Dica de Leitura">💡 Dica de Leitura</option>
+                    <option value="Citação Favorita">📜 Citação Favorita</option>
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Sua Avaliação (1 a 5 estrelas)</label>
+                  <div className={styles.starPickerRow}>
+                    {[1, 2, 3, 4, 5].map((starVal) => (
+                      <button
+                        type="button"
+                        key={starVal}
+                        className={styles.starPickerBtn}
+                        onClick={() => setNewPostRating(starVal)}
+                        title={`${starVal} estrelas`}
+                      >
+                        <Star
+                          size={24}
+                          className={starVal <= newPostRating ? styles.starFilled : styles.starEmpty}
+                        />
+                      </button>
+                    ))}
+                    <span className={styles.starPickerLabel}>{newPostRating}.0 de 5.0</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Título */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Título da sua resenha ou debate</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Uma das melhores leituras do ano! / O final foi surpreendente"
+                  value={newPostTitle}
+                  onChange={(e) => setNewPostTitle(e.target.value)}
+                  className={styles.formInput}
+                  required
+                />
+              </div>
+
+              {/* Conteúdo */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Sua opinião sincera / O que achou da obra?</label>
+                <textarea
+                  rows={4}
+                  placeholder="Conte o que achou dos personagens, ritmo da leitura, escrita do autor..."
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  className={styles.formTextarea}
+                  required
+                />
+              </div>
+
+              {/* Citação favorita (opcional) */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Citação ou trecho favorito (opcional)</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Não devo ter medo. O medo é o assassino da mente."
+                  value={newPostQuote}
+                  onChange={(e) => setNewPostQuote(e.target.value)}
+                  className={styles.formInput}
+                />
+              </div>
+
+              <div className={styles.newPostModalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancelPost}
+                  onClick={() => setIsNewPostModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className={styles.btnSubmitPost}
+                >
+                  <Sparkles size={16} />
+                  <span>Publicar na Comunidade</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {isSurveyModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsSurveyModalOpen(false)}>
           <div className={styles.surveyModalCard} onClick={(e) => e.stopPropagation()}>
