@@ -51,7 +51,8 @@ import {
   ShieldCheck,
   Percent,
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  RotateCcw
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
@@ -97,7 +98,7 @@ const DEFAULT_BOOKS = [
     pages: 576,
     status: 'Disponível',
     coverImage: 'https://covers.openlibrary.org/b/id/14547565-M.jpg',
-    coverGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #065f46 100%)',
+    coverGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #064e3b 100%)',
     accentColor: '#34d399'
   },
   {
@@ -285,7 +286,7 @@ const SUBSCRIPTION_PLANS = [
   }
 ];
 
-// Gêneros disponíveis para filtro e preferências
+// Gêneros disponíveis para pesquisa e recomendações
 const AVAILABLE_GENRES = [
   { id: 'Ficção Científica', name: 'Ficção Científica', icon: '🚀', desc: 'Exploração espacial, futuros e distopias' },
   { id: 'Fantasia', name: 'Fantasia', icon: '🧙‍♂️', desc: 'Mundos mágicos, seres épicos e lendas' },
@@ -294,7 +295,7 @@ const AVAILABLE_GENRES = [
   { id: 'Suspense', name: 'Suspense & Mistério', icon: '🕵️', desc: 'Investigações, thrillers e enigmas' },
   { id: 'Clássicos', name: 'Clássicos da Literatura', icon: '📜', desc: 'Obras fundamentais e imortais' },
   { id: 'Cinema & Adaptações', name: 'Cinema & Adaptações', icon: '🎬', desc: 'Grandes obras adaptadas para filmes e séries' },
-  { id: 'Romance', name: 'Romance', icon: '💖', desc: 'Relações humanas, dramas e paixões' },
+  { id: 'Romance', name: 'Romance & Paixão', icon: '💖', desc: 'Relações humanas, dramas e sentimentos' },
   { id: 'Aventura', name: 'Ação & Aventura', icon: '🧭', desc: 'Jornadas eletrizantes e grandes expedições' }
 ];
 
@@ -335,9 +336,11 @@ export default function BookStore() {
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [planForm, setPlanForm] = useState({ name: '', email: '' });
 
-  // Estados de Gêneros Preferidos
+  // Estados de Pesquisa de Gêneros & Sistema de Recomendações
   const [preferredGenres, setPreferredGenres] = useState([]);
-  const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const [preferredFormat, setPreferredFormat] = useState('Todos');
+  const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+  const [hasAnsweredSurvey, setHasAnsweredSurvey] = useState(false);
   const [filterOnlyPreferred, setFilterOnlyPreferred] = useState(false);
 
   // Estados de APIs Externas
@@ -363,7 +366,7 @@ export default function BookStore() {
     coverImage: ''
   });
 
-  // Carregar dados salvos no localStorage
+  // Carregar dados salvos no localStorage e disparar a pesquisa de preferências se for nova visita
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -404,6 +407,19 @@ export default function BookStore() {
       const savedPrefs = JSON.parse(localStorage.getItem('bibliotech_preferred_genres') || '[]');
       if (Array.isArray(savedPrefs) && savedPrefs.length > 0) {
         setPreferredGenres(savedPrefs);
+      }
+      const savedFmt = localStorage.getItem('bibliotech_preferred_format');
+      if (savedFmt) setPreferredFormat(savedFmt);
+
+      const answered = localStorage.getItem('bibliotech_survey_answered');
+      if (answered === 'true') {
+        setHasAnsweredSurvey(true);
+      } else {
+        // Dispara a pesquisa de boas-vindas automaticamente para o usuário
+        const timer = setTimeout(() => {
+          setIsSurveyModalOpen(true);
+        }, 850);
+        return () => clearTimeout(timer);
       }
     } catch (e) {}
 
@@ -606,42 +622,76 @@ export default function BookStore() {
     setIsPlanModalOpen(false);
   };
 
-  // Gêneros Preferidos
+  // Lógica de Seleção de Gêneros da Pesquisa
   const togglePreferredGenre = (genreId) => {
     const isSelected = preferredGenres.includes(genreId);
     const updated = isSelected
       ? preferredGenres.filter((g) => g !== genreId)
       : [...preferredGenres, genreId];
     setPreferredGenres(updated);
-    try {
-      localStorage.setItem('bibliotech_preferred_genres', JSON.stringify(updated));
-    } catch (e) {}
   };
 
-  const applyPreferredGenres = () => {
+  // Salvar a Pesquisa e Gerar Recomendações
+  const handleSaveSurvey = () => {
     if (preferredGenres.length === 0) {
-      showToast('Selecione pelo menos um gênero para filtrar.');
+      showToast('Selecione pelo menos um gênero para personalizarmos suas recomendações!');
       return;
     }
     try {
       localStorage.setItem('bibliotech_preferred_genres', JSON.stringify(preferredGenres));
+      localStorage.setItem('bibliotech_preferred_format', preferredFormat);
+      localStorage.setItem('bibliotech_survey_answered', 'true');
     } catch (e) {}
-    setFilterOnlyPreferred(true);
-    setSelectedGenre('Todos');
-    setIsPreferencesModalOpen(false);
-    showToast(`Filtro aplicado: ${preferredGenres.length} gêneros selecionados!`);
+    setHasAnsweredSurvey(true);
+    setIsSurveyModalOpen(false);
+    showToast(`🎉 Recomendações personalizadas geradas com base em ${preferredGenres.length} temas!`);
+    const recSection = document.getElementById('recomendados-section');
+    if (recSection) recSection.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Pular Pesquisa por Enquanto
+  const handleSkipSurvey = () => {
+    setIsSurveyModalOpen(false);
+    showToast('Você pode definir seus gostos a qualquer momento no botão "Recomendações" no topo!');
+  };
+
+  // Limpar Preferências
   const clearPreferredGenres = () => {
     setPreferredGenres([]);
     setFilterOnlyPreferred(false);
     try {
       localStorage.removeItem('bibliotech_preferred_genres');
+      localStorage.removeItem('bibliotech_survey_answered');
     } catch (e) {}
-    showToast('Preferências de gêneros redefinidas.');
+    setHasAnsweredSurvey(false);
+    showToast('Pesquisa de gostos reiniciada.');
   };
 
-  // 1. INTEGRAÇÃO GOOGLE BOOKS API COM PREÇOS DE E-COMMERCE
+  // Livros Recomendados com Base nas Preferências
+  const recommendedBooks = useMemo(() => {
+    if (preferredGenres.length === 0) {
+      return books.filter((b) => b.rating >= 4.8).slice(0, 4);
+    }
+    const matched = books.filter((book) => {
+      return preferredGenres.some((g) => {
+        const gLower = g.toLowerCase();
+        const bLower = book.genre.toLowerCase();
+        if (bLower === gLower) return true;
+        if (g === 'Cinema & Adaptações' && (bLower.includes('ficção') || bLower.includes('fantasia') || bLower.includes('distopia') || bLower.includes('suspense') || bLower.includes('clássicos'))) return true;
+        if (g === 'Suspense' && (bLower.includes('suspense') || bLower.includes('terror') || bLower.includes('mistério'))) return true;
+        if (g === 'Aventura' && (bLower.includes('aventura') || bLower.includes('fantasia'))) return true;
+        return false;
+      });
+    });
+
+    if (matched.length < 3) {
+      const remaining = books.filter((b) => !matched.some((m) => m.id === b.id));
+      return [...matched, ...remaining].slice(0, 4);
+    }
+    return matched;
+  }, [books, preferredGenres]);
+
+  // 1. INTEGRAÇÃO GOOGLE BOOKS API
   const searchGoogleBooks = useCallback(async (query) => {
     if (!query.trim()) {
       setApiBooks([]);
@@ -660,7 +710,6 @@ export default function BookStore() {
           const thumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
           const safeThumbnail = thumbnail.replace(/^http:\/\//i, 'https://');
 
-          // Cálculo inteligente de preço mock para venda
           const basePrice = 39.90 + ((idx * 7) % 35);
           const originalPrice = parseFloat((basePrice * 1.35).toFixed(2));
           const price = parseFloat(basePrice.toFixed(2));
@@ -700,7 +749,7 @@ export default function BookStore() {
     }
   }, []);
 
-  // 2. INTEGRAÇÃO OPEN LIBRARY API COM PREÇOS DE E-COMMERCE
+  // 2. INTEGRAÇÃO OPEN LIBRARY API
   const searchOpenLibrary = useCallback(async (query) => {
     if (!query.trim()) {
       setApiBooks([]);
@@ -980,13 +1029,18 @@ export default function BookStore() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToRecs = () => {
+    const el = document.getElementById('recomendados-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Head>
-        <title>Bibliotech • Livraria Online & Clube de Assinatura de Livros</title>
+        <title>Bibliotech • Livraria Online & Recomendações Personalizadas</title>
         <meta
           name="description"
-          content="Bibliotech: Compre livros incríveis com até 40% OFF ou assine nosso Clube Literário com caixas mensais, capas duras e brindes exclusivos."
+          content="Bibliotech: Compre livros incríveis com base nos seus gêneros favoritos. Descubra recomendações sob medida e caixas exclusivas com mimos literários."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -1016,6 +1070,10 @@ export default function BookStore() {
 
             {/* Menu Nav Links */}
             <nav className={styles.navLinks}>
+              <a href="#recomendados-section" className={styles.navItem} onClick={scrollToRecs}>
+                <span className={styles.navRecTag}>⭐</span>
+                Recomendações
+              </a>
               <a href="#catalogo-section" className={styles.navItem}>Livraria Online</a>
               <a href="#planos-section" className={styles.navItem}>
                 <span className={styles.navPlanTag}>NOVO</span>
@@ -1023,11 +1081,24 @@ export default function BookStore() {
               </a>
               <a href="#como-funciona" className={styles.navItem}>Como Funciona</a>
               <a href="#beneficios" className={styles.navItem}>Diferenciais</a>
-              <a href="#depoimentos" className={styles.navItem}>Depoimentos</a>
             </nav>
 
-            {/* Header Actions: Sacola de Compras + Login/Signup + Theme Toggle */}
+            {/* Header Actions: Pesquisa de Gostos + Sacola + Auth + Theme */}
             <div className={styles.headerActions}>
+              {/* Botão de Pesquisa de Gêneros Favoritos */}
+              <button
+                className={styles.btnSurveyHeader}
+                onClick={() => setIsSurveyModalOpen(true)}
+                title="Personalizar meus gêneros favoritos"
+                id="btn-open-survey"
+              >
+                <Sparkles size={15} />
+                <span className={styles.btnSurveyLabel}>Pesquisa de Gostos</span>
+                {preferredGenres.length > 0 && (
+                  <span className={styles.surveyActiveDot} title={`${preferredGenres.length} gêneros ativos`}></span>
+                )}
+              </button>
+
               {/* Botão de Sacola de Compras */}
               <button
                 className={styles.btnCart}
@@ -1102,6 +1173,16 @@ export default function BookStore() {
           <div className={styles.trustBarGrid}>
             <div className={styles.trustItem}>
               <div className={styles.trustIconCircle}>
+                <Sparkles size={18} />
+              </div>
+              <div className={styles.trustText}>
+                <strong>Recomendações IA</strong>
+                <span>Livros baseados nos seus gostos</span>
+              </div>
+            </div>
+
+            <div className={styles.trustItem}>
+              <div className={styles.trustIconCircle}>
                 <Truck size={18} />
               </div>
               <div className={styles.trustText}>
@@ -1132,16 +1213,6 @@ export default function BookStore() {
 
             <div className={styles.trustItem}>
               <div className={styles.trustIconCircle}>
-                <Gift size={18} />
-              </div>
-              <div className={styles.trustText}>
-                <strong>Clube Literário VIP</strong>
-                <span>Caixas com brindes exclusivos</span>
-              </div>
-            </div>
-
-            <div className={styles.trustItem}>
-              <div className={styles.trustIconCircle}>
                 <ShieldCheck size={18} />
               </div>
               <div className={styles.trustText}>
@@ -1154,16 +1225,20 @@ export default function BookStore() {
       </section>
 
       <main>
-        {/* ===== 1. HERO SECTION (LIVRARIA & CLUBE DE ASSINATURA) ===== */}
+        {/* ===== 1. HERO SECTION ===== */}
         <section className={styles.heroSection}>
           <div className={styles.heroGlow}></div>
           <div className={styles.container}>
             <div className={styles.heroGrid}>
               {/* Coluna Esquerda: Texto e Chamadas para Ação */}
               <div className={styles.heroTextCol}>
-                <div className={styles.heroBadge}>
+                <div className={styles.heroBadge} onClick={() => setIsSurveyModalOpen(true)} style={{ cursor: 'pointer' }}>
                   <Sparkles size={15} />
-                  <span>Bibliotech • Livraria & Clube Literário Oficial</span>
+                  <span>
+                    {preferredGenres.length > 0
+                      ? `Recomendações ativas para: ${preferredGenres.slice(0, 2).join(', ')}...`
+                      : 'Descubra livros perfeitos para você • Iniciar Pesquisa'}
+                  </span>
                 </div>
 
                 <h1 className={styles.heroTitle}>
@@ -1172,17 +1247,17 @@ export default function BookStore() {
                 </h1>
 
                 <p className={styles.heroDescription}>
-                  Milhares de títulos em edições de luxo, capa dura e brochura com até <strong>40% OFF</strong>. Receba livros selecionados e caixas temáticas com brindes colecionáveis todo mês na sua porta!
+                  Conte-nos os gêneros que você mais gosta e receba recomendações feitas sob medida para o seu estilo de leitura, com até <strong>40% OFF</strong> e frete grátis.
                 </p>
 
                 <div className={styles.heroCtaGroup}>
-                  <button onClick={scrollToCatalog} className={styles.btnCtaPrimary}>
-                    <ShoppingBag size={18} />
-                    <span>Explorar Livros à Venda</span>
+                  <button onClick={() => setIsSurveyModalOpen(true)} className={styles.btnCtaPrimary}>
+                    <Sparkles size={18} />
+                    <span>Pesquisar Meus Gêneros Favoritos</span>
                   </button>
-                  <button onClick={scrollToPlans} className={styles.btnCtaSecondary}>
-                    <Package size={18} />
-                    <span>Conhecer Planos do Clube</span>
+                  <button onClick={scrollToCatalog} className={styles.btnCtaSecondary}>
+                    <ShoppingBag size={18} />
+                    <span>Ver Todos os Livros</span>
                   </button>
                 </div>
 
@@ -1199,8 +1274,8 @@ export default function BookStore() {
                   </div>
                   <div className={styles.heroStatDivider}></div>
                   <div className={styles.heroStatItem}>
-                    <span className={styles.heroStatValue}>24h</span>
-                    <span className={styles.heroStatLabel}>Despacho Imediato</span>
+                    <span className={styles.heroStatValue}>98%</span>
+                    <span className={styles.heroStatLabel}>Recomendações Aprovadas</span>
                   </div>
                 </div>
               </div>
@@ -1287,7 +1362,163 @@ export default function BookStore() {
           </div>
         </section>
 
-        {/* ===== 2. SEÇÃO DE PLANOS DE ASSINATURA (CLUBE DO LIVRO) ===== */}
+        {/* ===== 2. SEÇÃO DE RECOMENDAÇÕES PERSONALIZADAS (BASEADA NA PESQUISA DE GÊNEROS) ===== */}
+        <section id="recomendados-section" className={styles.recommendedSection}>
+          <div className={styles.container}>
+            {preferredGenres.length > 0 ? (
+              <>
+                <div className={styles.recommendedHeaderRow}>
+                  <div>
+                    <div className={styles.recBadgeTop}>
+                      <Sparkles size={14} />
+                      <span>RECOMENDADOS PARA VOCÊ</span>
+                    </div>
+                    <h2 className={styles.recMainTitle}>Livros que Combinam com os Seus Gostos</h2>
+                    <p className={styles.recMainDesc}>
+                      Obras selecionadas automaticamente com base nos seus gêneros favoritos:{' '}
+                      <strong className={styles.recGenresHighlight}>{preferredGenres.join(' • ')}</strong>
+                    </p>
+                  </div>
+
+                  <button
+                    className={styles.btnRetakeSurvey}
+                    onClick={() => setIsSurveyModalOpen(true)}
+                    title="Alterar meus gêneros favoritos"
+                    id="btn-retake-survey"
+                  >
+                    <RotateCcw size={15} />
+                    <span>Refazer Pesquisa de Gostos</span>
+                  </button>
+                </div>
+
+                {/* Grid com Livros Recomendados */}
+                <div className={styles.recommendedGrid}>
+                  {recommendedBooks.map((book) => {
+                    const price = book.price || 49.90;
+                    const originalPrice = book.originalPrice || 69.90;
+                    const discountPercent =
+                      book.discountPercent ||
+                      Math.round(((originalPrice - price) / originalPrice) * 100);
+
+                    return (
+                      <article
+                        key={book.id}
+                        className={styles.recBookCard}
+                        onClick={() => setSelectedBook(book)}
+                      >
+                        <div className={styles.recCardMatchPill}>
+                          <Star size={12} fill="#10b981" />
+                          <span>Seu Gosto: {book.genre}</span>
+                        </div>
+
+                        <div className={styles.recCoverWrapper}>
+                          {book.coverImage ? (
+                            <img src={book.coverImage} alt={book.title} className={styles.recCoverImg} />
+                          ) : (
+                            <div className={styles.recCoverPlaceholder} style={{ background: book.coverGradient }}>
+                              <BookOpen size={32} />
+                              <h5>{book.title}</h5>
+                            </div>
+                          )}
+                          {discountPercent > 0 && (
+                            <span className={styles.recDiscountBadge}>-{discountPercent}% OFF</span>
+                          )}
+                        </div>
+
+                        <div className={styles.recCardBody}>
+                          <div className={styles.recGenreFormatRow}>
+                            <span className={styles.genreBadge}>{book.genre}</span>
+                            <span className={styles.formatPill}>{book.format || 'Capa Dura'}</span>
+                          </div>
+
+                          <h4 className={styles.recBookTitle} title={book.title}>
+                            {book.title}
+                          </h4>
+                          <p className={styles.recBookAuthor}>Por {book.author}</p>
+
+                          <div className={styles.ratingSection}>
+                            <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
+                            <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
+                          </div>
+
+                          <p className={styles.recSynopsisSnippet}>{book.synopsis}</p>
+
+                          <div className={styles.recPriceBox}>
+                            <div className={styles.recOldPrice}>De R$ {originalPrice.toFixed(2).replace('.', ',')}</div>
+                            <div className={styles.recCurrentPrice}>
+                              R$ <strong>{price.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                          </div>
+
+                          <div className={styles.recCardActions}>
+                            <button
+                              className={styles.btnRecBuy}
+                              onClick={(e) => {
+                                addToCart(book, 1, e);
+                                setIsCartOpen(true);
+                              }}
+                            >
+                              <ShoppingBag size={15} />
+                              <span>Comprar</span>
+                            </button>
+                            <button
+                              className={styles.btnCardDetails}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedBook(book);
+                              }}
+                            >
+                              <span>Detalhes</span>
+                              <ChevronRight size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              /* CARD DE CONVITE CASO O USUÁRIO AINDA NÃO TENHA RESPONDIDO */
+              <div className={styles.surveyInviteCard}>
+                <div className={styles.surveyInviteContent}>
+                  <div className={styles.surveyInviteBadge}>
+                    <Sparkles size={16} />
+                    <span>PESQUISA DE RECOMENDAÇÃO INTELIGENTE</span>
+                  </div>
+                  <h2 className={styles.surveyInviteTitle}>
+                    Descubra os Livros Perfeitos para o Seu Gosto Literário!
+                  </h2>
+                  <p className={styles.surveyInviteDesc}>
+                    Não perca tempo procurando entre milhares de títulos. Selecione os gêneros que você mais gosta de ler (como Ficção Científica, Fantasia, Suspense ou Tecnologia) e nós montaremos uma estante personalizada para você!
+                  </p>
+                  <div className={styles.surveyInviteActions}>
+                    <button
+                      className={styles.btnStartSurvey}
+                      onClick={() => setIsSurveyModalOpen(true)}
+                    >
+                      <Sparkles size={18} />
+                      <span>Responder Pesquisa de Gêneros (30 seg)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.surveyInviteDecor}>
+                  <div className={styles.surveyEmojiCloud}>
+                    <span className={styles.floatingEmoji1}>🚀</span>
+                    <span className={styles.floatingEmoji2}>🧙‍♂️</span>
+                    <span className={styles.floatingEmoji3}>💻</span>
+                    <span className={styles.floatingEmoji4}>🕵️</span>
+                    <span className={styles.floatingEmoji5}>📜</span>
+                    <span className={styles.floatingEmoji6}>💖</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ===== 3. SEÇÃO DE PLANOS DE ASSINATURA (CLUBE DO LIVRO) ===== */}
         <section id="planos-section" className={styles.plansSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
@@ -1397,7 +1628,7 @@ export default function BookStore() {
           </div>
         </section>
 
-        {/* ===== 3. SEÇÃO DO CATÁLOGO DE LIVROS À VENDA ===== */}
+        {/* ===== 4. SEÇÃO DO CATÁLOGO DE LIVROS À VENDA ===== */}
         <section id="catalogo-section" className={styles.booksSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
@@ -1475,17 +1706,17 @@ export default function BookStore() {
 
               {searchSource === 'local' && (
                 <div className={styles.searchControlsRight}>
-                  {/* Botão de Gêneros Preferidos */}
+                  {/* Botão de Pesquisa de Gêneros */}
                   <button
                     className={`${styles.btnGenrePreferences} ${
-                      filterOnlyPreferred ? styles.btnGenrePreferencesActive : ''
+                      preferredGenres.length > 0 ? styles.btnGenrePreferencesActive : ''
                     }`}
-                    onClick={() => setIsPreferencesModalOpen(true)}
+                    onClick={() => setIsSurveyModalOpen(true)}
                     title="Personalizar meus gêneros favoritos"
                     id="btn-genre-preferences"
                   >
-                    <Film size={17} className={styles.prefIcon} />
-                    <span>Gêneros Preferidos</span>
+                    <Sparkles size={17} className={styles.prefIcon} />
+                    <span>Meus Gêneros</span>
                     {preferredGenres.length > 0 && (
                       <span className={styles.prefCountBadge}>{preferredGenres.length}</span>
                     )}
@@ -1519,33 +1750,33 @@ export default function BookStore() {
                   Filtrar:
                 </span>
                 <div className={styles.genrePillsList}>
-                  {/* Pílula Especial de Gêneros Marcados como Preferidos */}
+                  {/* Pílula Especial de Gêneros da Pesquisa */}
                   <button
                     className={`${styles.genrePill} ${styles.genrePillPreferred} ${
                       filterOnlyPreferred ? styles.genrePillActivePreferred : ''
                     }`}
                     onClick={() => {
                       if (preferredGenres.length === 0) {
-                        setIsPreferencesModalOpen(true);
+                        setIsSurveyModalOpen(true);
                       } else {
                         const next = !filterOnlyPreferred;
                         setFilterOnlyPreferred(next);
                         if (next) {
                           setSelectedGenre('Todos');
-                          showToast(`Filtrando por ${preferredGenres.length} gêneros preferidos!`);
+                          showToast(`Filtrando por ${preferredGenres.length} gêneros selecionados!`);
                         } else {
                           showToast('Exibindo catálogo completo da livraria');
                         }
                       }
                     }}
-                    title="Filtrar pelos seus gêneros marcados"
+                    title="Filtrar pelos seus gêneros favoritos"
                   >
-                    <Film size={14} />
-                    <span>⭐ Meus Gêneros</span>
+                    <Sparkles size={14} />
+                    <span>⭐ Meus Favoritos</span>
                     {preferredGenres.length > 0 ? (
                       <span className={styles.genrePillCount}>{preferredGenres.length}</span>
                     ) : (
-                      <span className={styles.genrePillConfigHint}>Configurar</span>
+                      <span className={styles.genrePillConfigHint}>Responder</span>
                     )}
                   </button>
 
@@ -1658,9 +1889,7 @@ export default function BookStore() {
                       className={styles.bookCard}
                       onClick={() => setSelectedBook(book)}
                     >
-                      {/* Top: Capa do Livro estilizada ou imagem real */}
                       <div className={styles.coverWrapper}>
-                        {/* Selo de Desconto ou Badge */}
                         <div className={styles.cardBadgeRow}>
                           {discountPercent > 0 && (
                             <span className={styles.discountBadge}>-{discountPercent}% OFF</span>
@@ -1721,7 +1950,6 @@ export default function BookStore() {
                           </div>
                         )}
 
-                        {/* Botão Favoritar */}
                         {!isExternal && (
                           <button
                             className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
@@ -1733,9 +1961,7 @@ export default function BookStore() {
                         )}
                       </div>
 
-                      {/* Conteúdo do Card */}
                       <div className={styles.bookCardBody}>
-                        {/* Nome do Livro e Autor */}
                         <div className={styles.bookInfoTop}>
                           <h3 className={styles.bookTitle} title={book.title}>
                             {book.title}
@@ -1746,7 +1972,6 @@ export default function BookStore() {
                           </div>
                         </div>
 
-                        {/* Gênero e Formato */}
                         <div className={styles.genreSection}>
                           <span className={styles.genreBadge}>
                             <Bookmark size={12} className={styles.genreIcon} />
@@ -1755,7 +1980,6 @@ export default function BookStore() {
                           <span className={styles.formatPill}>{book.format || 'Capa Dura'}</span>
                         </div>
 
-                        {/* Avaliação */}
                         <div className={styles.ratingSection}>
                           <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
                           <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
@@ -1764,12 +1988,10 @@ export default function BookStore() {
                           </span>
                         </div>
 
-                        {/* Resumo da Sinopse */}
                         <div className={styles.synopsisSection}>
                           <p className={styles.synopsisText}>{book.synopsis}</p>
                         </div>
 
-                        {/* Bloco de Preço & Parcelamento */}
                         <div className={styles.cardPricingBox}>
                           <div className={styles.cardOldPrice}>
                             De R$ {originalPrice.toFixed(2).replace('.', ',')}
@@ -1782,7 +2004,6 @@ export default function BookStore() {
                           </div>
                         </div>
 
-                        {/* Ações do Card: Comprar e Detalhes */}
                         <div className={styles.cardActions}>
                           {isExternal ? (
                             <button
@@ -1831,14 +2052,14 @@ export default function BookStore() {
           </div>
         </section>
 
-        {/* ===== 4. SEÇÃO COMO FUNCIONA O CLUBE E AS COMPRAS ===== */}
+        {/* ===== 5. SEÇÃO COMO FUNCIONA O CLUBE E AS COMPRAS ===== */}
         <section id="como-funciona" className={styles.howItWorksSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
               <span className={styles.subHeadingBadge}>Experiência Bibliotech</span>
               <h2 className={styles.mainSectionTitle}>Como funciona a Livraria & Clube</h2>
               <p className={styles.mainSectionDesc}>
-                Compre exemplares avulsos com frete reduzido ou receba caixas exclusivas todo mês.
+                Compre exemplares com sugestões personalizadas ou assine caixas exclusivas todo mês.
               </p>
             </div>
 
@@ -1846,11 +2067,11 @@ export default function BookStore() {
               <div className={styles.stepCard}>
                 <div className={styles.stepNumberBadge}>01</div>
                 <div className={styles.stepIconBox}>
-                  <Compass size={24} />
+                  <Sparkles size={24} />
                 </div>
-                <h3 className={styles.stepTitle}>Escolha Livros ou Assine</h3>
+                <h3 className={styles.stepTitle}>Pesquisa de Gêneros</h3>
                 <p className={styles.stepDesc}>
-                  Compre obras avulsas pelo catálogo da livraria ou selecione um de nossos 3 planos de assinatura mensal.
+                  Responda quais gêneros você mais gosta de ler para que a livraria recomende títulos perfeitos para você.
                 </p>
               </div>
 
@@ -1890,7 +2111,7 @@ export default function BookStore() {
           </div>
         </section>
 
-        {/* ===== 5. SEÇÃO DIFERENCIAIS ===== */}
+        {/* ===== 6. SEÇÃO DIFERENCIAIS ===== */}
         <section id="beneficios" className={styles.benefitsSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
@@ -1902,6 +2123,16 @@ export default function BookStore() {
             </div>
 
             <div className={styles.benefitsGrid}>
+              <div className={styles.benefitCard}>
+                <div className={styles.benefitIconBox}>
+                  <Sparkles size={22} />
+                </div>
+                <h3 className={styles.benefitTitle}>Recomendações Sob Medida</h3>
+                <p className={styles.benefitDesc}>
+                  Algoritmo inteligente de preferências literárias que sugere obras alinhadas aos seus autores e gêneros favoritos.
+                </p>
+              </div>
+
               <div className={styles.benefitCard}>
                 <div className={styles.benefitIconBox}>
                   <Award size={22} />
@@ -1951,21 +2182,11 @@ export default function BookStore() {
                   Troca ou devolução facilitada em até 30 dias se o livro apresentar qualquer avaria no transporte.
                 </p>
               </div>
-
-              <div className={styles.benefitCard}>
-                <div className={styles.benefitIconBox}>
-                  <Sparkles size={22} />
-                </div>
-                <h3 className={styles.benefitTitle}>Experiência Visual Neon</h3>
-                <p className={styles.benefitDesc}>
-                  Paleta agradável em verde claro e branco de dia e modo escuro aveludado com detalhes em neon verde relaxante à noite.
-                </p>
-              </div>
             </div>
           </div>
         </section>
 
-        {/* ===== 6. DEPOIMENTOS DE LEITORES & CLIENTES ===== */}
+        {/* ===== 7. DEPOIMENTOS DE LEITORES & CLIENTES ===== */}
         <section id="depoimentos" className={styles.testimonialsSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
@@ -1980,13 +2201,13 @@ export default function BookStore() {
               <div className={styles.testimonialCard}>
                 <Quote size={28} className={styles.testimonialQuoteIcon} />
                 <p className={styles.testimonialText}>
-                  "O Box VIP Capa Dura superou todas as minhas expectativas! O livro veio super bem embalado, com uma ecobag linda e um marcador colecionável de metal. Vale cada centavo!"
+                  "A pesquisa de gêneros acertou em cheio! Escolhi Fantasia e Ficção Científica e recebi Duna e O Hobbit com um desconto excelente. A sacola de compras é muito rápida!"
                 </p>
                 <div className={styles.testimonialAuthorGroup}>
                   <div className={styles.testimonialAvatar}>M</div>
                   <div>
                     <h4 className={styles.testimonialName}>Mariana Costa</h4>
-                    <span className={styles.testimonialRole}>Assinante Box VIP há 6 meses</span>
+                    <span className={styles.testimonialRole}>Leitora Assídua & Estudante</span>
                   </div>
                 </div>
               </div>
@@ -1994,13 +2215,13 @@ export default function BookStore() {
               <div className={styles.testimonialCard}>
                 <Quote size={28} className={styles.testimonialQuoteIcon} />
                 <p className={styles.testimonialText}>
-                  "Comprei Duna e O Senhor dos Anéis com o cupom BIBLIO10 e o desconto no PIX. Chegou em apenas 2 dias aqui em Curitiba. A qualidade das capas duras é impecável!"
+                  "O Box VIP Capa Dura superou todas as minhas expectativas! O livro veio super bem embalado, com uma ecobag linda e um marcador colecionável de metal. Vale cada centavo!"
                 </p>
                 <div className={styles.testimonialAuthorGroup}>
                   <div className={styles.testimonialAvatar}>L</div>
                   <div>
                     <h4 className={styles.testimonialName}>Lucas Silveira</h4>
-                    <span className={styles.testimonialRole}>Cliente da Livraria Online</span>
+                    <span className={styles.testimonialRole}>Assinante Box VIP</span>
                   </div>
                 </div>
               </div>
@@ -2008,13 +2229,13 @@ export default function BookStore() {
               <div className={styles.testimonialCard}>
                 <Quote size={28} className={styles.testimonialQuoteIcon} />
                 <p className={styles.testimonialText}>
-                  "O site é lindo demais, o modo escuro com contornos neon verde é extremamente confortável para navegar à noite. A sacola de compras e os descontos são transparentes e fáceis!"
+                  "O modo escuro com contornos neon verde é extremamente confortável para navegar à noite. A experiência de compra e a rapidez da entrega são fora de série!"
                 </p>
                 <div className={styles.testimonialAuthorGroup}>
                   <div className={styles.testimonialAvatar}>C</div>
                   <div>
                     <h4 className={styles.testimonialName}>Camila Nogueira</h4>
-                    <span className={styles.testimonialRole}>Professora e Leitora Ávida</span>
+                    <span className={styles.testimonialRole}>Professora de Literatura</span>
                   </div>
                 </div>
               </div>
@@ -2022,7 +2243,7 @@ export default function BookStore() {
           </div>
         </section>
 
-        {/* ===== 7. BANNER CTA FINAL ===== */}
+        {/* ===== 8. BANNER CTA FINAL ===== */}
         <section className={styles.ctaBannerSection}>
           <div className={styles.container}>
             <div className={styles.ctaBannerCard}>
@@ -2030,15 +2251,15 @@ export default function BookStore() {
               <Sparkles size={32} className={styles.ctaIconBadge} />
               <h2 className={styles.ctaTitle}>Pronto para abastecer sua estante com grandes histórias?</h2>
               <p className={styles.ctaDesc}>
-                Aproveite frete grátis para compras acima de R$ 99 ou assine o Box VIP para receber um livro surpresa todo mês na sua casa!
+                Aproveite frete grátis para compras acima de R$ 99 ou personalize seus gêneros favoritos para receber as melhores recomendações!
               </p>
               <div className={styles.ctaActions}>
-                <button onClick={scrollToCatalog} className={styles.btnCtaBannerPrimary}>
-                  <ShoppingBag size={18} />
-                  <span>Comprar Livros Agora</span>
+                <button onClick={() => setIsSurveyModalOpen(true)} className={styles.btnCtaBannerPrimary}>
+                  <Sparkles size={18} />
+                  <span>Personalizar Meus Gostos</span>
                 </button>
-                <button onClick={scrollToPlans} className={styles.btnCtaBannerSecondary}>
-                  <span>Ver Planos de Assinatura</span>
+                <button onClick={scrollToCatalog} className={styles.btnCtaBannerSecondary}>
+                  <span>Ver Catálogo Completo</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
@@ -2046,6 +2267,110 @@ export default function BookStore() {
           </div>
         </section>
       </main>
+
+      {/* ===== MODAL DE PESQUISA DE GÊNEROS FAVORITOS (ONBOARDING & RECOMENDAÇÃO) ===== */}
+      {isSurveyModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsSurveyModalOpen(false)}>
+          <div className={styles.surveyModalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.surveyModalHeader}>
+              <div className={styles.surveyModalBadgeRow}>
+                <span className={styles.surveyModalBadge}>
+                  <Sparkles size={14} />
+                  PESQUISA DE GOSTO LITERÁRIO
+                </span>
+                <button
+                  className={styles.modalCloseBtn}
+                  onClick={() => setIsSurveyModalOpen(false)}
+                  title="Fechar pesquisa"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <h3 className={styles.surveyModalTitle}>Quais são os seus gêneros favoritos? 📚</h3>
+              <p className={styles.surveyModalSubtitle}>
+                Selecione os temas que você mais ama ler para que a Bibliotech monte uma vitrine com recomendações sob medida para você:
+              </p>
+            </div>
+
+            {/* Grid dos Gêneros Interativos */}
+            <div className={styles.surveyGenresGrid}>
+              {AVAILABLE_GENRES.map((g) => {
+                const isSelected = preferredGenres.includes(g.id);
+                return (
+                  <div
+                    key={g.id}
+                    className={`${styles.surveyGenreCard} ${isSelected ? styles.surveyGenreCardSelected : ''}`}
+                    onClick={() => togglePreferredGenre(g.id)}
+                  >
+                    <div className={styles.surveyGenreHeader}>
+                      <span className={styles.surveyGenreEmoji}>{g.icon}</span>
+                      <div className={`${styles.surveyCheckbox} ${isSelected ? styles.surveyCheckboxChecked : ''}`}>
+                        {isSelected && <Check size={12} strokeWidth={3} />}
+                      </div>
+                    </div>
+                    <h4 className={styles.surveyGenreName}>{g.name}</h4>
+                    <p className={styles.surveyGenreDesc}>{g.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pergunta Complementar de Formato */}
+            <div className={styles.surveyFormatRow}>
+              <span className={styles.surveyFormatLabel}>Qual acabamento você prefere?</span>
+              <div className={styles.surveyFormatPills}>
+                {['Todos', 'Capa Dura', 'Brochura'].map((fmt) => (
+                  <button
+                    key={fmt}
+                    type="button"
+                    className={`${styles.surveyFormatBtn} ${preferredFormat === fmt ? styles.surveyFormatBtnActive : ''}`}
+                    onClick={() => setPreferredFormat(fmt)}
+                  >
+                    {fmt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Rodapé da Pesquisa com Contador e Ações */}
+            <div className={styles.surveyModalFooter}>
+              <div className={styles.surveyFooterLeft}>
+                <span className={styles.surveySelectedCount}>
+                  <strong>{preferredGenres.length}</strong> de {AVAILABLE_GENRES.length} gêneros selecionados
+                </span>
+                {preferredGenres.length > 0 && (
+                  <button
+                    type="button"
+                    className={styles.btnSurveyReset}
+                    onClick={clearPreferredGenres}
+                  >
+                    Limpar
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.surveyFooterRight}>
+                <button
+                  type="button"
+                  className={styles.btnSurveySkip}
+                  onClick={handleSkipSurvey}
+                >
+                  Explorar sem responder
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSurveySubmit}
+                  onClick={handleSaveSurvey}
+                >
+                  <Sparkles size={16} />
+                  <span>Ver Minhas Recomendações</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===== DRAWER / MODAL DA SACOLA DE COMPRAS (CART) ===== */}
       {isCartOpen && (
@@ -2174,7 +2499,6 @@ export default function BookStore() {
             {/* Rodapé da Sacola com Cupom e Totais */}
             {cart.length > 0 && (
               <div className={styles.cartFooter}>
-                {/* Campo de Cupom */}
                 <form onSubmit={handleApplyCoupon} className={styles.couponForm}>
                   <div className={styles.couponInputWrapper}>
                     <Tag size={15} className={styles.couponIcon} />
@@ -2204,7 +2528,6 @@ export default function BookStore() {
                   </div>
                 )}
 
-                {/* Resumo Financeiro */}
                 <div className={styles.cartSummaryLines}>
                   <div className={styles.summaryLine}>
                     <span>Subtotal</span>
@@ -2363,7 +2686,6 @@ export default function BookStore() {
                   </div>
                 </div>
 
-                {/* Resumo do Pedido no Checkout */}
                 <div className={styles.checkoutSummaryCard}>
                   <div className={styles.checkoutSummaryRow}>
                     <span>Itens ({cartTotalItems})</span>
@@ -2408,7 +2730,6 @@ export default function BookStore() {
                 </div>
               </form>
             ) : (
-              /* TELA DE SUCESSO DO PEDIDO */
               <div className={styles.orderSuccessCard}>
                 <div className={styles.orderSuccessIconCircle}>
                   <CheckCircle size={48} />
@@ -2552,7 +2873,6 @@ export default function BookStore() {
             </button>
 
             <div className={styles.modalGrid}>
-              {/* Capa */}
               <div
                 className={styles.modalCover}
                 style={{
@@ -2568,7 +2888,6 @@ export default function BookStore() {
                 <span className={styles.modalCoverYear}>{selectedBook.year}</span>
               </div>
 
-              {/* Detalhes */}
               <div className={styles.modalDetails}>
                 <div className={styles.modalGenreRow}>
                   <span className={styles.genreBadge}>
@@ -2589,7 +2908,6 @@ export default function BookStore() {
                   <span>Por {selectedBook.author}</span>
                 </div>
 
-                {/* Avaliação */}
                 <div className={styles.modalRatingRow}>
                   <div className={styles.modalStarsBox}>{renderStars(selectedBook.rating)}</div>
                   <span className={styles.modalRatingScore}>
@@ -2600,7 +2918,6 @@ export default function BookStore() {
                   </span>
                 </div>
 
-                {/* Bloco de Preço Modal */}
                 <div className={styles.modalPriceContainer}>
                   <div className={styles.modalPriceTop}>
                     <span className={styles.modalOldPrice}>
@@ -2618,7 +2935,6 @@ export default function BookStore() {
                   </div>
                 </div>
 
-                {/* Metadados */}
                 <div className={styles.modalMetaGrid}>
                   <div className={styles.modalMetaItem}>
                     <Calendar size={18} />
@@ -2643,13 +2959,11 @@ export default function BookStore() {
                   </div>
                 </div>
 
-                {/* Sinopse Completa */}
                 <div className={styles.modalSynopsisBox}>
                   <h4 className={styles.synopsisHeaderTitle}>Sinopse do Livro:</h4>
                   <p className={styles.modalSynopsisParagraph}>{selectedBook.synopsis}</p>
                 </div>
 
-                {/* Ações */}
                 <div className={styles.modalActions}>
                   <button
                     className={styles.btnModalAddToCart}
@@ -2706,7 +3020,6 @@ export default function BookStore() {
               </button>
             </div>
 
-            {/* Autopreenchimento Google Books API */}
             <div className={styles.apiAutofillBox}>
               <span className={styles.apiAutofillTitle}>
                 <Wand2 size={14} />
@@ -2777,7 +3090,6 @@ export default function BookStore() {
                 </div>
               </div>
 
-              {/* Preços e Estoque */}
               <div className={styles.formRow}>
                 <div className={styles.formField}>
                   <label className={styles.formLabel}>Preço de Venda (R$) *</label>
@@ -2891,97 +3203,6 @@ export default function BookStore() {
         </div>
       )}
 
-      {/* ===== MODAL DE PREFERÊNCIAS DE GÊNEROS ===== */}
-      {isPreferencesModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsPreferencesModalOpen(false)}>
-          <div className={styles.modalCardMedium} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.formHeader}>
-              <div className={styles.formHeaderTitleGroup}>
-                <div className={styles.prefModalIconBox}>
-                  <Film size={22} />
-                </div>
-                <div>
-                  <h3 className={styles.formTitle}>Meus Gêneros & Estilos Favoritos</h3>
-                  <p className={styles.formSubtitle}>Marque seus temas preferidos para filtrar a livraria com 1 clique</p>
-                </div>
-              </div>
-              <button
-                className={styles.modalCloseBtn}
-                onClick={() => setIsPreferencesModalOpen(false)}
-                title="Fechar"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className={styles.prefModalIntro}>
-              <span>Selecione abaixo os gêneros que você mais gosta de ler ou assistir:</span>
-            </div>
-
-            <div className={styles.prefGenresGrid}>
-              {AVAILABLE_GENRES.map((g) => {
-                const isSelected = preferredGenres.includes(g.id);
-                return (
-                  <div
-                    key={g.id}
-                    className={`${styles.prefGenreCard} ${
-                      isSelected ? styles.prefGenreCardSelected : ''
-                    }`}
-                    onClick={() => togglePreferredGenre(g.id)}
-                  >
-                    <div className={styles.prefGenreHeader}>
-                      <span className={styles.prefGenreEmoji}>{g.icon}</span>
-                      <div
-                        className={`${styles.prefCheckbox} ${
-                          isSelected ? styles.prefCheckboxChecked : ''
-                        }`}
-                      >
-                        {isSelected && <Check size={13} strokeWidth={3} />}
-                      </div>
-                    </div>
-                    <h4 className={styles.prefGenreName}>{g.name}</h4>
-                    <p className={styles.prefGenreDesc}>{g.desc}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className={styles.prefModalFooter}>
-              <div className={styles.prefSelectedCounter}>
-                <span><strong>{preferredGenres.length}</strong> de {AVAILABLE_GENRES.length} temas marcados</span>
-                {preferredGenres.length > 0 && (
-                  <button
-                    type="button"
-                    className={styles.btnPrefClear}
-                    onClick={clearPreferredGenres}
-                  >
-                    Limpar tudo
-                  </button>
-                )}
-              </div>
-
-              <div className={styles.prefModalActions}>
-                <button
-                  type="button"
-                  className={styles.btnFormCancel}
-                  onClick={() => setIsPreferencesModalOpen(false)}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className={styles.btnFormSubmit}
-                  onClick={applyPreferredGenres}
-                >
-                  <Sparkles size={16} />
-                  <span>Aplicar & Ver Catálogo</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.container}>
@@ -2994,12 +3215,13 @@ export default function BookStore() {
                 <span className={styles.footerLogoTitle}>BIBLIOTECH</span>
               </div>
               <p className={styles.footerDesc}>
-                Sua livraria online definitiva e clube literário exclusivo. Grandes histórias entregues com amor, embalagens protegidas e os melhores preços do Brasil.
+                Sua livraria online definitiva e clube literário exclusivo. Descubra recomendações personalizadas com base nos seus gêneros favoritos e receba os livros mais premiados na sua porta.
               </p>
             </div>
 
             <div className={styles.footerLinks}>
               <span className={styles.footerGroupTitle}>Navegação</span>
+              <a href="#recomendados-section" className={styles.footerLinkItem}>Recomendações para Você</a>
               <a href="#catalogo-section" className={styles.footerLinkItem}>Livraria Online</a>
               <a href="#planos-section" className={styles.footerLinkItem}>Clube do Livro & Planos</a>
               <a href="#como-funciona" className={styles.footerLinkItem}>Como Funciona</a>
