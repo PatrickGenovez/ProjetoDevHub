@@ -18,6 +18,7 @@ import {
   Lock,
   FileText,
   X,
+  ChevronLeft,
   ChevronRight,
   Sparkles,
   Heart,
@@ -55,434 +56,30 @@ import {
   Percent,
   CheckCircle,
   HelpCircle,
-  RotateCcw
+  RotateCcw,
+  LayoutGrid,
+  List,
+  Crown,
+  Flame,
+  DollarSign,
+  Coffee,
+  Sliders
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/index.module.css';
 
-// Catálogo inicial padrão da livraria com atributos de e-commerce
-const DEFAULT_BOOKS = [
-  {
-    "id": 1,
-    "title": "Duna",
-    "author": "Frank Herbert",
-    "genre": "Ficção Científica",
-    "rating": 4.9,
-    "reviewsCount": 1840,
-    "price": 59.9,
-    "originalPrice": 89.9,
-    "discountPercent": 33,
-    "stock": 24,
-    "badge": "Mais Vendido",
-    "format": "Capa Dura",
-    "synopsis": "Em um futuro distante, o jovem Paul Atreides é herdeiro de uma família nobre enviada para governar o inóspito planeta desértico Arrakis, a única fonte da substância mais valiosa do universo, a especiaria mélange.",
-    "year": 1965,
-    "pages": 680,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/11149234-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 2,
-    "title": "O Senhor dos Anéis: A Sociedade do Anel",
-    "author": "J.R.R. Tolkien",
-    "genre": "Fantasia",
-    "rating": 5,
-    "reviewsCount": 2410,
-    "price": 69.9,
-    "originalPrice": 99.9,
-    "discountPercent": 30,
-    "stock": 18,
-    "badge": "Destaque",
-    "format": "Edição Especial",
-    "synopsis": "Frodo Bolseiro, um hobbit da pacata Comarca, herda um anel mágico ancestral e descobre que ele tem o poder de escravizar toda a Terra-média nas mãos do Senhor do Escuro, Sauron.",
-    "year": 1954,
-    "pages": 576,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/14547565-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #34d399 0%, #10b981 50%, #064e3b 100%)",
-    "accentColor": "#34d399"
-  },
-  {
-    "id": 3,
-    "title": "1984",
-    "author": "George Orwell",
-    "genre": "Distopia",
-    "rating": 4.8,
-    "reviewsCount": 3150,
-    "price": 34.9,
-    "originalPrice": 49.9,
-    "discountPercent": 30,
-    "stock": 45,
-    "badge": "Super Oferta",
-    "format": "Brochura",
-    "synopsis": "Em uma sociedade totalitária dominada pelo Partido e pelo onipresente Grande Irmão, Winston Smith trabalha no Ministério da Verdade reescrevendo a história, mas começa secretamente a questionar o regime.",
-    "year": 1949,
-    "pages": 336,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/9267242-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #059669 0%, #047857 50%, #022c22 100%)",
-    "accentColor": "#059669"
-  },
-  {
-    "id": 4,
-    "title": "Código Limpo (Clean Code)",
-    "author": "Robert C. Martin",
-    "genre": "Tecnologia",
-    "rating": 4.7,
-    "reviewsCount": 980,
-    "price": 84.9,
-    "originalPrice": 119,
-    "discountPercent": 28,
-    "stock": 12,
-    "badge": "Mais Vendido",
-    "format": "Brochura Premium",
-    "synopsis": "Um guia fundamental sobre boas práticas de engenharia de software, mostrando como escrever código legível, modular e de fácil manutenção através de princípios de refatoração, nomes significativos e testes automatizados.",
-    "year": 2008,
-    "pages": 464,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #047857 50%, #064e3b 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 5,
-    "title": "O Hobbit",
-    "author": "J.R.R. Tolkien",
-    "genre": "Fantasia",
-    "rating": 4.9,
-    "reviewsCount": 1620,
-    "price": 49.9,
-    "originalPrice": 65,
-    "discountPercent": 23,
-    "stock": 22,
-    "badge": "Clássico",
-    "format": "Capa Dura",
-    "synopsis": "Bilbo Bolseiro vive uma vida tranquila no Condado até ser surpreendido pelo mago Gandalf e uma companhia de treze anões para recuperar um tesouro guardado pelo temível dragão Smaug.",
-    "year": 1937,
-    "pages": 310,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/12003528-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #14b8a6 0%, #0f766e 50%, #134e4a 100%)",
-    "accentColor": "#14b8a6"
-  },
-  {
-    "id": 6,
-    "title": "Neuromancer",
-    "author": "William Gibson",
-    "genre": "Ficção Científica",
-    "rating": 4.6,
-    "reviewsCount": 890,
-    "price": 44.9,
-    "originalPrice": 59.9,
-    "discountPercent": 25,
-    "stock": 15,
-    "badge": "Cyberpunk",
-    "format": "Brochura",
-    "synopsis": "Case é um cowboy do ciberespaço que foi banido da rede neural após trair seus empregadores. Uma oportunidade misteriosa surge para recuperar sua conexão em troca de uma última invasão hacker de alto risco.",
-    "year": 1984,
-    "pages": 320,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/283860-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #059669 0%, #047857 50%, #022c22 100%)",
-    "accentColor": "#059669"
-  },
-  {
-    "id": 7,
-    "title": "O Silêncio dos Inocentes",
-    "author": "Thomas Harris",
-    "genre": "Suspense & Mistério",
-    "rating": 4.8,
-    "reviewsCount": 1120,
-    "price": 39.9,
-    "originalPrice": 54.9,
-    "discountPercent": 27,
-    "stock": 30,
-    "badge": "Bestseller",
-    "format": "Brochura",
-    "synopsis": "A jovem estagiária do FBI Clarice Starling deve interrogar o brilhante psiquiatra e assassino em série Dr. Hannibal Lecter para obter pistas sobre um novo criminoso que aterroriza o país.",
-    "year": 1988,
-    "pages": 368,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/isbn/9780312924584-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #047857 0%, #065f46 50%, #022c22 100%)",
-    "accentColor": "#047857"
-  },
-  {
-    "id": 8,
-    "title": "O Pequeno Príncipe",
-    "author": "Antoine de Saint-Exupéry",
-    "genre": "Clássicos",
-    "rating": 4.9,
-    "reviewsCount": 4300,
-    "price": 24.9,
-    "originalPrice": 35,
-    "discountPercent": 28,
-    "stock": 60,
-    "badge": "Mais Vendido",
-    "format": "Capa Dura Ilustrada",
-    "synopsis": "Um piloto cai no deserto do Saara e encontra um menino misterioso vindo de um asteroide distante. Uma fábula poética sobre amizade, amor, perda e o que é verdadeiramente essencial aos olhos.",
-    "year": 1943,
-    "pages": 96,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/10574187-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #34d399 50%, #065f46 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 9,
-    "title": "Fundação",
-    "author": "Isaac Asimov",
-    "genre": "Ficção Científica",
-    "rating": 4.9,
-    "reviewsCount": 1450,
-    "price": 54.9,
-    "originalPrice": 79.9,
-    "discountPercent": 31,
-    "stock": 20,
-    "badge": "Obra-Prima",
-    "format": "Capa Dura",
-    "synopsis": "O matemático Hari Seldon desenvolve a psico-história e prevê a queda do Império Galáctico e uma era de trevas de trinta mil anos, criando um refúgio para preservar o conhecimento humano.",
-    "year": 1951,
-    "pages": 240,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8758832-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #042f2e 100%)",
-    "accentColor": "#0d9488"
-  },
-  {
-    "id": 10,
-    "title": "Harry Potter e a Pedra Filosofal",
-    "author": "J.K. Rowling",
-    "genre": "Fantasia",
-    "rating": 4.9,
-    "reviewsCount": 5200,
-    "price": 42.9,
-    "originalPrice": 59.9,
-    "discountPercent": 28,
-    "stock": 35,
-    "badge": "Edição Especial",
-    "format": "Capa Dura",
-    "synopsis": "Harry Potter descobre no seu aniversário de 11 anos que é um bruxo e é convidado para estudar na Escola de Magia e Bruxaria de Hogwarts, descobrindo o segredo do seu passado.",
-    "year": 1997,
-    "pages": 223,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/10521270-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #059669 0%, #10b981 50%, #022c22 100%)",
-    "accentColor": "#059669"
-  },
-  {
-    "id": 11,
-    "title": "O Programador Pragmático",
-    "author": "Andrew Hunt & David Thomas",
-    "genre": "Tecnologia",
-    "rating": 4.8,
-    "reviewsCount": 850,
-    "price": 89.9,
-    "originalPrice": 129,
-    "discountPercent": 30,
-    "stock": 14,
-    "badge": "Essencial Dev",
-    "format": "Brochura Premium",
-    "synopsis": "Um clássico atemporal que aborda a jornada do desenvolvedor, desde responsabilidade profissional e desenvolvimento de carreira até técnicas arquiteturais para manter seu código maleável e flexível.",
-    "year": 1999,
-    "pages": 352,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/10143650-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #065f46 50%, #022c22 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 12,
-    "title": "Sapiens: Uma Breve História da Humanidade",
-    "author": "Yuval Noah Harari",
-    "genre": "História & Biografias",
-    "rating": 4.9,
-    "reviewsCount": 3800,
-    "price": 62.9,
-    "originalPrice": 84.9,
-    "discountPercent": 25,
-    "stock": 28,
-    "badge": "Fenômeno Global",
-    "format": "Capa Dura",
-    "synopsis": "Uma jornada fascinante por toda a história da humanidade, desde os primeiros hominídeos na África até as revoluções cognitiva, agrícola e científica que moldaram a sociedade moderna.",
-    "year": 2011,
-    "pages": 464,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/11497928-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #047857 0%, #064e3b 50%, #022c22 100%)",
-    "accentColor": "#047857"
-  },
-  {
-    "id": 13,
-    "title": "Orgulho e Preconceito",
-    "author": "Jane Austen",
-    "genre": "Romance",
-    "rating": 4.8,
-    "reviewsCount": 2900,
-    "price": 29.9,
-    "originalPrice": 44.9,
-    "discountPercent": 33,
-    "stock": 32,
-    "badge": "Clássico Romance",
-    "format": "Capa Dura Floral",
-    "synopsis": "Elizabeth Bennet enfrenta as pressões sociais do casamento na Inglaterra do século XIX enquanto navega em seu relacionamento turbulento e fascinante com o orgulhoso Sr. Darcy.",
-    "year": 1813,
-    "pages": 424,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8225261-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #34d399 50%, #064e3b 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 14,
-    "title": "Admirável Mundo Novo",
-    "author": "Aldous Huxley",
-    "genre": "Distopia",
-    "rating": 4.7,
-    "reviewsCount": 1980,
-    "price": 38.9,
-    "originalPrice": 52,
-    "discountPercent": 25,
-    "stock": 25,
-    "badge": "Distopia Clássica",
-    "format": "Brochura",
-    "synopsis": "Uma sociedade futurista onde as pessoas são geneticamente condicionadas em castas e mantidas em estado de felicidade química e controle através do consumo e da droga soma.",
-    "year": 1932,
-    "pages": 312,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8763784-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #059669 0%, #047857 50%, #022c22 100%)",
-    "accentColor": "#059669"
-  },
-  {
-    "id": 15,
-    "title": "Fahrenheit 451",
-    "author": "Ray Bradbury",
-    "genre": "Distopia",
-    "rating": 4.7,
-    "reviewsCount": 1750,
-    "price": 36.9,
-    "originalPrice": 49.9,
-    "discountPercent": 26,
-    "stock": 22,
-    "badge": "Recomendado",
-    "format": "Brochura Especial",
-    "synopsis": "Guy Montag é um bombeiro cuja missão não é apagar incêndios, mas queimar livros proibidos pelo governo, até que um encontro o faz questionar tudo o que acreditava.",
-    "year": 1953,
-    "pages": 216,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/10313414-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #0d9488 0%, #10b981 50%, #022c22 100%)",
-    "accentColor": "#0d9488"
-  },
-  {
-    "id": 16,
-    "title": "As Aventuras de Sherlock Holmes",
-    "author": "Arthur Conan Doyle",
-    "genre": "Suspense & Mistério",
-    "rating": 4.8,
-    "reviewsCount": 2100,
-    "price": 32.9,
-    "originalPrice": 45,
-    "discountPercent": 26,
-    "stock": 40,
-    "badge": "Mistério",
-    "format": "Capa Dura",
-    "synopsis": "Doze casos intrigantes resolvidos pelo detetive consultor Sherlock Holmes e seu fiel amigo Dr. John Watson nas névoas da Londres vitoriana.",
-    "year": 1892,
-    "pages": 360,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8232986-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #047857 0%, #065f46 50%, #022c22 100%)",
-    "accentColor": "#047857"
-  },
-  {
-    "id": 17,
-    "title": "Crime e Castigo",
-    "author": "Fiódor Dostoiévski",
-    "genre": "Clássicos",
-    "rating": 4.9,
-    "reviewsCount": 1680,
-    "price": 49.9,
-    "originalPrice": 72,
-    "discountPercent": 30,
-    "stock": 18,
-    "badge": "Clássico Russo",
-    "format": "Edição de Luxo",
-    "synopsis": "O jovem estudante Raskólnikov comete um assassinato justificado por sua teoria de homens extraordinários, desencadeando um drama psicológico arrebatador sobre culpa e redenção.",
-    "year": 1866,
-    "pages": 592,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8231856-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #064e3b 0%, #047857 50%, #022c22 100%)",
-    "accentColor": "#064e3b"
-  },
-  {
-    "id": 18,
-    "title": "O Iluminado (The Shining)",
-    "author": "Stephen King",
-    "genre": "Terror & Suspense",
-    "rating": 4.8,
-    "reviewsCount": 2400,
-    "price": 48.9,
-    "originalPrice": 68,
-    "discountPercent": 28,
-    "stock": 26,
-    "badge": "Mestre do Terror",
-    "format": "Capa Dura",
-    "synopsis": "Jack Torrance aceita o trabalho de zelador de inverno no isolado Hotel Overlook junto com sua família, mas forças sombrias do local começam a exercer uma influência aterradora.",
-    "year": 1977,
-    "pages": 464,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/12376585-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #059669 0%, #064e3b 50%, #022c22 100%)",
-    "accentColor": "#059669"
-  },
-  {
-    "id": 19,
-    "title": "Dom Casmurro",
-    "author": "Machado de Assis",
-    "genre": "Clássicos",
-    "rating": 4.8,
-    "reviewsCount": 3500,
-    "price": 26.9,
-    "originalPrice": 38,
-    "discountPercent": 29,
-    "stock": 50,
-    "badge": "Literatura Nacional",
-    "format": "Capa Dura",
-    "synopsis": "Bento Santiago narra em retrospectiva sua vida e sua paixão por Capitu, atormentado pelo ciúme e pela dúvida sobre a fidelidade de sua amada nos olhos de ressaca.",
-    "year": 1899,
-    "pages": 256,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/12818862-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #10b981 0%, #047857 50%, #064e3b 100%)",
-    "accentColor": "#10b981"
-  },
-  {
-    "id": 20,
-    "title": "Entendendo Algoritmos",
-    "author": "Aditya Y. Bhargava",
-    "genre": "Tecnologia",
-    "rating": 4.9,
-    "reviewsCount": 1320,
-    "price": 58.9,
-    "originalPrice": 79,
-    "discountPercent": 25,
-    "stock": 22,
-    "badge": "Mais Vendido",
-    "format": "Brochura Ilustrada",
-    "synopsis": "Um guia ilustrado e amigável que ensina como aplicar algoritmos comuns aos problemas práticos do dia a dia da programação, com exemplos em Python e explicações visuais intuitivas.",
-    "year": 2016,
-    "pages": 264,
-    "status": "Disponível",
-    "coverImage": "https://covers.openlibrary.org/b/id/8512926-L.jpg",
-    "coverGradient": "linear-gradient(135deg, #14b8a6 0%, #0f766e 50%, #042f2e 100%)",
-    "accentColor": "#14b8a6"
+// Otimizador de URL de imagem de capas (converte para tamanho médio -M.jpg reduzindo 90%+ do peso da imagem)
+export const getOptimizedCoverUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  if (url.includes('covers.openlibrary.org') && url.includes('-L.jpg')) {
+    return url.replace('-L.jpg', '-M.jpg');
   }
-];
+  return url;
+};
+
+// Catálogo dinâmico carregado diretamente da API
+const DEFAULT_BOOKS = [];
+
 
 // Planos de Assinatura do Clube Literário
 const SUBSCRIPTION_PLANS = [
@@ -670,11 +267,23 @@ const INITIAL_COMMUNITY_POSTS = [
   }
 ];
 
-export default function BookStore() {
+export default function BookStore({ auth }) {
   const router = useRouter();
   const [books, setBooks] = useState(DEFAULT_BOOKS);
   const [searchSource, setSearchSource] = useState('local'); // 'local' | 'google' | 'openlibrary'
+  const [catalogViewMode, setCatalogViewMode] = useState('grid'); // 'grid' | 'list'
+  
+  // Estados de Busca com Debounce de 300ms (Alta Performance)
+  const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Estados de Paginação & Navegação do Catálogo
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [paginationMode, setPaginationMode] = useState('pages'); // 'pages' | 'infinite'
+  const [visibleCount, setVisibleCount] = useState(8); // Para o modo contínuo
+
   const [selectedGenre, setSelectedGenre] = useState('Todos');
   const [sortBy, setSortBy] = useState('sales'); // 'sales' | 'price-asc' | 'price-desc' | 'rating' | 'title'
   const [selectedBook, setSelectedBook] = useState(null);
@@ -702,13 +311,14 @@ export default function BookStore() {
     city: 'São Paulo - SP'
   });
 
-  // Estados dos Planos de Assinatura
+  // Estados dos Planos de Assinatura & Clube VIP
   const [billingCycle, setBillingCycle] = useState('mensal'); // 'mensal' | 'anual'
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [planForm, setPlanForm] = useState({ name: '', email: '' });
+  const [userPlan, setUserPlan] = useState('box-vip'); // 'none' | 'digital' | 'box-vip' | 'master'
 
-  // Estados de Pesquisa de Gêneros & Sistema de Recomendações
+  // Estados de Pesquisa de Gêneros
   const [preferredGenres, setPreferredGenres] = useState([]);
   const [preferredFormat, setPreferredFormat] = useState('Todos');
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
@@ -756,41 +366,90 @@ export default function BookStore() {
   const [newPostQuote, setNewPostQuote] = useState('');
 
 
-  // Carregar dados salvos no localStorage e disparar a pesquisa de preferências se for nova visita
+  // Debounce de 300ms no campo de busca para evitar travamentos e poupar processamento
   useEffect(() => {
+    if (searchInput !== searchTerm) {
+      setIsSearching(true);
+    }
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setIsSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Resetar página e contagem ao alterar busca, gênero, ordenação, origem ou tamanho de página
+  useEffect(() => {
+    setCurrentPage(1);
+    setVisibleCount(pageSize);
+  }, [searchTerm, selectedGenre, sortBy, filterOnlyPreferred, searchSource, pageSize]);
+
+  // Carregar dados salvos no localStorage e disparar a pesquisa de preferências se for nova visita
+  // Carregar dados dinamicamente da API e limpar qualquer cache legado de mock
+  useEffect(() => {
+    let isCancelled = false;
+
     const fetchBooks = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${apiUrl}/books`);
-        if (res.ok) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        let endpoint = `${apiUrl}/books?limit=36`;
+        if (selectedGenre && selectedGenre !== 'Todos') {
+          endpoint = `${apiUrl}/books?genre=${encodeURIComponent(selectedGenre)}&limit=24`;
+        }
+
+        const res = await fetch(endpoint, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (res.ok && !isCancelled) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {
-            setBooks(json.data);
+            setBooks((prev) => {
+              if (!selectedGenre || selectedGenre === 'Todos') {
+                return json.data;
+              }
+              const existingIds = new Set(prev.map((b) => String(b.id)));
+              const newBooks = json.data.filter((b) => !existingIds.has(String(b.id)));
+              return [...prev, ...newBooks];
+            });
+            localStorage.setItem('bibliotech_live_books_v1', JSON.stringify(json.data));
+            // Remove o mock legado caso ainda exista no navegador
+            localStorage.removeItem('bibliotech_books');
             return;
           }
         }
       } catch (err) {}
 
-      const saved = localStorage.getItem('bibliotech_books');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.length >= DEFAULT_BOOKS.length) {
-            setBooks(parsed);
-          } else {
-            setBooks(DEFAULT_BOOKS);
-            localStorage.setItem('bibliotech_books', JSON.stringify(DEFAULT_BOOKS));
-          }
-        } catch (e) {
-          setBooks(DEFAULT_BOOKS);
+      if (!isCancelled) {
+        // Limpa cache legado que possa ter ficado no navegador do usuário
+        const oldSaved = localStorage.getItem('bibliotech_books');
+        if (oldSaved && (oldSaved.includes('"Duna"') || oldSaved.includes('"Frank Herbert"'))) {
+          localStorage.removeItem('bibliotech_books');
         }
-      } else {
-        localStorage.setItem('bibliotech_books', JSON.stringify(DEFAULT_BOOKS));
+
+        const saved = localStorage.getItem('bibliotech_live_books_v1');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+              setBooks(parsed);
+            }
+          } catch (e) {}
+        }
       }
     };
 
     fetchBooks();
 
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedGenre]);
+
+  // Carregar dados salvos no localStorage (favoritos, sessão, carrinho, onboarding)
+  useEffect(() => {
     try {
       const savedFavs = JSON.parse(localStorage.getItem('bibliotech_favs') || '[]');
       setFavorites(savedFavs);
@@ -855,22 +514,128 @@ export default function BookStore() {
         setCart(savedCart);
       }
 
-    try {
-      const savedCommunity = localStorage.getItem('bibliotech_community_posts');
-      if (savedCommunity) {
-        const parsed = JSON.parse(savedCommunity);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCommunityPosts(parsed);
+      const storedSub = localStorage.getItem('bibliotech_user_subscription');
+      if (storedSub) {
+        try {
+          const sub = JSON.parse(storedSub);
+          if (sub.planId) setUserPlan(sub.planId);
+        } catch (e) {}
+      }
+
+      try {
+        const savedCommunity = localStorage.getItem('bibliotech_community_posts');
+        if (savedCommunity) {
+          const parsed = JSON.parse(savedCommunity);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCommunityPosts(parsed);
+          }
         }
-      }
-      const savedLikes = localStorage.getItem('bibliotech_community_likes');
-      if (savedLikes) {
-        setCommunityLikes(JSON.parse(savedLikes));
-      }
-    } catch (e) {}
+        const savedLikes = localStorage.getItem('bibliotech_community_likes');
+        if (savedLikes) {
+          setCommunityLikes(JSON.parse(savedLikes));
+        }
+      } catch (e) {}
 
     } catch (e) {}
   }, []);
+
+  // Sincronização reativa com sessão de autenticação (useAuth)
+  useEffect(() => {
+    if (auth?.user) {
+      setCurrentUser(auth.user);
+      if (auth.user.plano_id && auth.user.plano_id !== 'visitante') {
+        setUserPlan(auth.user.plano_id);
+      }
+    } else {
+      const stored = localStorage.getItem('userData');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setCurrentUser(parsed);
+          if (parsed.plano_id && parsed.plano_id !== 'visitante') {
+            setUserPlan(parsed.plano_id);
+          }
+        } catch (e) {
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+    }
+  }, [auth?.user]);
+
+  // Sincronização do carrinho no localStorage e com a conta do usuário
+  useEffect(() => {
+    let isCancelled = false;
+
+    const syncUserCart = async () => {
+      const userKey = currentUser ? (currentUser.email || currentUser.id) : null;
+      let localItems = [];
+
+      try {
+        const userSaved = userKey ? localStorage.getItem(`bibliotech_cart_${userKey}`) : null;
+        const generalSaved = localStorage.getItem('bibliotech_cart');
+        const raw = userSaved || generalSaved || '[]';
+        localItems = JSON.parse(raw);
+        if (Array.isArray(localItems) && !isCancelled) {
+          setCart(localItems);
+        }
+      } catch (e) {}
+
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (token && currentUser) {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+          const res = await fetch(`${apiUrl}/cart/merge`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ items: localItems })
+          });
+
+          if (res.ok && !isCancelled) {
+            const json = await res.json();
+            if (json.data && Array.isArray(json.data)) {
+              setCart(json.data);
+              localStorage.setItem('bibliotech_cart', JSON.stringify(json.data));
+              if (userKey) {
+                localStorage.setItem(`bibliotech_cart_${userKey}`, JSON.stringify(json.data));
+              }
+            }
+          }
+        } catch (err) {}
+      }
+    };
+
+    syncUserCart();
+
+    const handleStorage = (e) => {
+      if (!e.key || e.key.includes('bibliotech_cart')) {
+        try {
+          const updated = JSON.parse(localStorage.getItem('bibliotech_cart') || '[]');
+          if (Array.isArray(updated) && !isCancelled) setCart(updated);
+        } catch (err) {}
+      }
+    };
+
+    const handleCustomSync = () => {
+      try {
+        const updated = JSON.parse(localStorage.getItem('bibliotech_cart') || '[]');
+        if (Array.isArray(updated) && !isCancelled) setCart(updated);
+      } catch (err) {}
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('bibliotech_cart_updated', handleCustomSync);
+
+    return () => {
+      isCancelled = true;
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('bibliotech_cart_updated', handleCustomSync);
+    };
+  }, [currentUser]);
 
   // Abre a pesquisa se o usuário já estiver logado e tiver o parâmetro de onboarding na URL
   useEffect(() => {
@@ -879,16 +644,41 @@ export default function BookStore() {
     }
   }, [router.query, currentUser]);
 
-  const saveCart = (newCart) => {
+  const saveCart = async (newCart) => {
     setCart(newCart);
+    const userKey = currentUser ? (currentUser.email || currentUser.id) : null;
     try {
       localStorage.setItem('bibliotech_cart', JSON.stringify(newCart));
+      if (userKey) {
+        localStorage.setItem(`bibliotech_cart_${userKey}`, JSON.stringify(newCart));
+      }
+      window.dispatchEvent(new Event('bibliotech_cart_updated'));
     } catch (e) {}
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token && currentUser) {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        await fetch(`${apiUrl}/cart`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ items: newCart })
+        });
+      } catch (err) {}
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+    if (auth?.logout) {
+      auth.logout();
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+    }
+    window.dispatchEvent(new Event('storage'));
     setCurrentUser(null);
     setPreferredGenres([]);
     setHasAnsweredSurvey(false);
@@ -911,6 +701,10 @@ export default function BookStore() {
   // Favoritar
   const toggleFavorite = (bookId, e) => {
     if (e) e.stopPropagation();
+    if (!currentUser) {
+      showToast('Faça login para salvar livros na sua lista de favoritos!');
+      return;
+    }
     const isFav = favorites.includes(bookId);
     const updated = isFav ? favorites.filter((id) => id !== bookId) : [...favorites, bookId];
     setFavorites(updated);
@@ -924,7 +718,7 @@ export default function BookStore() {
   const addToCart = (book, quantity = 1, e) => {
     if (e) e.stopPropagation();
 
-    const existingIndex = cart.findIndex((item) => item.book.id === book.id);
+    const existingIndex = cart.findIndex((item) => String(item.id || item.book?.id) === String(book.id));
     let newCart;
 
     if (existingIndex > -1) {
@@ -937,14 +731,22 @@ export default function BookStore() {
       newCart = [
         ...cart,
         {
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          price: book.price || 49.90,
+          originalPrice: book.originalPrice || 69.90,
+          format: book.format || 'Capa Dura',
+          coverImage: book.coverImage || '',
+          coverGradient: book.coverGradient || '',
+          genre: book.genre || 'Geral',
+          quantity,
           book: {
             ...book,
             price: book.price || 49.90,
             originalPrice: book.originalPrice || 69.90,
             format: book.format || 'Capa Dura'
-          },
-          quantity,
-          format: book.format || 'Capa Dura'
+          }
         }
       ];
     }
@@ -956,8 +758,9 @@ export default function BookStore() {
   const updateCartQuantity = (bookId, delta) => {
     const updated = cart
       .map((item) => {
-        if (item.book.id === bookId) {
-          const newQty = item.quantity + delta;
+        const itemId = item.id || item.book?.id;
+        if (String(itemId) === String(bookId)) {
+          const newQty = (item.quantity || 1) + delta;
           return newQty > 0 ? { ...item, quantity: newQty } : null;
         }
         return item;
@@ -968,18 +771,21 @@ export default function BookStore() {
   };
 
   const removeFromCart = (bookId) => {
-    const updated = cart.filter((item) => item.book.id !== bookId);
+    const updated = cart.filter((item) => String(item.id || item.book?.id) !== String(bookId));
     saveCart(updated);
     showToast('Item removido da sacola.');
   };
 
   // Cálculos do Carrinho
   const cartSubtotal = useMemo(() => {
-    return cart.reduce((sum, item) => sum + (item.book.price || 49.90) * item.quantity, 0);
+    return cart.reduce((sum, item) => {
+      const price = item.book?.price || item.price || 49.90;
+      return sum + price * (item.quantity || 1);
+    }, 0);
   }, [cart]);
 
   const cartTotalItems = useMemo(() => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
+    return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   }, [cart]);
 
   const freeShippingThreshold = 99.0;
@@ -1058,7 +864,7 @@ export default function BookStore() {
     setIsPlanModalOpen(true);
   };
 
-  const handleConfirmPlanSubscription = (e) => {
+  const handleConfirmPlanSubscription = async (e) => {
     e.preventDefault();
     if (!planForm.email) {
       showToast('Por favor, informe seu e-mail para assinar.');
@@ -1066,6 +872,26 @@ export default function BookStore() {
     }
     const currentPrice =
       billingCycle === 'mensal' ? selectedPlan.monthlyPrice : selectedPlan.annualPrice;
+
+    setUserPlan(selectedPlan.id);
+    if (currentUser) {
+      const updatedUser = { ...currentUser, plano_id: selectedPlan.id };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('userData', JSON.stringify(updatedUser));
+    }
+
+    if (auth?.updatePlan) {
+      await auth.updatePlan(selectedPlan.id);
+    } else {
+      try {
+        const subData = {
+          planId: selectedPlan.id,
+          planName: selectedPlan.name,
+          updatedAt: Date.now()
+        };
+        localStorage.setItem('bibliotech_user_subscription', JSON.stringify(subData));
+      } catch (err) {}
+    }
 
     showToast(
       `🎉 Parabéns! Você assinou o "${selectedPlan.name}" (${billingCycle === 'mensal' ? 'Mensal' : 'Anual - 2 Meses Grátis'}) por R$ ${currentPrice.toFixed(2)}/mês!`
@@ -1111,9 +937,9 @@ export default function BookStore() {
     } catch (e) {}
     setHasAnsweredSurvey(true);
     setIsSurveyModalOpen(false);
-    showToast(`🎉 Recomendações personalizadas geradas com base em ${preferredGenres.length} temas!`);
-    const recSection = document.getElementById('recomendados-section');
-    if (recSection) recSection.scrollIntoView({ behavior: 'smooth' });
+    showToast(`🎉 Preferências de gêneros salvas com sucesso!`);
+    const catSection = document.getElementById('catalogo-section');
+    if (catSection) catSection.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Pular Pesquisa por Enquanto
@@ -1146,29 +972,13 @@ export default function BookStore() {
     showToast('Pesquisa de gostos reiniciada.');
   };
 
-  // Livros Recomendados com Base nas Preferências
-  const recommendedBooks = useMemo(() => {
-    if (preferredGenres.length === 0) {
-      return books.filter((b) => b.rating >= 4.8).slice(0, 4);
-    }
-    const matched = books.filter((book) => {
-      return preferredGenres.some((g) => {
-        const gLower = g.toLowerCase();
-        const bLower = book.genre.toLowerCase();
-        if (bLower === gLower) return true;
-        if (g === 'Cinema & Adaptações' && (bLower.includes('ficção') || bLower.includes('fantasia') || bLower.includes('distopia') || bLower.includes('suspense') || bLower.includes('clássicos'))) return true;
-        if (g === 'Suspense' && (bLower.includes('suspense') || bLower.includes('terror') || bLower.includes('mistério'))) return true;
-        if (g === 'Aventura' && (bLower.includes('aventura') || bLower.includes('fantasia'))) return true;
-        return false;
-      });
-    });
-
-    if (matched.length < 3) {
-      const remaining = books.filter((b) => !matched.some((m) => m.id === b.id));
-      return [...matched, ...remaining].slice(0, 4);
-    }
-    return matched;
-  }, [books, preferredGenres]);
+  // Desconto VIP de acordo com o plano ativo
+  const vipDiscountRate = useMemo(() => {
+    if (userPlan === 'master') return 0.30; // 30% OFF vitalício
+    if (userPlan === 'box-vip') return 0.20; // 20% OFF permanente
+    if (userPlan === 'digital') return 0.10; // 10% OFF
+    return 0;
+  }, [userPlan]);
 
   // 1. INTEGRAÇÃO GOOGLE BOOKS API
   const searchGoogleBooks = useCallback(async (query) => {
@@ -1179,7 +989,7 @@ export default function BookStore() {
     setIsApiLoading(true);
     try {
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=16`
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&langRestrict=pt&printType=books&maxResults=16`
       );
       const data = await res.json();
       if (data.items && data.items.length > 0) {
@@ -1332,7 +1142,7 @@ export default function BookStore() {
     setIsAutofilling(true);
     try {
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(autofillQuery)}&maxResults=1`
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(autofillQuery)}&langRestrict=pt&printType=books&maxResults=1`
       );
       const data = await res.json();
       if (data.items && data.items.length > 0) {
@@ -1397,8 +1207,8 @@ export default function BookStore() {
       pages: parseInt(newBookForm.pages) || 280,
       status: 'Disponível',
       coverImage: newBookForm.coverImage || '',
-      coverGradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-      accentColor: '#10b981'
+      coverGradient: 'linear-gradient(135deg, #8e1f1f 0%, #53331b 100%)',
+      accentColor: '#c69238'
     };
 
     try {
@@ -1432,8 +1242,17 @@ export default function BookStore() {
   };
 
   const genresList = useMemo(() => {
-    const set = new Set(books.map((b) => b.genre));
-    return ['Todos', ...Array.from(set)];
+    const fromBooks = books.map((b) => b.genre).filter(Boolean);
+    const standardGenres = [
+      'Clássicos',
+      'Romance',
+      'Ficção Científica',
+      'Fantasia',
+      'Suspense & Mistério',
+      'História & Biografias',
+      'Tecnologia'
+    ];
+    return ['Todos', ...Array.from(new Set([...standardGenres, ...fromBooks]))];
   }, [books]);
 
   const filteredLocalBooks = useMemo(() => {
@@ -1473,6 +1292,26 @@ export default function BookStore() {
 
   const displayedBooks = searchSource === 'local' ? filteredLocalBooks : apiBooks;
 
+  const totalPages = Math.ceil(displayedBooks.length / pageSize) || 1;
+
+  // Obras visíveis com suporte tanto a páginas numeradas quanto a modo contínuo ultrarrápido
+  const visibleBooks = useMemo(() => {
+    if (paginationMode === 'pages') {
+      const startIndex = (currentPage - 1) * pageSize;
+      return displayedBooks.slice(startIndex, startIndex + pageSize);
+    }
+    return displayedBooks.slice(0, visibleCount);
+  }, [displayedBooks, paginationMode, currentPage, pageSize, visibleCount]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+    const catEl = document.getElementById('catalogo-section');
+    if (catEl) {
+      catEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const stats = useMemo(() => {
     const total = books.length;
     const avgRating =
@@ -1481,7 +1320,7 @@ export default function BookStore() {
     return { total, avgRating, genresCount };
   }, [books]);
 
-  const featuredBook = books[0] || DEFAULT_BOOKS[0];
+  const featuredBook = books.length > 0 ? books[0] : null;
 
   const renderStars = (rating) => {
     const stars = [];
@@ -1508,10 +1347,6 @@ export default function BookStore() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const scrollToRecs = () => {
-    const el = document.getElementById('recomendados-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const scrollToCommunity = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -1700,10 +1535,21 @@ export default function BookStore() {
 
             {/* Menu Nav Links Limpo */}
             <nav className={styles.navLinks}>
-              <a href="#catalogo-section" className={styles.navItem} onClick={scrollToCatalog}>Catálogo</a>
-              <a href="#recomendados-section" className={styles.navItem} onClick={scrollToRecs}>Recomendações</a>
-              <a href="#planos-section" className={styles.navItem} onClick={scrollToPlans}>Clube do Livro</a>
-              <a href="#comunidade-section" className={styles.navItem} onClick={scrollToCommunity}>Comunidade</a>
+              <Link href="/catalogo" className={styles.navItem}>
+                Catálogo
+              </Link>
+              <a href="#planos-section" className={styles.navItem} onClick={scrollToPlans}>
+                Clube do Livro
+              </a>
+              <Link
+                href="/comunidade"
+                className={`${styles.navItem} ${styles.navItemCommunity}`}
+                title="Acessar o Canal de Comunicação entre Leitores"
+              >
+                <Users size={16} className={styles.navCommunityIcon} />
+                <span>Comunidade</span>
+                <span className={styles.navCommunityBadge}>Canal</span>
+              </Link>
             </nav>
 
             {/* Header Actions: Sacola + Auth + Theme */}
@@ -1756,6 +1602,11 @@ export default function BookStore() {
                     <span className={styles.userName}>
                       {currentUser.full_name ? currentUser.full_name.split(' ')[0] : currentUser.email.split('@')[0]}
                     </span>
+                    {currentUser.plano_id && currentUser.plano_id !== 'visitante' && (
+                      <span className={styles.userPlanBadge}>
+                        {currentUser.plano_id === 'master' ? '👑 Master' : currentUser.plano_id === 'box-vip' ? '📦 VIP' : '📱 Digital'}
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -1829,10 +1680,10 @@ export default function BookStore() {
                 </p>
 
                 <div className={styles.heroCtaGroup}>
-                  <button onClick={scrollToCatalog} className={styles.btnCtaPrimary}>
+                  <Link href="/catalogo" className={styles.btnCtaPrimary} style={{ textDecoration: 'none' }}>
                     <ShoppingBag size={17} />
-                    <span>Explorar Catálogo</span>
-                  </button>
+                    <span>Explorar Catálogo Completo</span>
+                  </Link>
                   <button onClick={handleOpenSurvey} className={styles.btnCtaSecondary}>
                     <Sparkles size={17} />
                     <span>{currentUser ? 'Personalizar Gostos' : 'Entrar & Ver Recomendações'}</span>
@@ -1842,171 +1693,57 @@ export default function BookStore() {
 
               {/* Coluna Direita: Destaque Sem Poluição */}
               <div className={styles.heroCardCol}>
-                <div className={styles.featuredCleanCard} onClick={() => setSelectedBook(featuredBook)}>
-                  <div className={styles.featuredCoverWrapper}>
-                    {featuredBook.coverImage ? (
-                      <img
-                        src={featuredBook.coverImage}
-                        alt={featuredBook.title}
-                        className={styles.featuredCoverImg}
-                      />
-                    ) : (
-                      <div className={styles.featuredCoverGradient} style={{ background: featuredBook.coverGradient }}>
-                        <BookOpen size={42} />
-                        <h4>{featuredBook.title}</h4>
-                      </div>
-                    )}
-                    {featuredBook.discountPercent > 0 && (
-                      <span className={styles.cleanDiscountBadge}>-{featuredBook.discountPercent}% OFF</span>
-                    )}
-                  </div>
+                {featuredBook && (
+                  <div className={styles.featuredCleanCard} onClick={() => setSelectedBook(featuredBook)}>
+                    <div className={styles.featuredCoverWrapper}>
+                      {featuredBook.coverImage ? (
+                        <img
+                          src={featuredBook.coverImage}
+                          alt={featuredBook.title}
+                          className={styles.featuredCoverImg}
+                        />
+                      ) : (
+                        <div className={styles.featuredCoverGradient} style={{ background: featuredBook.coverGradient }}>
+                          <BookOpen size={42} />
+                          <h4>{featuredBook.title}</h4>
+                        </div>
+                      )}
+                      {featuredBook.discountPercent > 0 && (
+                        <span className={styles.cleanDiscountBadge}>-{featuredBook.discountPercent}% OFF</span>
+                      )}
+                    </div>
 
-                  <div className={styles.featuredCleanBody}>
-                    <span className={styles.cleanGenrePill}>{featuredBook.genre}</span>
-                    <h3 className={styles.featuredCleanTitle}>{featuredBook.title}</h3>
-                    <p className={styles.featuredCleanAuthor}>Por {featuredBook.author}</p>
+                    <div className={styles.featuredCleanBody}>
+                      <span className={styles.cleanGenrePill}>{featuredBook.genre}</span>
+                      <h3 className={styles.featuredCleanTitle}>{featuredBook.title}</h3>
+                      <p className={styles.featuredCleanAuthor}>Por {featuredBook.author}</p>
 
-                    <div className={styles.featuredCleanPriceRow}>
-                      <div className={styles.featuredCleanPrice}>
-                        R$ <strong>{(featuredBook.price || 59.90).toFixed(2).replace('.', ',')}</strong>
+                      <div className={styles.featuredCleanPriceRow}>
+                        <div className={styles.featuredCleanPrice}>
+                          R$ <strong>{(featuredBook.price || 59.90).toFixed(2).replace('.', ',')}</strong>
+                        </div>
+                        <button
+                          className={styles.btnCleanAdd}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(featuredBook, 1);
+                            setIsCartOpen(true);
+                          }}
+                          title="Adicionar à sacola"
+                        >
+                          <ShoppingBag size={16} />
+                          <span>Comprar</span>
+                        </button>
                       </div>
-                      <button
-                        className={styles.btnCleanAdd}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(featuredBook, 1);
-                          setIsCartOpen(true);
-                        }}
-                        title="Adicionar à sacola"
-                      >
-                        <ShoppingBag size={16} />
-                        <span>Comprar</span>
-                      </button>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </section>
 
-        {/* ===== 2. SEÇÃO DE RECOMENDAÇÕES PERSONALIZADAS ===== */}
-        <section id="recomendados-section" className={styles.recommendedSection}>
-          <div className={styles.container}>
-            {preferredGenres.length > 0 ? (
-              <>
-                <div className={styles.recommendedHeaderRow}>
-                  <div>
-                    <div className={styles.recBadgeTop}>
-                      <Sparkles size={14} />
-                      <span>RECOMENDADOS PARA VOCÊ</span>
-                    </div>
-                    <h2 className={styles.recMainTitle}>Livros no Seu Estilo de Leitura</h2>
-                    <p className={styles.recMainDesc}>
-                      Com base nas suas preferências: <strong className={styles.recGenresHighlight}>{preferredGenres.join(' • ')}</strong>
-                    </p>
-                  </div>
-
-                  <button
-                    className={styles.btnRetakeSurvey}
-                    onClick={handleOpenSurvey}
-                    title="Alterar meus gêneros favoritos"
-                    id="btn-retake-survey"
-                  >
-                    <RotateCcw size={14} />
-                    <span>Alterar Gostos</span>
-                  </button>
-                </div>
-
-                {/* Grid com Livros Recomendados Limpos */}
-                <div className={styles.recommendedGrid}>
-                  {recommendedBooks.map((book) => {
-                    const price = book.price || 49.90;
-                    const originalPrice = book.originalPrice || 69.90;
-                    const discountPercent =
-                      book.discountPercent ||
-                      Math.round(((originalPrice - price) / originalPrice) * 100);
-
-                    return (
-                      <article
-                        key={book.id}
-                        className={styles.recBookCard}
-                        onClick={() => setSelectedBook(book)}
-                      >
-                        <div className={styles.recCoverWrapper}>
-                          {book.coverImage ? (
-                            <img src={book.coverImage} alt={book.title} className={styles.recCoverImg} />
-                          ) : (
-                            <div className={styles.recCoverPlaceholder} style={{ background: book.coverGradient }}>
-                              <BookOpen size={32} />
-                              <h5>{book.title}</h5>
-                            </div>
-                          )}
-                          {discountPercent > 0 && (
-                            <span className={styles.recDiscountBadge}>-{discountPercent}% OFF</span>
-                          )}
-                        </div>
-
-                        <div className={styles.recCardBody}>
-                          <span className={styles.recGenreBadge}>{book.genre}</span>
-                          <h4 className={styles.recBookTitle} title={book.title}>
-                            {book.title}
-                          </h4>
-                          <p className={styles.recBookAuthor}>{book.author}</p>
-
-                          <div className={styles.recPriceRow}>
-                            <div className={styles.recPriceVal}>
-                              R$ <strong>{price.toFixed(2).replace('.', ',')}</strong>
-                            </div>
-                            <button
-                              className={styles.btnRecBuy}
-                              onClick={(e) => {
-                                addToCart(book, 1, e);
-                                setIsCartOpen(true);
-                              }}
-                              title="Adicionar à sacola"
-                            >
-                              <ShoppingBag size={14} />
-                              <span>Comprar</span>
-                            </button>
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              /* CARD DE CONVITE LIMPO E ELEGANTE (SEM EMOJIS POLUÍDOS) */
-              <div className={styles.cleanSurveyInvite}>
-                <div className={styles.cleanInviteIcon}>
-                  <Sparkles size={24} />
-                </div>
-                <div className={styles.cleanInviteContent}>
-                  <h3 className={styles.cleanInviteTitle}>
-                    {currentUser
-                      ? `Olá, ${currentUser.full_name ? currentUser.full_name.split(' ')[0] : 'leitor'}! Quer ver livros sob medida para você?`
-                      : 'Descubra livros perfeitos para os seus gostos literários'}
-                  </h3>
-                  <p className={styles.cleanInviteDesc}>
-                    {currentUser
-                      ? 'Selecione os gêneros que você mais ama ler para montarmos uma estante personalizada com descontos exclusivos.'
-                      : 'Faça login para responder à nossa rápida pesquisa de preferências e receber recomendações personalizadas.'}
-                  </p>
-                </div>
-                <button
-                  className={styles.btnCleanInviteAction}
-                  onClick={handleOpenSurvey}
-                >
-                  <Sparkles size={16} />
-                  <span>{currentUser ? 'Definir Meus Gêneros' : 'Entrar para Personalizar'}</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ===== 3. SEÇÃO DE PLANOS DE ASSINATURA (CLUBE DO LIVRO) ===== */}
+        {/* ===== 2. SEÇÃO DE PLANOS DE ASSINATURA (CLUBE DO LIVRO) ===== */}
         <section id="planos-section" className={styles.plansSection}>
           <div className={styles.container}>
             <div className={styles.sectionHeadingCenter}>
@@ -2119,211 +1856,268 @@ export default function BookStore() {
         {/* ===== 4. SEÇÃO DO CATÁLOGO DE LIVROS À VENDA ===== */}
         <section id="catalogo-section" className={styles.booksSection}>
           <div className={styles.container}>
+            {/* Banner de Diferenciais da Loja */}
+            <div className={styles.storePerksRibbon}>
+              <div className={styles.storePerkItem}>
+                <div className={styles.storePerkIcon}>
+                  <Truck size={20} />
+                </div>
+                <div className={styles.storePerkText}>
+                  <strong>Frete Grátis Brasil</strong>
+                  <span>Nas compras a partir de R$ 99</span>
+                </div>
+              </div>
+              <div className={styles.storePerkItem}>
+                <div className={styles.storePerkIcon}>
+                  <Zap size={20} />
+                </div>
+                <div className={styles.storePerkText}>
+                  <strong>Envio Expresso em 24h</strong>
+                  <span>Despacho imediato com rastreio</span>
+                </div>
+              </div>
+              <div className={styles.storePerkItem}>
+                <div className={styles.storePerkIcon}>
+                  <ShieldCheck size={20} />
+                </div>
+                <div className={styles.storePerkText}>
+                  <strong>Garantia & Troca Fácil</strong>
+                  <span>30 dias para devolução grátis</span>
+                </div>
+              </div>
+              <div className={styles.storePerkItem}>
+                <div className={styles.storePerkIcon}>
+                  <CreditCard size={20} />
+                </div>
+                <div className={styles.storePerkText}>
+                  <strong>Até 6x Sem Juros</strong>
+                  <span>Ou 5% OFF extra via PIX</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cabeçalho Principal da Seção */}
             <div className={styles.sectionHeadingCenter}>
-              <span className={styles.subHeadingBadge}>Loja & Catálogo</span>
-              <h2 className={styles.mainSectionTitle}>Livros Disponíveis para Compra</h2>
+              <span className={styles.subHeadingBadge}>Loja & Catálogo Oficial</span>
+              <h2 className={styles.mainSectionTitle}>Livraria Online & Catálogo de Obras</h2>
               <p className={styles.mainSectionDesc}>
-                Explore nosso acervo com pronta entrega ou busque qualquer título internacional via Google Books e Open Library.
+                Explore nosso acervo físico com pronta entrega para todo o Brasil, edições especiais e os títulos favoritos dos nossos leitores.
               </p>
             </div>
 
+            {/* ===== EXPLORADOR COMPLETO DO ACERVO ===== */}
+            <div className={styles.catalogExplorerWrapper}>
 
+              {/* Barra de Pesquisa e Ordenação */}
+              <div className={styles.searchBarContainer}>
+                <div className={styles.searchInputWrapper}>
+                  <Search size={20} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Pesquisar livro por título, autor, assunto..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className={styles.searchInput}
+                    id="search-input"
+                  />
+                  {isSearching && (
+                    <Loader2 size={16} className={styles.searchSpinner} />
+                  )}
+                  {searchInput && (
+                    <button
+                      className={styles.clearSearchBtn}
+                      onClick={() => {
+                        setSearchInput('');
+                        setSearchTerm('');
+                        setIsSearching(false);
+                      }}
+                      title="Limpar busca"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
 
-            {/* Search & Sort Bar + Preferências de Gênero */}
-            <div className={styles.searchBarContainer}>
-              <div className={styles.searchInputWrapper}>
-                <Search size={20} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder={
-                    searchSource === 'local'
-                      ? 'Pesquisar livro por título, autor, assunto...'
-                      : searchSource === 'google'
-                      ? 'Buscar qualquer livro no Google Books (Ex: Harry Potter, George Orwell)...'
-                      : 'Buscar qualquer livro na Open Library (Ex: Tolkien, Machado de Assis)...'
-                  }
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={styles.searchInput}
-                  id="search-input"
-                />
-                {searchTerm && (
-                  <button
-                    className={styles.clearSearchBtn}
-                    onClick={() => setSearchTerm('')}
-                    title="Limpar busca"
-                  >
-                    <X size={16} />
-                  </button>
+                {searchSource === 'local' && (
+                  <div className={styles.searchControlsRight}>
+                    {/* Botão de Pesquisa de Gêneros */}
+                    <button
+                      className={`${styles.btnGenrePreferences} ${
+                        preferredGenres.length > 0 ? styles.btnGenrePreferencesActive : ''
+                      }`}
+                      onClick={() => {
+                        if (!currentUser) {
+                          handleOpenSurvey();
+                          return;
+                        }
+                        if (preferredGenres.length === 0) {
+                          setIsSurveyModalOpen(true);
+                        } else {
+                          setFilterOnlyPreferred(!filterOnlyPreferred);
+                        }
+                      }}
+                      title="Personalizar meus gêneros favoritos"
+                      id="btn-genre-preferences"
+                    >
+                      <Sparkles size={17} className={styles.prefIcon} />
+                      <span>Meus Gêneros</span>
+                      {preferredGenres.length > 0 && (
+                        <span className={styles.prefCountBadge}>{preferredGenres.length}</span>
+                      )}
+                    </button>
+
+                    {/* Ordenação para Vendas */}
+                    <div className={styles.sortSelectWrapper}>
+                      <ArrowUpDown size={16} className={styles.sortIcon} />
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className={styles.sortSelect}
+                        id="sort-select"
+                      >
+                        <option value="sales">Mais Populares / Vendidos</option>
+                        <option value="price-asc">Menor Preço</option>
+                        <option value="price-desc">Maior Preço</option>
+                        <option value="rating">Melhor Avaliados</option>
+                        <option value="title">Título (A-Z)</option>
+                      </select>
+                    </div>
+                  </div>
                 )}
               </div>
 
+              {/* Genre Pills */}
               {searchSource === 'local' && (
-                <div className={styles.searchControlsRight}>
-                  {/* Botão de Pesquisa de Gêneros */}
-                  <button
-                    className={`${styles.btnGenrePreferences} ${
-                      preferredGenres.length > 0 ? styles.btnGenrePreferencesActive : ''
-                    }`}
-                    onClick={() => {
-                      if (!currentUser) {
-                        handleOpenSurvey();
-                        return;
-                      }
-                      if (preferredGenres.length === 0) {
-                        setIsSurveyModalOpen(true);
-                      } else {
-                        setFilterOnlyPreferred(!filterOnlyPreferred);
-                      }
-                    }}
-                    title="Personalizar meus gêneros favoritos"
-                    id="btn-genre-preferences"
-                  >
-                    <Sparkles size={17} className={styles.prefIcon} />
-                    <span>Meus Gêneros</span>
-                    {preferredGenres.length > 0 && (
-                      <span className={styles.prefCountBadge}>{preferredGenres.length}</span>
-                    )}
-                  </button>
-
-                  {/* Ordenação para Vendas */}
-                  <div className={styles.sortSelectWrapper}>
-                    <ArrowUpDown size={16} className={styles.sortIcon} />
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className={styles.sortSelect}
-                      id="sort-select"
+                <div className={styles.genreFiltersContainer}>
+                  <span className={styles.genreFilterLabel}>
+                    <Filter size={14} />
+                    Filtrar:
+                  </span>
+                  <div className={styles.genrePillsList}>
+                    {/* Pílula Especial de Gêneros da Pesquisa */}
+                    <button
+                      className={`${styles.genrePill} ${styles.genrePillPreferred} ${
+                        filterOnlyPreferred ? styles.genrePillActivePreferred : ''
+                      }`}
+                      onClick={() => {
+                        if (preferredGenres.length === 0) {
+                          setIsSurveyModalOpen(true);
+                        } else {
+                          const next = !filterOnlyPreferred;
+                          setFilterOnlyPreferred(next);
+                          if (next) {
+                            setSelectedGenre('Todos');
+                            showToast(`Filtrando por ${preferredGenres.length} gêneros selecionados!`);
+                          } else {
+                            showToast('Exibindo catálogo completo da livraria');
+                          }
+                        }
+                      }}
+                      title="Filtrar pelos seus gêneros favoritos"
                     >
-                      <option value="sales">Mais Populares / Vendidos</option>
-                      <option value="price-asc">Menor Preço</option>
-                      <option value="price-desc">Maior Preço</option>
-                      <option value="rating">Melhor Avaliados</option>
-                      <option value="title">Título (A-Z)</option>
-                    </select>
+                      <Sparkles size={14} />
+                      <span>⭐ Meus Favoritos</span>
+                      {preferredGenres.length > 0 ? (
+                        <span className={styles.genrePillCount}>{preferredGenres.length}</span>
+                      ) : (
+                        <span className={styles.genrePillConfigHint}>Responder</span>
+                      )}
+                    </button>
+
+                    {genresList.map((genre) => (
+                      <button
+                        key={genre}
+                        className={`${styles.genrePill} ${
+                          !filterOnlyPreferred && selectedGenre === genre ? styles.genrePillActive : ''
+                        }`}
+                        onClick={() => {
+                          setFilterOnlyPreferred(false);
+                          setSelectedGenre(genre);
+                        }}
+                      >
+                        <span>{genre}</span>
+                        <span className={styles.genrePillCount}>
+                          {genre === 'Todos'
+                            ? books.length
+                            : books.filter((b) => b.genre.toLowerCase() === genre.toLowerCase()).length}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Genre Pills */}
-            {searchSource === 'local' && (
-              <div className={styles.genreFiltersContainer}>
-                <span className={styles.genreFilterLabel}>
-                  <Filter size={14} />
-                  Filtrar:
-                </span>
-                <div className={styles.genrePillsList}>
-                  {/* Pílula Especial de Gêneros da Pesquisa */}
-                  <button
-                    className={`${styles.genrePill} ${styles.genrePillPreferred} ${
-                      filterOnlyPreferred ? styles.genrePillActivePreferred : ''
-                    }`}
-                    onClick={() => {
-                      if (preferredGenres.length === 0) {
-                        setIsSurveyModalOpen(true);
-                      } else {
-                        const next = !filterOnlyPreferred;
-                        setFilterOnlyPreferred(next);
-                        if (next) {
-                          setSelectedGenre('Todos');
-                          showToast(`Filtrando por ${preferredGenres.length} gêneros selecionados!`);
-                        } else {
-                          showToast('Exibindo catálogo completo da livraria');
-                        }
-                      }
-                    }}
-                    title="Filtrar pelos seus gêneros favoritos"
-                  >
-                    <Sparkles size={14} />
-                    <span>⭐ Meus Favoritos</span>
-                    {preferredGenres.length > 0 ? (
-                      <span className={styles.genrePillCount}>{preferredGenres.length}</span>
-                    ) : (
-                      <span className={styles.genrePillConfigHint}>Responder</span>
-                    )}
-                  </button>
-
-                  {genresList.map((genre) => (
-                    <button
-                      key={genre}
-                      className={`${styles.genrePill} ${
-                        !filterOnlyPreferred && selectedGenre === genre ? styles.genrePillActive : ''
-                      }`}
-                      onClick={() => {
-                        setFilterOnlyPreferred(false);
-                        setSelectedGenre(genre);
-                      }}
-                    >
-                      <span>{genre}</span>
-                      <span className={styles.genrePillCount}>
-                        {genre === 'Todos'
-                          ? books.length
-                          : books.filter((b) => b.genre.toLowerCase() === genre.toLowerCase()).length}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className={styles.sectionHeaderRow}>
-              <div>
-                <h3 className={styles.sectionTitle}>
-                  {searchSource === 'local'
-                    ? filterOnlyPreferred
+              {/* Sub-cabeçalho com Título, Total e Alternador de Modo de Visualização */}
+              <div className={styles.catalogExplorerHeading}>
+                <div className={styles.catalogExplorerTitleGroup}>
+                  <span className={styles.catalogExplorerBadge}>
+                    <Sparkles size={13} />
+                    Estante Completa
+                  </span>
+                  <h3 className={styles.catalogExplorerTitle}>
+                    {filterOnlyPreferred
                       ? `⭐ Livros nos seus gêneros preferidos (${preferredGenres.length} temas)`
                       : selectedGenre === 'Todos'
                       ? 'Todos os Livros à Venda'
-                      : `Categoria: ${selectedGenre}`
-                    : searchSource === 'google'
-                    ? 'Resultados do Google Books API'
-                    : 'Resultados da Open Library API'}
-                </h3>
-                <p className={styles.sectionSubtitle}>
-                  {searchSource === 'local'
-                    ? `Exibindo ${displayedBooks.length} obras com pronta entrega e garantia`
-                    : `Pesquisa online em tempo real via ${
-                        searchSource === 'google' ? 'Google Books' : 'Open Library'
-                      }`}
-                </p>
-              </div>
-
-              {searchSource === 'local' && (
-                <button
-                  className={styles.btnAddBook}
-                  onClick={() => setIsAddModalOpen(true)}
-                  id="btn-add-book-section"
-                >
-                  <Plus size={16} />
-                  <span>Cadastrar Livro</span>
-                </button>
-              )}
-            </div>
-
-            {/* Loading / Empty State */}
-            {isApiLoading ? (
-              <div className={styles.loadingState}>
-                <div className={styles.loadingSpinner}></div>
-                <h3 className={styles.emptyTitle}>Buscando livros na API...</h3>
-                <p className={styles.emptyDesc}>Conectando aos servidores e calculando valores de catálogo.</p>
-              </div>
-            ) : displayedBooks.length === 0 ? (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIconBox}>
-                  <BookOpen size={36} />
+                      : `Categoria: ${selectedGenre}`}
+                  </h3>
+                  <p className={styles.catalogExplorerSubtitle}>
+                    Exibindo {visibleBooks.length} de {displayedBooks.length} obras com pronta entrega e garantia de qualidade
+                  </p>
                 </div>
-                <h3 className={styles.emptyTitle}>
-                  {searchSource !== 'local' && !searchTerm
-                    ? 'Digite algo para pesquisar na API'
-                    : 'Nenhum livro encontrado'}
-                </h3>
-                <p className={styles.emptyDesc}>
-                  {searchSource !== 'local' && !searchTerm
-                    ? 'Use a barra de busca acima para pesquisar qualquer livro publicado no mundo.'
-                    : 'Tente alterar os termos da sua busca ou selecionar outro gênero literário.'}
-                </p>
-                {searchSource === 'local' && (
+
+                <div className={styles.catalogViewControls}>
+                  {/* Modo de Visualização: Grade vs Lista */}
+                  <div className={styles.viewModeToggle} title="Alternar formato de exibição">
+                    <button
+                      type="button"
+                      className={`${styles.viewModeBtn} ${catalogViewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setCatalogViewMode('grid')}
+                      title="Exibição em Grade de Cards"
+                      aria-label="Grade"
+                    >
+                      <LayoutGrid size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.viewModeBtn} ${catalogViewMode === 'list' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setCatalogViewMode('list')}
+                      title="Exibição em Lista Detalhada"
+                      aria-label="Lista"
+                    >
+                      <List size={17} />
+                    </button>
+                  </div>
+
+                  {searchSource === 'local' && (
+                    <button
+                      className={styles.btnAddBook}
+                      onClick={() => setIsAddModalOpen(true)}
+                      id="btn-add-book-section"
+                    >
+                      <Plus size={16} />
+                      <span>Cadastrar Livro</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Loading / Empty State */}
+              {isApiLoading ? (
+                <div className={styles.loadingState}>
+                  <div className={styles.loadingSpinner}></div>
+                  <h3 className={styles.emptyTitle}>Carregando livros...</h3>
+                  <p className={styles.emptyDesc}>Organizando catálogo da livraria.</p>
+                </div>
+              ) : displayedBooks.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <div className={styles.emptyIconBox}>
+                    <BookOpen size={36} />
+                  </div>
+                  <h3 className={styles.emptyTitle}>Nenhum livro encontrado</h3>
+                  <p className={styles.emptyDesc}>
+                    Tente alterar os termos da sua busca ou selecionar outro gênero literário.
+                  </p>
                   <button
                     className={styles.btnResetSearch}
                     onClick={() => {
@@ -2333,152 +2127,464 @@ export default function BookStore() {
                   >
                     Limpar Filtros
                   </button>
-                )}
-              </div>
-            ) : (
-              /* GRID DE CARDS DOS LIVROS DE E-COMMERCE */
-              <div className={styles.booksGrid}>
-                {displayedBooks.map((book) => {
-                  const isFav = favorites.includes(book.id);
-                  const isExternal = searchSource !== 'local';
-                  const price = book.price || 49.90;
-                  const originalPrice = book.originalPrice || 69.90;
-                  const discountPercent =
-                    book.discountPercent ||
-                    Math.round(((originalPrice - price) / originalPrice) * 100);
+                </div>
+              ) : catalogViewMode === 'grid' ? (
+                /* GRID DE CARDS DOS LIVROS DE E-COMMERCE */
+                <div className={styles.booksGrid}>
+                  {visibleBooks.map((book) => {
+                    const isFav = favorites.includes(book.id);
+                    const isExternal = searchSource !== 'local';
+                    const price = book.price || 49.90;
+                    const originalPrice = book.originalPrice || 69.90;
+                    const discountPercent =
+                      book.discountPercent ||
+                      Math.round(((originalPrice - price) / originalPrice) * 100);
 
-                  return (
-                    <article
-                      key={book.id}
-                      className={styles.bookCard}
-                      onClick={() => setSelectedBook(book)}
-                    >
-                      <div className={styles.coverWrapper}>
-                        {/* Badges superiores esquerdos */}
-                        <div className={styles.cardBadgeRow}>
-                          {discountPercent > 0 && (
-                            <span className={styles.discountBadge}>-{discountPercent}% OFF</span>
+                    return (
+                      <article
+                        key={book.id}
+                        className={styles.bookCard}
+                        onClick={() => setSelectedBook(book)}
+                      >
+                        <div className={styles.coverWrapper}>
+                          {/* Badges superiores esquerdos */}
+                          <div className={styles.cardBadgeRow}>
+                            {discountPercent > 0 && (
+                              <span className={styles.discountBadge}>-{discountPercent}% OFF</span>
+                            )}
+                            {book.badge && (
+                              <span className={styles.customCardBadge}>{book.badge}</span>
+                            )}
+                          </div>
+
+                          {/* Botão de Favorito superior direito (apenas quando logado) */}
+                          {!isExternal && currentUser && (
+                            <button
+                              className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
+                              onClick={(e) => toggleFavorite(book.id, e)}
+                              title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                            >
+                              <Heart size={16} fill={isFav ? '#ef4444' : 'none'} />
+                            </button>
                           )}
-                          {book.badge && (
-                            <span className={styles.customCardBadge}>{book.badge}</span>
+
+                          {/* Capa com Imagem Real com efeito 3D ou Fallback */}
+                          {book.coverImage ? (
+                            <div className={styles.bookCover}>
+                              <img
+                                src={getOptimizedCoverUrl(book.coverImage)}
+                                alt={book.title}
+                                className={styles.bookCoverImage}
+                                loading="lazy"
+                                decoding="async"
+                                fetchPriority="low"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                              <div className={styles.coverHoverPreview}>
+                                <Eye size={14} />
+                                <span>Ver Detalhes</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div
+                              className={styles.bookCoverFallback}
+                              style={{ background: book.coverGradient || 'linear-gradient(135deg, #53331b, #271e16)' }}
+                            >
+                              <div className={styles.coverPattern}></div>
+                              <div className={styles.coverSpine}></div>
+                              <BookOpen size={36} className={styles.coverBookIcon} />
+                              <h4 className={styles.fallbackTitle}>{book.title}</h4>
+                              <p className={styles.fallbackAuthor}>{book.author}</p>
+                            </div>
                           )}
                         </div>
 
-                        {/* Botão de Favorito superior direito */}
-                        {!isExternal && (
-                          <button
-                            className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
-                            onClick={(e) => toggleFavorite(book.id, e)}
-                            title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                          >
-                            <Heart size={16} fill={isFav ? '#ef4444' : 'none'} />
-                          </button>
-                        )}
+                        <div className={styles.bookCardBody}>
+                          <div className={styles.genreSection}>
+                            <span className={styles.genreBadge}>
+                              <Bookmark size={11} className={styles.genreIcon} />
+                              {book.genre}
+                            </span>
+                            <span className={styles.formatPill}>{book.format || 'Capa Dura'}</span>
+                          </div>
 
-                        {/* Capa com Imagem Real com efeito 3D ou Fallback */}
-                        {book.coverImage ? (
-                          <div className={styles.bookCover}>
+                          <div className={styles.bookInfoTop}>
+                            <h3 className={styles.bookTitle} title={book.title}>
+                              {book.title}
+                            </h3>
+                            <div className={styles.bookAuthorRow}>
+                              <User size={13} className={styles.authorIcon} />
+                              <span className={styles.bookAuthor}>{book.author}</span>
+                            </div>
+                          </div>
+
+                          <div className={styles.ratingSection}>
+                            <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
+                            <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
+                            <span className={styles.reviewsCount}>
+                              ({book.reviewsCount.toLocaleString('pt-BR')})
+                            </span>
+                          </div>
+
+                          <div className={styles.cardPricingBox}>
+                            {originalPrice > price && (
+                              <div className={styles.cardOldPrice}>
+                                De R$ {originalPrice.toFixed(2).replace('.', ',')}
+                              </div>
+                            )}
+                            <div className={styles.cardCurrentPrice}>
+                              R$ <strong>{price.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div className={styles.cardInstallments}>
+                              ou 3x de R$ {(price / 3).toFixed(2).replace('.', ',')} sem juros
+                            </div>
+                          </div>
+
+                          <div className={styles.cardActions}>
+                            {isExternal ? (
+                              <button
+                                className={styles.btnImportBook}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  importBookToLocal(book);
+                                }}
+                              >
+                                <Download size={14} />
+                                <span>Adicionar à Loja</span>
+                              </button>
+                            ) : (
+                              <button
+                                className={styles.btnAddToCart}
+                                onClick={(e) => {
+                                  addToCart(book, 1, e);
+                                  setIsCartOpen(true);
+                                }}
+                                title="Adicionar à sacola de compras"
+                              >
+                                <ShoppingBag size={15} />
+                                <span>Adicionar à Sacola</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* MODO LISTA EXPANDIDA DE LIVROS */
+                <div className={styles.booksList}>
+                  {visibleBooks.map((book) => {
+                    const isFav = favorites.includes(book.id);
+                    const isExternal = searchSource !== 'local';
+                    const price = book.price || 49.90;
+                    const originalPrice = book.originalPrice || 69.90;
+                    const discountPercent =
+                      book.discountPercent ||
+                      Math.round(((originalPrice - price) / originalPrice) * 100);
+
+                    return (
+                      <article
+                        key={book.id}
+                        className={styles.bookCardList}
+                        onClick={() => setSelectedBook(book)}
+                      >
+                        <div className={styles.bookCardListCover}>
+                          {book.coverImage ? (
                             <img
-                              src={book.coverImage}
+                              src={getOptimizedCoverUrl(book.coverImage)}
                               alt={book.title}
-                              className={styles.bookCoverImage}
+                              className={styles.bookCardListCoverImg}
                               loading="lazy"
+                              decoding="async"
+                              fetchPriority="low"
                               onError={(e) => {
                                 e.target.style.display = 'none';
                               }}
                             />
-                            <div className={styles.coverHoverPreview}>
-                              <Eye size={14} />
-                              <span>Ver Detalhes</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            className={styles.bookCoverFallback}
-                            style={{ background: book.coverGradient || 'linear-gradient(135deg, #10b981, #064e3b)' }}
-                          >
-                            <div className={styles.coverPattern}></div>
-                            <div className={styles.coverSpine}></div>
-                            <BookOpen size={36} className={styles.coverBookIcon} />
-                            <h4 className={styles.fallbackTitle}>{book.title}</h4>
-                            <p className={styles.fallbackAuthor}>{book.author}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className={styles.bookCardBody}>
-                        <div className={styles.genreSection}>
-                          <span className={styles.genreBadge}>
-                            <Bookmark size={11} className={styles.genreIcon} />
-                            {book.genre}
-                          </span>
-                          <span className={styles.formatPill}>{book.format || 'Capa Dura'}</span>
-                        </div>
-
-                        <div className={styles.bookInfoTop}>
-                          <h3 className={styles.bookTitle} title={book.title}>
-                            {book.title}
-                          </h3>
-                          <div className={styles.bookAuthorRow}>
-                            <User size={13} className={styles.authorIcon} />
-                            <span className={styles.bookAuthor}>{book.author}</span>
-                          </div>
-                        </div>
-
-                        <div className={styles.ratingSection}>
-                          <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
-                          <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
-                          <span className={styles.reviewsCount}>
-                            ({book.reviewsCount.toLocaleString('pt-BR')})
-                          </span>
-                        </div>
-
-                        <div className={styles.cardPricingBox}>
-                          {originalPrice > price && (
-                            <div className={styles.cardOldPrice}>
-                              De R$ {originalPrice.toFixed(2).replace('.', ',')}
-                            </div>
-                          )}
-                          <div className={styles.cardCurrentPrice}>
-                            R$ <strong>{price.toFixed(2).replace('.', ',')}</strong>
-                          </div>
-                          <div className={styles.cardInstallments}>
-                            ou 3x de R$ {(price / 3).toFixed(2).replace('.', ',')} sem juros
-                          </div>
-                        </div>
-
-                        <div className={styles.cardActions}>
-                          {isExternal ? (
-                            <button
-                              className={styles.btnImportBook}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                importBookToLocal(book);
-                              }}
-                            >
-                              <Download size={14} />
-                              <span>Adicionar à Loja</span>
-                            </button>
                           ) : (
-                            <button
-                              className={styles.btnAddToCart}
-                              onClick={(e) => {
-                                addToCart(book, 1, e);
-                                setIsCartOpen(true);
+                            <div
+                              className={styles.bookCoverFallback}
+                              style={{
+                                background: book.coverGradient || 'linear-gradient(135deg, #10b981, #064e3b)',
+                                width: '130px',
+                                height: '175px'
                               }}
-                              title="Adicionar à sacola de compras"
                             >
-                              <ShoppingBag size={15} />
-                              <span>Adicionar à Sacola</span>
-                            </button>
+                              <BookOpen size={28} />
+                              <h5 className={styles.fallbackTitle}>{book.title}</h5>
+                            </div>
+                          )}
+                          {discountPercent > 0 && (
+                            <span
+                              className={styles.discountBadge}
+                              style={{ position: 'absolute', top: 12, left: 12 }}
+                            >
+                              -{discountPercent}%
+                            </span>
                           )}
                         </div>
+
+                        <div className={styles.bookCardListBody}>
+                          <div>
+                            <div className={styles.bookCardListTop}>
+                              <div>
+                                <div className={styles.bookCardListMeta}>
+                                  <span className={styles.genreBadge}>
+                                    <Bookmark size={11} className={styles.genreIcon} />
+                                    {book.genre}
+                                  </span>
+                                  <span className={styles.formatPill}>{book.format || 'Capa Dura'}</span>
+                                  {book.badge && (
+                                    <span className={styles.customCardBadge}>{book.badge}</span>
+                                  )}
+                                </div>
+                                <h3 className={styles.bookCardListTitle}>{book.title}</h3>
+                                <div className={styles.bookCardListAuthor}>
+                                  <User size={13} className={styles.authorIcon} />
+                                  <span>{book.author}</span>
+                                </div>
+                              </div>
+
+                              {!isExternal && currentUser && (
+                                <button
+                                  className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
+                                  onClick={(e) => toggleFavorite(book.id, e)}
+                                  title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                                  style={{ position: 'static' }}
+                                >
+                                  <Heart size={16} fill={isFav ? '#ef4444' : 'none'} />
+                                </button>
+                              )}
+                            </div>
+
+                            <div className={styles.ratingSection} style={{ maxWidth: 280, marginTop: 10 }}>
+                              <div className={styles.starsWrapper}>{renderStars(book.rating)}</div>
+                              <span className={styles.ratingNumber}>{book.rating.toFixed(1)}</span>
+                              <span className={styles.reviewsCount}>
+                                ({book.reviewsCount.toLocaleString('pt-BR')} avaliações)
+                              </span>
+                            </div>
+
+                            {book.synopsis && (
+                              <p className={styles.bookCardListSynopsis}>{book.synopsis}</p>
+                            )}
+
+                            <div className={styles.bookCardListBadgesRow}>
+                              {book.year && (
+                                <span className={styles.bookCardListBadgeItem}>
+                                  <Calendar size={12} /> Publicado em {book.year}
+                                </span>
+                              )}
+                              {book.pages && (
+                                <span className={styles.bookCardListBadgeItem}>
+                                  <FileText size={12} /> {book.pages} páginas
+                                </span>
+                              )}
+                              {book.stock && (
+                                <span className={styles.bookCardListBadgeItem}>
+                                  <Package size={12} /> {book.stock} unidades em estoque
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className={styles.bookCardListFooter}>
+                            <div className={styles.bookCardListPrice}>
+                              {originalPrice > price && (
+                                <div className={styles.bookCardListOldPrice}>
+                                  De R$ {originalPrice.toFixed(2).replace('.', ',')}
+                                </div>
+                              )}
+                              <div className={styles.bookCardListCurrentPrice}>
+                                R$ {price.toFixed(2).replace('.', ',')}
+                              </div>
+                              <div className={styles.bookCardListInstallments}>
+                                ou 3x de R$ {(price / 3).toFixed(2).replace('.', ',')} sem juros
+                              </div>
+                            </div>
+
+                            <div className={styles.bookCardListActions}>
+                              <button
+                                type="button"
+                                className={styles.btnListDetails}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedBook(book);
+                                }}
+                              >
+                                <Eye size={15} />
+                                <span>Ver Detalhes</span>
+                              </button>
+
+                              {isExternal ? (
+                                <button
+                                  type="button"
+                                  className={styles.btnListBuy}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    importBookToLocal(book);
+                                  }}
+                                >
+                                  <Download size={15} />
+                                  <span>Importar para Loja</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className={styles.btnListBuy}
+                                  onClick={(e) => {
+                                    addToCart(book, 1, e);
+                                    setIsCartOpen(true);
+                                  }}
+                                >
+                                  <ShoppingBag size={15} />
+                                  <span>Comprar Agora</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Controles de Paginação & Visualização Leve */}
+              {displayedBooks.length > 0 && (
+                <div className={styles.paginationWrapper}>
+                  <div className={styles.paginationHeader}>
+                    <span className={styles.paginationInfo}>
+                      Exibindo{' '}
+                      <strong>
+                        {paginationMode === 'pages'
+                          ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, displayedBooks.length)}`
+                          : `1–${Math.min(visibleCount, displayedBooks.length)}`}
+                      </strong>{' '}
+                      de <strong>{displayedBooks.length}</strong> obras encontradas
+                    </span>
+
+                    <div className={styles.paginationSettings}>
+                      <div className={styles.paginationModeToggle}>
+                        <button
+                          type="button"
+                          className={`${styles.modeBtn} ${paginationMode === 'pages' ? styles.modeBtnActive : ''}`}
+                          onClick={() => setPaginationMode('pages')}
+                          title="Navegar por páginas numeradas"
+                        >
+                          Páginas
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.modeBtn} ${paginationMode === 'infinite' ? styles.modeBtnActive : ''}`}
+                          onClick={() => setPaginationMode('infinite')}
+                          title="Carregamento contínuo"
+                        >
+                          Ver Mais
+                        </button>
                       </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
+
+                      {paginationMode === 'pages' && (
+                        <div className={styles.pageSizeWrapper}>
+                          <span className={styles.pageSizeLabel}>Por página:</span>
+                          <select
+                            value={pageSize}
+                            onChange={(e) => setPageSize(Number(e.target.value))}
+                            className={styles.pageSizeSelect}
+                            id="page-size-select"
+                          >
+                            <option value={8}>8 livros</option>
+                            <option value={12}>12 livros</option>
+                            <option value={16}>16 livros</option>
+                            <option value={24}>24 livros</option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {paginationMode === 'pages' ? (
+                    totalPages > 1 && (
+                      <div className={styles.paginationPagesRow}>
+                        <button
+                          type="button"
+                          className={styles.paginationNavBtn}
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          title="Página Anterior"
+                        >
+                          <ChevronLeft size={16} />
+                          <span>Anterior</span>
+                        </button>
+
+                        <div className={styles.paginationNumbers}>
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                            if (totalPages > 7) {
+                              if (page !== 1 && page !== totalPages && Math.abs(page - currentPage) > 1) {
+                                if (page === 2 || page === totalPages - 1) {
+                                  return (
+                                    <span key={page} className={styles.paginationEllipsis}>
+                                      …
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              }
+                            }
+                            return (
+                              <button
+                                key={page}
+                                type="button"
+                                className={`${styles.pageNumberBtn} ${
+                                  currentPage === page ? styles.pageNumberBtnActive : ''
+                                }`}
+                                onClick={() => handlePageChange(page)}
+                              >
+                                {page}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <button
+                          type="button"
+                          className={styles.paginationNavBtn}
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          title="Próxima Página"
+                        >
+                          <span>Próxima</span>
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    )
+                  ) : (
+                    displayedBooks.length > visibleCount && (
+                      <div className={styles.loadMoreContainer} style={{ margin: '10px 0 0' }}>
+                        <button
+                          type="button"
+                          className={styles.btnLoadMore}
+                          onClick={() => setVisibleCount((prev) => prev + 8)}
+                        >
+                          <ChevronRight size={18} />
+                          <span>Carregar Mais Obras ({displayedBooks.length - visibleCount} restantes)</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.btnShowAll}
+                          onClick={() => setVisibleCount(displayedBooks.length)}
+                        >
+                          Ver Todo o Acervo ({displayedBooks.length})
+                        </button>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -2835,7 +2941,7 @@ export default function BookStore() {
                   <div key={item.book.id} className={styles.cartItemCard}>
                     <div className={styles.cartItemCover}>
                       {item.book.coverImage ? (
-                        <img src={item.book.coverImage} alt={item.book.title} />
+                        <img src={getOptimizedCoverUrl(item.book.coverImage)} alt={item.book.title} loading="lazy" decoding="async" />
                       ) : (
                         <div
                           className={styles.cartItemCoverPlaceholder}
@@ -3275,7 +3381,7 @@ export default function BookStore() {
                 className={styles.modalCover}
                 style={{
                   background: selectedBook.coverImage
-                    ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url(${selectedBook.coverImage}) center/cover no-repeat`
+                    ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url(${getOptimizedCoverUrl(selectedBook.coverImage)}) center/cover no-repeat`
                     : selectedBook.coverGradient
                 }}
               >
@@ -3375,20 +3481,22 @@ export default function BookStore() {
                     <span>Adicionar à Sacola de Compras</span>
                   </button>
 
-                  <button
-                    className={`${styles.btnModalFav} ${
-                      favorites.includes(selectedBook.id) ? styles.btnModalFavActive : ''
-                    }`}
-                    onClick={(e) => toggleFavorite(selectedBook.id, e)}
-                  >
-                    <Heart
-                      size={18}
-                      fill={favorites.includes(selectedBook.id) ? '#ef4444' : 'none'}
-                    />
-                    <span>
-                      {favorites.includes(selectedBook.id) ? 'Desejado' : 'Lista de Desejos'}
-                    </span>
-                  </button>
+                  {currentUser && (
+                    <button
+                      className={`${styles.btnModalFav} ${
+                        favorites.includes(selectedBook.id) ? styles.btnModalFavActive : ''
+                      }`}
+                      onClick={(e) => toggleFavorite(selectedBook.id, e)}
+                    >
+                      <Heart
+                        size={18}
+                        fill={favorites.includes(selectedBook.id) ? '#ef4444' : 'none'}
+                      />
+                      <span>
+                        {favorites.includes(selectedBook.id) ? 'Desejado' : 'Lista de Desejos'}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -3613,15 +3721,15 @@ export default function BookStore() {
                 <span className={styles.footerLogoTitle}>BIBLIOTECH</span>
               </div>
               <p className={styles.footerDesc}>
-                Sua livraria online definitiva e clube literário exclusivo. Descubra recomendações personalizadas com base nos seus gêneros favoritos e receba os livros mais premiados na sua porta.
+                Sua livraria online definitiva e clube literário exclusivo. Encontre grandes clássicos e edições épicas e receba os livros mais premiados na sua porta.
               </p>
             </div>
 
             <div className={styles.footerLinks}>
               <span className={styles.footerGroupTitle}>Navegação</span>
-              <a href="#recomendados-section" className={styles.footerLinkItem}>Recomendações para Você</a>
-              <a href="#catalogo-section" className={styles.footerLinkItem}>Livraria Online</a>
+              <a href="#catalogo-section" className={styles.footerLinkItem}>Catálogo de Obras</a>
               <a href="#planos-section" className={styles.footerLinkItem}>Clube do Livro & Planos</a>
+              <Link href="/comunidade" className={styles.footerLinkItem}>Canal de Leitores (Comunidade)</Link>
               <a href="#como-funciona" className={styles.footerLinkItem}>Como Funciona</a>
               <a href="#beneficios" className={styles.footerLinkItem}>Diferenciais</a>
             </div>
