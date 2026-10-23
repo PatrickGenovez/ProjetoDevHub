@@ -66,6 +66,7 @@ import {
   Sliders
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
+import CheckoutModal from '../components/checkout/CheckoutModal';
 import styles from '../styles/index.module.css';
 
 // Otimizador de URL de imagem de capas (converte para tamanho médio -M.jpg reduzindo 90%+ do peso da imagem)
@@ -798,24 +799,53 @@ export default function BookStore({ auth }) {
 
   const cartDiscount = useMemo(() => {
     if (!appliedCoupon) return 0;
-    return (cartSubtotal * appliedCoupon.discountPercent) / 100;
+    if (appliedCoupon.discountAmount) return appliedCoupon.discountAmount;
+    if (appliedCoupon.discountPercent) return (cartSubtotal * appliedCoupon.discountPercent) / 100;
+    return 0;
   }, [cartSubtotal, appliedCoupon]);
 
-  const shippingCost = cart.length === 0 || isFreeShipping ? 0 : 14.90;
+  const shippingCost = cart.length === 0 || isFreeShipping || appliedCoupon?.isShippingFree ? 0 : 14.90;
   const cartTotal = Math.max(0, cartSubtotal - cartDiscount + shippingCost);
 
-  // Aplicação de Cupom
-  const handleApplyCoupon = (e) => {
-    e.preventDefault();
+  // Aplicação de Cupom com validação em tempo real no backend
+  const handleApplyCoupon = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     const code = couponInput.trim().toUpperCase();
-    if (code === 'BIBLIO10') {
-      setAppliedCoupon({ code: 'BIBLIO10', discountPercent: 10 });
-      showToast('Cupom BIBLIO10 aplicado: 10% de desconto!');
-    } else if (code === 'LEITORVIP') {
-      setAppliedCoupon({ code: 'LEITORVIP', discountPercent: 15 });
-      showToast('Cupom LEITORVIP aplicado: 15% de desconto!');
-    } else {
-      showToast('Cupom inválido. Experimente usar: BIBLIO10');
+    if (!code) {
+      showToast('Digite um código de cupom.');
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/checkout/coupons/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal: cartSubtotal })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setAppliedCoupon({
+          code: json.data.code,
+          discountPercent: json.data.type === 'percentage' ? json.data.value : 0,
+          discountAmount: json.data.discountAmount,
+          isShippingFree: json.data.isShippingFree,
+          description: json.data.description
+        });
+        showToast(`🎉 Cupom ${json.data.code} aplicado com sucesso!`);
+      } else {
+        showToast(json.message || 'Cupom inválido. Use CLUBE20 ou BEMVINDO10');
+      }
+    } catch (err) {
+      if (code === 'CLUBE20') {
+        setAppliedCoupon({ code: 'CLUBE20', discountPercent: 20, description: '20% de desconto do Clube' });
+        showToast('Cupom CLUBE20 aplicado: 20% de desconto!');
+      } else if (code === 'BEMVINDO10') {
+        setAppliedCoupon({ code: 'BEMVINDO10', discountPercent: 10, description: '10% de desconto' });
+        showToast('Cupom BEMVINDO10 aplicado: 10% de desconto!');
+      } else {
+        showToast('Cupom inválido. Experimente usar: CLUBE20');
+      }
     }
     setCouponInput('');
   };
@@ -3008,7 +3038,7 @@ export default function BookStore({ auth }) {
                     <Tag size={15} className={styles.couponIcon} />
                     <input
                       type="text"
-                      placeholder="Cupom de desconto (Ex: BIBLIO10)"
+                      placeholder="Cupom de desconto (Ex: CLUBE20)"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value)}
                       className={styles.couponInput}
@@ -3021,7 +3051,15 @@ export default function BookStore({ auth }) {
 
                 {appliedCoupon && (
                   <div className={styles.appliedCouponBadge}>
-                    <span>Cupom <strong>{appliedCoupon.code}</strong> ativo ({appliedCoupon.discountPercent}% OFF)</span>
+                    <span>
+                      Cupom <strong>{appliedCoupon.code}</strong> ativo (
+                      {appliedCoupon.discountPercent
+                        ? `${appliedCoupon.discountPercent}% OFF`
+                        : appliedCoupon.discountAmount
+                        ? `R$ ${appliedCoupon.discountAmount.toFixed(2).replace('.', ',')} OFF`
+                        : 'Frete Grátis'}
+                      )
+                    </span>
                     <button
                       type="button"
                       onClick={() => setAppliedCoupon(null)}
@@ -3079,202 +3117,17 @@ export default function BookStore({ auth }) {
         </div>
       )}
 
-      {/* ===== MODAL DE CHECKOUT SIMULADO ===== */}
-      {isCheckoutModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsCheckoutModalOpen(false)}>
-          <div className={styles.modalCardCheckout} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.formHeader}>
-              <div className={styles.formHeaderTitleGroup}>
-                <div className={styles.formIconBox}>
-                  <CreditCard size={20} />
-                </div>
-                <div>
-                  <h3 className={styles.formTitle}>
-                    {checkoutStep === 'form' ? 'Finalizar Pedido' : 'Pedido Confirmado!'}
-                  </h3>
-                  <p className={styles.formSubtitle}>
-                    {checkoutStep === 'form'
-                      ? 'Confirme seus dados de entrega e forma de pagamento'
-                      : 'Sua compra foi processada com sucesso na Bibliotech'}
-                  </p>
-                </div>
-              </div>
-              <button
-                className={styles.modalCloseBtn}
-                onClick={() => setIsCheckoutModalOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {checkoutStep === 'form' ? (
-              <form onSubmit={handleConfirmOrder} className={styles.checkoutFormGrid}>
-                <div className={styles.checkoutSection}>
-                  <h4 className={styles.checkoutSectionTitle}>1. Dados de Entrega</h4>
-                  <div className={styles.formRow}>
-                    <div className={styles.formField}>
-                      <label className={styles.formLabel}>Nome Completo *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Ex: Ana Maria Silva"
-                        value={checkoutForm.name}
-                        onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
-                        className={styles.formInput}
-                      />
-                    </div>
-                    <div className={styles.formField}>
-                      <label className={styles.formLabel}>E-mail para Rastreamento *</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="Ex: ana@exemplo.com"
-                        value={checkoutForm.email}
-                        onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
-                        className={styles.formInput}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.formRow}>
-                    <div className={styles.formField}>
-                      <label className={styles.formLabel}>CEP *</label>
-                      <input
-                        type="text"
-                        required
-                        value={checkoutForm.cep}
-                        onChange={(e) => setCheckoutForm({ ...checkoutForm, cep: e.target.value })}
-                        className={styles.formInput}
-                      />
-                    </div>
-                    <div className={styles.formField}>
-                      <label className={styles.formLabel}>Endereço Completo *</label>
-                      <input
-                        type="text"
-                        required
-                        value={checkoutForm.address}
-                        onChange={(e) => setCheckoutForm({ ...checkoutForm, address: e.target.value })}
-                        className={styles.formInput}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.checkoutSection}>
-                  <h4 className={styles.checkoutSectionTitle}>2. Forma de Pagamento</h4>
-                  <div className={styles.paymentMethodsRow}>
-                    <div
-                      className={`${styles.paymentMethodCard} ${paymentMethod === 'pix' ? styles.paymentMethodSelected : ''}`}
-                      onClick={() => setPaymentMethod('pix')}
-                    >
-                      <div className={styles.paymentBadgeDiscount}>5% OFF</div>
-                      <strong>PIX Imediato</strong>
-                      <span>Aprovação instantânea</span>
-                    </div>
-
-                    <div
-                      className={`${styles.paymentMethodCard} ${paymentMethod === 'credit' ? styles.paymentMethodSelected : ''}`}
-                      onClick={() => setPaymentMethod('credit')}
-                    >
-                      <strong>Cartão de Crédito</strong>
-                      <span>Em até 6x sem juros</span>
-                    </div>
-
-                    <div
-                      className={`${styles.paymentMethodCard} ${paymentMethod === 'boleto' ? styles.paymentMethodSelected : ''}`}
-                      onClick={() => setPaymentMethod('boleto')}
-                    >
-                      <strong>Boleto Bancário</strong>
-                      <span>Vencimento em 3 dias</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.checkoutSummaryCard}>
-                  <div className={styles.checkoutSummaryRow}>
-                    <span>Itens ({cartTotalItems})</span>
-                    <span>R$ {cartSubtotal.toFixed(2).replace('.', ',')}</span>
-                  </div>
-                  {cartDiscount > 0 && (
-                    <div className={`${styles.checkoutSummaryRow} ${styles.summaryDiscount}`}>
-                      <span>Desconto ({appliedCoupon?.code})</span>
-                      <span>- R$ {cartDiscount.toFixed(2).replace('.', ',')}</span>
-                    </div>
-                  )}
-                  {paymentMethod === 'pix' && (
-                    <div className={`${styles.checkoutSummaryRow} ${styles.summaryDiscount}`}>
-                      <span>Desconto Especial PIX (5%)</span>
-                      <span>- R$ {(cartTotal * 0.05).toFixed(2).replace('.', ',')}</span>
-                    </div>
-                  )}
-                  <div className={styles.checkoutSummaryRow}>
-                    <span>Frete</span>
-                    <span>{shippingCost === 0 ? 'GRÁTIS' : `R$ ${shippingCost.toFixed(2).replace('.', ',')}`}</span>
-                  </div>
-                  <div className={styles.checkoutSummaryTotalRow}>
-                    <span>Valor Final a Pagar</span>
-                    <strong className={styles.checkoutFinalPrice}>
-                      R$ {(paymentMethod === 'pix' ? cartTotal * 0.95 : cartTotal).toFixed(2).replace('.', ',')}
-                    </strong>
-                  </div>
-                </div>
-
-                <div className={styles.formFooterActions}>
-                  <button
-                    type="button"
-                    className={styles.btnFormCancel}
-                    onClick={() => setIsCheckoutModalOpen(false)}
-                  >
-                    Voltar
-                  </button>
-                  <button type="submit" className={styles.btnFormSubmit}>
-                    <CheckCircle2 size={18} />
-                    <span>Confirmar Pedido</span>
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className={styles.orderSuccessCard}>
-                <div className={styles.orderSuccessIconCircle}>
-                  <CheckCircle size={48} />
-                </div>
-                <h3 className={styles.orderSuccessTitle}>Obrigado pela sua compra!</h3>
-                <p className={styles.orderSuccessSubtitle}>
-                  Seu pedido <strong>#{confirmedOrder?.orderNumber}</strong> foi gerado e está sendo preparado com muito carinho.
-                </p>
-
-                <div className={styles.orderSuccessBox}>
-                  <div className={styles.orderDetailRow}>
-                    <span>Data:</span>
-                    <strong>{confirmedOrder?.date}</strong>
-                  </div>
-                  <div className={styles.orderDetailRow}>
-                    <span>Forma de Pagamento:</span>
-                    <strong>{confirmedOrder?.paymentMethod}</strong>
-                  </div>
-                  <div className={styles.orderDetailRow}>
-                    <span>Endereço de Entrega:</span>
-                    <strong>{confirmedOrder?.address}</strong>
-                  </div>
-                  <div className={styles.orderDetailRow}>
-                    <span>Total Pago:</span>
-                    <strong className={styles.orderSuccessTotal}>
-                      R$ {confirmedOrder?.total.toFixed(2).replace('.', ',')}
-                    </strong>
-                  </div>
-                </div>
-
-                <button
-                  className={styles.btnOrderSuccessClose}
-                  onClick={() => setIsCheckoutModalOpen(false)}
-                >
-                  Continuar Navegando
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* ===== MODAL DE CHECKOUT INTELIGENTE COM FRETE POR CEP E CUPOM ===== */}
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        cart={cart}
+        currentUser={currentUser}
+        onOrderSuccess={(order) => {
+          saveCart([]);
+          showToast(`🎉 Pedido #${order.orderId} confirmado com sucesso!`);
+        }}
+      />
 
       {/* ===== MODAL DE CONFIRMAÇÃO DE ASSINATURA DE PLANO ===== */}
       {isPlanModalOpen && selectedPlan && (

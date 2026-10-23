@@ -66,6 +66,7 @@ import {
   Sliders
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
+import CheckoutModal from '../components/checkout/CheckoutModal';
 import styles from '../styles/index.module.css';
 
 // Otimizador de URL de imagem de capas (converte para tamanho médio -M.jpg reduzindo peso da imagem)
@@ -1442,103 +1443,17 @@ export default function CatalogoPage({ auth }) {
         </div>
       )}
 
-      {/* ===== MODAL DE CHECKOUT RÁPIDO ===== */}
-      {isCheckoutModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsCheckoutModalOpen(false)}>
-          <div
-            className={styles.modalCard}
-            style={{ maxWidth: '520px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.modalCloseBtn}
-              onClick={() => setIsCheckoutModalOpen(false)}
-            >
-              <X size={18} />
-            </button>
-
-            {!isOrderSuccess ? (
-              <div>
-                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                  <ShoppingBag size={36} color="#10b981" />
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginTop: '0.5rem' }}>
-                    Confirmar Pedido
-                  </h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    Revise seus dados e finalize a compra com segurança
-                  </p>
-                </div>
-
-                <div
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    marginBottom: '1.25rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span>Itens na Sacola:</span>
-                    <strong>{cartTotalItems} produtos</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span>Total a Pagar:</span>
-                    <strong style={{ color: '#10b981', fontSize: '1.2rem' }}>
-                      R$ {cartTotal.toFixed(2).replace('.', ',')}
-                    </strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#10b981' }}>
-                    <span>Forma de Envio:</span>
-                    <span>{shippingCost === 0 ? 'Frete Grátis Nacional' : 'Envio Padrão'}</span>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <button
-                    className={styles.btnCheckout}
-                    onClick={() => {
-                      setIsOrderSuccess(true);
-                      saveCart([]);
-                    }}
-                  >
-                    <CheckCircle size={18} />
-                    <span>Pagar com PIX (Aprovação Imediata)</span>
-                  </button>
-
-                  <button
-                    className={styles.btnAddToCart}
-                    style={{ justifyContent: 'center' }}
-                    onClick={() => {
-                      setIsOrderSuccess(true);
-                      saveCart([]);
-                    }}
-                  >
-                    <CreditCard size={18} />
-                    <span>Cartão de Crédito (Até 3x sem juros)</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                <CheckCircle2 size={56} color="#10b981" style={{ margin: '0 auto 1rem' }} />
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Pedido Confirmado com Sucesso!</h3>
-                <p style={{ color: 'var(--text-muted)', margin: '0.75rem 0 1.5rem' }}>
-                  Obrigado por comprar na Bibliotech. Enviamos o código de rastreio e confirmação para o seu e-mail.
-                </p>
-                <button
-                  className={styles.btnCheckout}
-                  onClick={() => {
-                    setIsOrderSuccess(false);
-                    setIsCheckoutModalOpen(false);
-                  }}
-                >
-                  Voltar ao Catálogo
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* ===== MODAL DE CHECKOUT INTELIGENTE COM FRETE POR CEP E CUPOM ===== */}
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        cart={cart}
+        currentUser={currentUser}
+        onOrderSuccess={(order) => {
+          saveCart([]);
+          showToast(`🎉 Pedido #${order.orderId} confirmado com sucesso!`);
+        }}
+      />
 
       {/* Footer */}
       <footer
