@@ -1,17 +1,32 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const { CONFIG } = require('../config/constants');
+const ApiResponse = require('../utils/apiResponse');
 
-const verifyToken = (req, res, next) => {
-  const token = req.header("Authorization");
+/**
+ * Middleware para verificação e validação de Token JWT (Clean Code)
+ */
+function verifyToken(req, res, next) {
+  const authHeader = req.header('Authorization') || req.headers['authorization'];
 
-  if (!token) return res.status(401).json({ error: "Acesso negado!" });
+  if (!authHeader) {
+    return ApiResponse.unauthorized(res, 'Acesso negado! Token de autenticação não informado.');
+  }
+
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : authHeader.trim();
+
+  if (!token) {
+    return ApiResponse.unauthorized(res, 'Formato de token inválido.');
+  }
 
   try {
-    const verified = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
-    req.user = verified; // Adiciona os dados do usuário ao request
+    const verified = jwt.verify(token, CONFIG.JWT_SECRET);
+    req.user = verified;
     next();
   } catch (error) {
-    res.status(400).json({ error: "Token inválido!" });
+    return ApiResponse.unauthorized(res, 'Token inválido ou expirado! Faça login novamente.');
   }
-};
+}
 
 module.exports = verifyToken;

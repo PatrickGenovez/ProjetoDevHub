@@ -1,82 +1,106 @@
-/* ===== TOKENS CSS - SISTEMA DE CORES ===== */
+/* ===== TOKENS CSS - SISTEMA DE CORES: PERGAMINHO & CRÔNICA MEDIEVAL (VIKING RÚSTICO) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=MedievalSharp&display=swap');
 
-/* Variáveis CSS para modo claro (Verde Claro e Branco) */
+/* Modo Claro: Pergaminho Ancestral, Couro & Selo de Cera Carmesim */
 :root {
-  /* Cores Primárias - Verde Esmeralda & Menta */
-  --color-primary: #10b981;
-  --color-primary-hover: #059669;
-  --color-primary-light: #34d399;
-  --color-primary-gradient-start: #34d399;
-  --color-primary-gradient-end: #059669;
-  --color-neon-accent: #00ff88;
-  
-  /* Cores de Fundo */
-  --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F0FDF4;
-  --color-bg-tertiary: #DCFCE7;
-  
-  /* Cores de Texto */
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
-  
+  /* Fontes Temáticas */
+  --font-heading: 'Cinzel', 'Cinzel Decorative', Georgia, serif;
+  --font-display: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+  --font-rune: 'MedievalSharp', 'Cinzel', serif;
+
+  /* Cores Primárias - Selo de Cera Carmesim & Ouro Antigo */
+  --color-primary: #8e1f1f;
+  --color-primary-hover: #731717;
+  --color-primary-light: #ad3333;
+  --color-primary-gradient-start: #ad3333;
+  --color-primary-gradient-end: #6e1616;
+  --color-gold-accent: #c69238;
+  --color-gold-light: #e5b352;
+  --color-bronze: #8c5627;
+  --color-leather: #53331b;
+  --color-leather-dark: #372111;
+  --color-neon-accent: #c69238;
+
+  /* Cores de Fundo (Pergaminho Envelhecido & Linho Antigo) */
+  --color-bg-primary: #f6efe2;
+  --color-bg-secondary: #ede2cd;
+  --color-bg-tertiary: #dfd0b5;
+  --color-parchment-border: rgba(140, 86, 39, 0.28);
+  --color-parchment-glow: rgba(198, 146, 56, 0.18);
+
+  /* Cores de Texto (Tinta Ferrogálica & Carvão de Forja) */
+  --color-text-primary: #271e16;
+  --color-text-secondary: #574637;
+  --color-text-muted: #8b7662;
+
   /* Campos de Formulário */
-  --color-form-bg: #FFFFFF;
-  --color-form-border: rgba(16, 185, 129, 0.3);
-  
+  --color-form-bg: #faf5eb;
+  --color-form-border: rgba(140, 86, 39, 0.35);
+
   /* Botões */
-  --color-button-normal: #10b981;
-  --color-button-hover: #059669;
-  --color-button-pressed: #047857;
-  
+  --color-button-normal: #8e1f1f;
+  --color-button-hover: #731717;
+  --color-button-pressed: #581010;
+
   /* Cores de Acento */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  
-  /* Sombras */
-  --shadow-sm: 0 2px 4px rgba(16, 185, 129, 0.06);
-  --shadow-md: 0 4px 12px rgba(16, 185, 129, 0.12);
-  --shadow-lg: 0 12px 28px rgba(16, 185, 129, 0.18);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1);
-  --shadow-neon: 0 0 15px rgba(16, 185, 129, 0.35);
+  --color-success: #3f683a;
+  --color-warning: #c69238;
+  --color-error: #9a2020;
+
+  /* Sombras Quentes & Selos de Cera */
+  --shadow-sm: 0 2px 5px rgba(60, 35, 15, 0.08);
+  --shadow-md: 0 4px 14px rgba(60, 35, 15, 0.14);
+  --shadow-lg: 0 10px 28px rgba(60, 35, 15, 0.18);
+  --shadow-xl: 0 16px 36px rgba(45, 25, 10, 0.22);
+  --shadow-gold: 0 0 18px rgba(198, 146, 56, 0.35);
+  --shadow-seal: 0 4px 14px rgba(142, 31, 31, 0.4);
+  --shadow-neon: 0 0 14px rgba(198, 146, 56, 0.35);
 }
 
-/* Variáveis CSS para modo escuro (Preto Suave & Confortável com Contorno Neon Elegante) */
+/* Modo Escuro: Crônica Noturna, Forja Nórdica, Carvalho & Runas Brilhantes */
 [data-theme="dark"] {
-  /* Cores Primárias Neon Suavizadas */
-  --color-primary: #00ff88;
-  --color-primary-hover: #34d399;
-  --color-primary-light: #6ee7b7;
-  --color-primary-gradient-start: #00ff88;
-  --color-primary-gradient-end: #10b981;
-  --color-neon-accent: #00ff88;
-  
-  /* Cores de Fundo Suaves (Charcoal/Grafite Suave Aconchegante) */
-  --color-bg-primary: #121a16;
-  --color-bg-secondary: #18231e;
-  --color-bg-tertiary: #1f2e27;
-  
-  /* Cores de Texto */
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
-  
+  --color-primary: #c93b2b;
+  --color-primary-hover: #e04e3c;
+  --color-primary-light: #f26d5b;
+  --color-primary-gradient-start: #e04e3c;
+  --color-primary-gradient-end: #9e2315;
+  --color-gold-accent: #e5b352;
+  --color-gold-light: #f7ce7a;
+  --color-bronze: #af7239;
+  --color-leather: #3c2617;
+  --color-leather-dark: #24160c;
+  --color-neon-accent: #e5b352;
+
+  /* Cores de Fundo (Carvalho Tostado, Couro Noturno & Cinzas) */
+  --color-bg-primary: #15110d;
+  --color-bg-secondary: #1e1813;
+  --color-bg-tertiary: #2a2119;
+  --color-parchment-border: rgba(229, 179, 82, 0.28);
+  --color-parchment-glow: rgba(229, 179, 82, 0.15);
+
+  /* Cores de Texto (Pergaminho à Luz de Archotes) */
+  --color-text-primary: #f5eedf;
+  --color-text-secondary: #c9baa4;
+  --color-text-muted: #8d7e6c;
+
   /* Campos de Formulário */
-  --color-form-bg: #1a2721;
-  --color-form-border: rgba(0, 255, 136, 0.3);
-  
+  --color-form-bg: #221b14;
+  --color-form-border: rgba(229, 179, 82, 0.32);
+
   /* Botões */
-  --color-button-normal: #00ff88;
-  --color-button-hover: #10b981;
-  --color-button-pressed: #059669;
-  
-  /* Sombras Neon Suaves */
-  --shadow-sm: 0 0 8px rgba(0, 255, 136, 0.15);
-  --shadow-md: 0 0 16px rgba(0, 255, 136, 0.2);
-  --shadow-lg: 0 0 25px rgba(0, 255, 136, 0.28);
-  --shadow-xl: 0 0 35px rgba(0, 255, 136, 0.35);
-  --shadow-neon: 0 0 15px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
+  --color-button-normal: #c93b2b;
+  --color-button-hover: #e04e3c;
+  --color-button-pressed: #ad2d1f;
+
+  /* Sombras Douradas & Forja */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.65);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.75);
+  --shadow-gold: 0 0 20px rgba(229, 179, 82, 0.32);
+  --shadow-seal: 0 0 20px rgba(201, 59, 43, 0.45);
+  --shadow-neon: 0 0 16px rgba(229, 179, 82, 0.35);
 }
 
 /* ===== RESET E ESTILOS BASE ===== */
@@ -88,37 +112,46 @@
 
 html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
-/* Scrollbar com tema Verde / Neon */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.6px;
+  font-weight: 700;
+}
+
+/* Scrollbar rústica em Bronze & Couro Antigo */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--color-bg-primary);
+  border-left: 1px solid var(--color-parchment-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgba(140, 86, 39, 0.45);
   border-radius: 4px;
+  border: 1px solid rgba(198, 146, 56, 0.2);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 136, 0.35);
+  background: rgba(229, 179, 82, 0.35);
+  border: 1px solid rgba(229, 179, 82, 0.2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: var(--color-gold-accent);
 }
