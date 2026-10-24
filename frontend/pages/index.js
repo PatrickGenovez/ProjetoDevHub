@@ -270,9 +270,34 @@ const INITIAL_COMMUNITY_POSTS = [
 
 export default function BookStore({ auth }) {
   const router = useRouter();
+  const [activeNav, setActiveNav] = useState('inicio');
   const [books, setBooks] = useState(DEFAULT_BOOKS);
   const [searchSource, setSearchSource] = useState('local'); // 'local' | 'google' | 'openlibrary'
   const [catalogViewMode, setCatalogViewMode] = useState('grid'); // 'grid' | 'list'
+
+  // Sincroniza aba ativa com rolagem (Início vs Clube do Livro)
+  useEffect(() => {
+    const handleScroll = () => {
+      const planosEl = document.getElementById('planos-section');
+      if (planosEl) {
+        const rect = planosEl.getBoundingClientRect();
+        if (rect.top <= 250 && rect.bottom >= 150) {
+          setActiveNav('planos');
+          return;
+        }
+      }
+      if (window.scrollY < 300) {
+        setActiveNav('inicio');
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.location.hash === '#planos-section') {
+      setActiveNav('planos');
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   // Estados de Busca com Debounce de 300ms (Alta Performance)
   const [searchInput, setSearchInput] = useState('');
@@ -1568,7 +1593,15 @@ export default function BookStore({ auth }) {
         <div className={styles.container}>
           <div className={styles.headerContent}>
             {/* Logo */}
-            <div className={styles.logoGroup}>
+            <Link
+              href="/"
+              className={styles.logoGroup}
+              style={{ textDecoration: 'none', cursor: 'pointer' }}
+              onClick={() => {
+                setActiveNav('inicio');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
               <div className={styles.logoBadge}>
                 <Library size={24} className={styles.logoIcon} />
               </div>
@@ -1576,19 +1609,39 @@ export default function BookStore({ auth }) {
                 <span className={styles.logoTitle}>BIBLIOTECH</span>
                 <span className={styles.logoSubtitle}>Livraria & Clube Literário</span>
               </div>
-            </div>
+            </Link>
 
             {/* Menu Nav Links Limpo */}
             <nav className={styles.navLinks}>
-              <Link href="/catalogo" className={styles.navItem}>
+              <Link
+                href="/"
+                className={`${styles.navItem} ${activeNav === 'inicio' ? styles.navItemActive : ''}`}
+                onClick={() => {
+                  setActiveNav('inicio');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                Início
+              </Link>
+              <Link
+                href="/catalogo"
+                className={`${styles.navItem} ${router.pathname === '/catalogo' ? styles.navItemActive : ''}`}
+              >
                 Catálogo
               </Link>
-              <a href="#planos-section" className={styles.navItem} onClick={scrollToPlans}>
+              <a
+                href="#planos-section"
+                className={`${styles.navItem} ${activeNav === 'planos' ? styles.navItemActive : ''}`}
+                onClick={(e) => {
+                  scrollToPlans(e);
+                  setActiveNav('planos');
+                }}
+              >
                 Clube do Livro
               </a>
               <Link
                 href="/comunidade"
-                className={`${styles.navItem} ${styles.navItemCommunity}`}
+                className={`${styles.navItem} ${styles.navItemCommunity} ${router.pathname === '/comunidade' ? styles.navItemActive : ''}`}
                 title="Acessar o Canal de Comunicação entre Leitores"
               >
                 <Users size={16} className={styles.navCommunityIcon} />

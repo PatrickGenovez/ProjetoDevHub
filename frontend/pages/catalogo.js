@@ -521,18 +521,27 @@ export default function CatalogoPage({ auth }) {
 
             {/* Menu Nav Links */}
             <nav className={styles.navLinks}>
-              <Link href="/" className={styles.navItem}>
+              <Link
+                href="/"
+                className={`${styles.navItem} ${router.pathname === '/' ? styles.navItemActive : ''}`}
+              >
                 Início
               </Link>
-              <Link href="/catalogo" className={`${styles.navItem} ${styles.navItemActive}`}>
+              <Link
+                href="/catalogo"
+                className={`${styles.navItem} ${router.pathname === '/catalogo' ? styles.navItemActive : ''}`}
+              >
                 Catálogo
               </Link>
-              <Link href="/#planos-section" className={styles.navItem}>
+              <Link
+                href="/#planos-section"
+                className={`${styles.navItem} ${router.asPath === '/#planos-section' ? styles.navItemActive : ''}`}
+              >
                 Clube do Livro
               </Link>
               <Link
                 href="/comunidade"
-                className={`${styles.navItem} ${styles.navItemCommunity}`}
+                className={`${styles.navItem} ${styles.navItemCommunity} ${router.pathname === '/comunidade' ? styles.navItemActive : ''}`}
                 title="Acessar o Canal de Comunicação entre Leitores"
               >
                 <Users size={16} className={styles.navCommunityIcon} />

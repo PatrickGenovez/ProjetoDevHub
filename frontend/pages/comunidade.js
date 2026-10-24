@@ -839,16 +839,28 @@ export default function ComunidadePage({ auth }) {
 
             {/* Menu Nav Links */}
             <nav className={styles.navLinks}>
-              <Link href="/" className={styles.navItem}>
+              <Link
+                href="/"
+                className={`${styles.navItem} ${router.pathname === '/' ? styles.navItemActive : ''}`}
+              >
                 Início
               </Link>
-              <Link href="/catalogo" className={styles.navItem}>
+              <Link
+                href="/catalogo"
+                className={`${styles.navItem} ${router.pathname === '/catalogo' ? styles.navItemActive : ''}`}
+              >
                 Catálogo
               </Link>
-              <Link href="/#planos-section" className={styles.navItem}>
+              <Link
+                href="/#planos-section"
+                className={`${styles.navItem} ${router.asPath === '/#planos-section' ? styles.navItemActive : ''}`}
+              >
                 Clube do Livro
               </Link>
-              <Link href="/comunidade" className={`${styles.navItem} ${styles.navItemActive}`}>
+              <Link
+                href="/comunidade"
+                className={`${styles.navItem} ${router.pathname === '/comunidade' ? styles.navItemActive : ''}`}
+              >
                 <Users size={16} />
                 <span>Comunidade</span>
                 <span className={styles.navBadge}>Canal</span>

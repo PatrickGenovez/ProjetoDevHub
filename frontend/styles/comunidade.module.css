@@ -153,7 +153,7 @@
 .navLinks {
   display: none;
   align-items: center;
-  gap: 26px;
+  gap: 16px;
 }
 
 @media (min-width: 820px) {
@@ -169,9 +169,10 @@
   letter-spacing: 0.6px;
   color: var(--color-text-secondary);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
-  padding: 6px 0;
+  padding: 7px 12px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -179,10 +180,12 @@
 
 .navItem:hover {
   color: var(--color-primary);
+  background: rgba(142, 31, 31, 0.05);
 }
 
 :global([data-theme="dark"]) .navItem:hover {
   color: #e5b352;
+  background: rgba(229, 179, 82, 0.08);
   text-shadow: 0 0 10px rgba(229, 179, 82, 0.4);
 }
 
@@ -190,11 +193,11 @@
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: 12px;
   width: 0%;
-  height: 2px;
+  height: 2.5px;
   background: var(--color-gold-accent);
-  transition: width 0.2s ease;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 2px;
 }
 
@@ -204,26 +207,31 @@
 }
 
 .navItem:hover::after {
-  width: 100%;
+  width: calc(100% - 24px);
 }
 
 .navItemActive {
   color: var(--color-primary) !important;
-  font-weight: 800;
+  font-weight: 800 !important;
+  background: rgba(142, 31, 31, 0.09) !important;
 }
 
 :global([data-theme="dark"]) .navItemActive {
   color: #e5b352 !important;
+  background: rgba(229, 179, 82, 0.15) !important;
+  text-shadow: 0 0 10px rgba(229, 179, 82, 0.5);
 }
 
 .navItemActive::after {
-  width: 100%;
-  background: var(--color-primary);
+  width: calc(100% - 24px) !important;
+  height: 2.5px !important;
+  background: var(--color-primary) !important;
+  box-shadow: 0 2px 6px rgba(142, 31, 31, 0.35);
 }
 
 :global([data-theme="dark"]) .navItemActive::after {
-  background: #e5b352;
-  box-shadow: 0 0 8px rgba(229, 179, 82, 0.6);
+  background: #e5b352 !important;
+  box-shadow: 0 0 10px rgba(229, 179, 82, 0.7) !important;
 }
 
 .navBadge {
