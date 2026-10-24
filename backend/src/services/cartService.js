@@ -32,7 +32,14 @@ function readAllCarts() {
 
 function writeAllCarts(carts) {
   try {
-    fs.writeFileSync(CARTS_FILE, JSON.stringify(carts, null, 2), 'utf-8');
+    const newContent = JSON.stringify(carts, null, 2);
+    if (fs.existsSync(CARTS_FILE)) {
+      const currentContent = fs.readFileSync(CARTS_FILE, 'utf-8');
+      if (currentContent === newContent) {
+        return true; // Sem alterações, evita I/O e eventos de arquivo desnecessários
+      }
+    }
+    fs.writeFileSync(CARTS_FILE, newContent, 'utf-8');
     return true;
   } catch (err) {
     console.error('[CartService] Erro ao salvar carts.json:', err.message);
@@ -88,7 +95,16 @@ class CartService {
     const serverCart = this.getCart(userId);
     const incomingItems = Array.isArray(localItems) ? localItems : [];
 
-    // Mapa de itens para combinar quantidades sem duplicar livros
+    // Se o cliente não tem itens locais, retorna o carrinho do servidor sem alterar nada
+    if (incomingItems.length === 0) {
+      return serverCart;
+    }
+
+    // Se o servidor está vazio, salva os itens trazidos do localStorage
+    if (serverCart.length === 0) {
+      return this.saveCart(userId, incomingItems);
+    }
+
     const mergedMap = new Map();
 
     // 1. Carrega itens do servidor
@@ -96,17 +112,18 @@ class CartService {
       mergedMap.set(String(item.id), { ...item });
     }
 
-    // 2. Mescla itens trazidos do localStorage local
+    // 2. Mescla itens trazidos do localStorage
     for (const item of incomingItems) {
       const key = String(item.id);
       if (mergedMap.has(key)) {
         const existing = mergedMap.get(key);
-        existing.quantity = (existing.quantity || 1) + (item.quantity || 1);
+        // Não soma as quantidades para não duplicar itens a cada entrada/refresh na página!
+        existing.quantity = Math.max(existing.quantity || 1, item.quantity || 1);
       } else {
         mergedMap.set(key, {
           id: item.id,
-          title: item.title,
-          author: item.author,
+          title: item.title || 'Livro Sem Título',
+          author: item.author || 'Autor',
           price: parseFloat(item.price) || 49.9,
           originalPrice: item.originalPrice ? parseFloat(item.originalPrice) : null,
           quantity: Math.max(1, parseInt(item.quantity, 10) || 1),

@@ -1,23 +1,12 @@
 {
   "1": [
     {
-      "id": "OL1003017W",
-      "title": "Memórias póstumas de Brás Cubas",
-      "author": "Machado de Assis",
-      "price": 49.9,
-      "originalPrice": null,
-      "quantity": 18,
-      "coverImage": "",
-      "format": "Brochura",
-      "genre": "Geral"
-    },
-    {
       "id": "OL1003040W",
       "title": "Dom Casmurro",
       "author": "Machado de Assis",
       "price": 39.9,
       "originalPrice": null,
-      "quantity": 6,
+      "quantity": 1,
       "coverImage": "",
       "format": "Brochura",
       "genre": "Geral"

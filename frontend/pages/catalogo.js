@@ -162,33 +162,48 @@ export default function CatalogoPage({ auth }) {
         const userSaved = userKey ? localStorage.getItem(`bibliotech_cart_${userKey}`) : null;
         const generalSaved = localStorage.getItem('bibliotech_cart');
         const raw = userSaved || generalSaved || '[]';
-        localItems = JSON.parse(raw);
-        if (Array.isArray(localItems) && !isCancelled) {
-          setCart(localItems);
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          // Limpa e sanitiza qualquer quantidade inflada previamente
+          localItems = parsed.map((item) => ({
+            ...item,
+            quantity: Math.min(Math.max(1, parseInt(item.quantity, 10) || 1), 20)
+          }));
+          if (!isCancelled) {
+            setCart(localItems);
+          }
         }
       } catch (e) {}
 
-      // Se o usuário estiver autenticado, sincroniza/mescla com a conta no backend
+      // Se o usuário estiver autenticado, sincroniza com o backend
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (token && currentUser) {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-          const res = await fetch(`${apiUrl}/cart/merge`, {
-            method: 'POST',
+          const endpoint = localItems.length > 0 ? `${apiUrl}/cart/merge` : `${apiUrl}/cart`;
+          const method = localItems.length > 0 ? 'POST' : 'GET';
+          const body = localItems.length > 0 ? JSON.stringify({ items: localItems }) : undefined;
+
+          const res = await fetch(endpoint, {
+            method,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ items: localItems })
+            body
           });
 
           if (res.ok && !isCancelled) {
             const json = await res.json();
             if (json.data && Array.isArray(json.data)) {
-              setCart(json.data);
-              localStorage.setItem('bibliotech_cart', JSON.stringify(json.data));
+              const sanitized = json.data.map((item) => ({
+                ...item,
+                quantity: Math.min(Math.max(1, parseInt(item.quantity, 10) || 1), 20)
+              }));
+              setCart(sanitized);
+              localStorage.setItem('bibliotech_cart', JSON.stringify(sanitized));
               if (userKey) {
-                localStorage.setItem(`bibliotech_cart_${userKey}`, JSON.stringify(json.data));
+                localStorage.setItem(`bibliotech_cart_${userKey}`, JSON.stringify(sanitized));
               }
             }
           }
