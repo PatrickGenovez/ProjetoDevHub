@@ -78,16 +78,24 @@ export const getOptimizedCoverUrl = (url) => {
   return url;
 };
 
-// Gêneros disponíveis no catálogo
+// Gêneros disponíveis no catálogo com iconografia e runas nórdicas
 const AVAILABLE_GENRES = [
-  { id: 'Todos', name: 'Todos os Gêneros' },
-  { id: 'Clássicos', name: 'Clássicos' },
-  { id: 'Romance', name: 'Romance' },
-  { id: 'Ficção Científica', name: 'Ficção Científica' },
-  { id: 'Fantasia', name: 'Fantasia' },
-  { id: 'Suspense & Mistério', name: 'Suspense & Mistério' },
-  { id: 'História & Biografias', name: 'História & Biografias' },
-  { id: 'Tecnologia', name: 'Tecnologia & Programação' }
+  { id: 'Todos', name: 'Todos os Gêneros', vikingName: 'Todos os Tomos', rune: 'ᛟ', icon: Layers },
+  { id: 'Clássicos', name: 'Clássicos', vikingName: 'Clássicos Antigos', rune: 'ᚲ', icon: Crown },
+  { id: 'Romance', name: 'Romance', vikingName: 'Romances & Bardos', rune: 'ᛒ', icon: Heart },
+  { id: 'Ficção Científica', name: 'Ficção Científica', vikingName: 'Ficção & Profecias', rune: 'ᛉ', icon: Sparkles },
+  { id: 'Fantasia', name: 'Fantasia', vikingName: 'Fantasia & Mitos', rune: 'ᚠ', icon: Flame },
+  { id: 'Suspense & Mistério', name: 'Suspense & Mistério', vikingName: 'Mistérios & Segredos', rune: 'ᚦ', icon: Lock },
+  { id: 'História & Biografias', name: 'História & Biografias', vikingName: 'Crônicas de Batalha', rune: 'ᚺ', icon: Award },
+  { id: 'Tecnologia', name: 'Tecnologia & Programação', vikingName: 'Alquimia & Códigos', rune: 'ᚨ', icon: SlidersHorizontal }
+];
+
+// Faixas de preço / tributo nórdico
+const PRICE_RANGES = [
+  { id: 'all', label: 'Todos os Valores', desc: 'Qualquer tributo' },
+  { id: 'under30', label: 'Até R$ 30,00', desc: 'Peças de Prata (Econômico)' },
+  { id: '30to60', label: 'R$ 30 a R$ 60', desc: 'Moedas de Ouro (Padrão)' },
+  { id: 'over60', label: 'Acima de R$ 60', desc: 'Tomos Nobres (Raros)' }
 ];
 
 export default function CatalogoPage({ auth }) {
@@ -102,6 +110,8 @@ export default function CatalogoPage({ auth }) {
   const [isSearching, setIsSearching] = useState(false);
   const [sortBy, setSortBy] = useState('sales'); // 'sales' | 'price-asc' | 'price-desc' | 'rating' | 'title'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [layoutStyle, setLayoutStyle] = useState('viking'); // 'viking' | 'classic'
+  const [priceFilter, setPriceFilter] = useState('all'); // 'all' | 'under30' | '30to60' | 'over60'
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -429,6 +439,15 @@ export default function CatalogoPage({ auth }) {
     return favorites.some((f) => String(f.id) === String(bookId));
   };
 
+  // Contagem dinâmica por gênero
+  const getGenreCount = useCallback(
+    (genreId) => {
+      if (genreId === 'Todos') return books.length;
+      return books.filter((b) => b.genre && b.genre.toLowerCase() === genreId.toLowerCase()).length;
+    },
+    [books]
+  );
+
   // Filtragem e Ordenação dos Livros
   const filteredBooks = useMemo(() => {
     let list = [...books];
@@ -449,6 +468,15 @@ export default function CatalogoPage({ auth }) {
       list = list.filter((b) => b.genre && b.genre.toLowerCase() === selectedGenre.toLowerCase());
     }
 
+    // Filtro por faixa de preço / tributo
+    if (priceFilter === 'under30') {
+      list = list.filter((b) => (b.price || 49.9) <= 30);
+    } else if (priceFilter === '30to60') {
+      list = list.filter((b) => (b.price || 49.9) >= 30 && (b.price || 49.9) <= 60);
+    } else if (priceFilter === 'over60') {
+      list = list.filter((b) => (b.price || 49.9) > 60);
+    }
+
     // Ordenação
     list.sort((a, b) => {
       if (sortBy === 'sales') return (b.reviewsCount || 0) - (a.reviewsCount || 0);
@@ -460,7 +488,7 @@ export default function CatalogoPage({ auth }) {
     });
 
     return list;
-  }, [books, searchTerm, selectedGenre, sortBy]);
+  }, [books, searchTerm, selectedGenre, sortBy, priceFilter]);
 
   // Paginação
   const totalPages = Math.ceil(filteredBooks.length / pageSize) || 1;
@@ -482,6 +510,380 @@ export default function CatalogoPage({ auth }) {
     setCurrentUser(null);
     showToast('Você saiu da sua conta.');
   };
+
+  // Renderização unificada do acervo (grid, lista, loading, vazio, paginação)
+  const renderBooksContent = () => (
+    <>
+      {/* Meta informações do resultado */}
+      <div className={styles.catalogExplorerHeading}>
+        <div className={styles.catalogExplorerTitleGroup}>
+          <span className={styles.catalogExplorerBadge}>
+            <BookOpen size={13} />
+            {layoutStyle === 'viking' ? 'Relíquias do Grande Salão' : 'Acervo Disponível'}
+          </span>
+          <h2 className={styles.catalogExplorerTitle}>
+            {selectedGenre === 'Todos'
+              ? layoutStyle === 'viking'
+                ? 'Todos os Tomos & Manuscritos'
+                : 'Todas as Obras'
+              : `Gênero: ${selectedGenre}`}
+            {searchTerm && ` • Busca: "${searchTerm}"`}
+            {priceFilter !== 'all' && ` • ${PRICE_RANGES.find((p) => p.id === priceFilter)?.label}`}
+          </h2>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted, #94a3b8)' }}>
+            {filteredBooks.length} {filteredBooks.length === 1 ? 'livro encontrado' : 'livros encontrados'}
+          </span>
+
+          {/* Seletor de Itens por Página */}
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className={styles.sortSelect}
+            style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+            aria-label="Livros por página"
+          >
+            <option value={12}>12 por página</option>
+            <option value={24}>24 por página</option>
+            <option value={36}>36 por página</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Estado de Carregamento */}
+      {isLoading && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '4rem 1rem',
+            gap: '1rem'
+          }}
+        >
+          <Loader2 size={36} className={styles.searchSpinner} style={{ color: 'var(--color-gold-accent, #c69238)' }} />
+          <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '0.95rem' }}>
+            Consultando obras em tempo real na biblioteca sagrada...
+          </p>
+        </div>
+      )}
+
+      {/* Estado Vazio */}
+      {!isLoading && displayedBooks.length === 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '4rem 1rem',
+            textAlign: 'center',
+            gap: '1rem'
+          }}
+        >
+          <BookOpen size={48} color="#c69238" />
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Nenhum tomo encontrado</h3>
+          <p style={{ color: 'var(--text-muted, #94a3b8)', maxWidth: '420px' }}>
+            Não encontramos pergaminhos para as runas e filtros selecionados. Tente pesquisar outro termo ou restaurar os filtros originais.
+          </p>
+          <button
+            className={styles.btnCartBrowse}
+            onClick={() => {
+              setSearchInput('');
+              setSearchTerm('');
+              setSelectedGenre('Todos');
+              setPriceFilter('all');
+            }}
+          >
+            Restaurar Todos os Filtros
+          </button>
+        </div>
+      )}
+
+      {/* Grid de Livros (Visualização Grade) */}
+      {!isLoading && displayedBooks.length > 0 && viewMode === 'grid' && (
+        <div className={styles.booksGrid}>
+          {displayedBooks.map((book) => {
+            const cover = getOptimizedCoverUrl(book.coverImage);
+            const fav = isFavorited(book.id);
+
+            return (
+              <div key={book.id} className={styles.bookCard}>
+                {/* Badge superior */}
+                <div className={styles.cardBadgeRow}>
+                  <span className={styles.customCardBadge}>{book.badge || 'Disponível'}</span>
+                  {book.discountPercent > 0 && (
+                    <span className={styles.cleanDiscountBadge}>-{book.discountPercent}% OFF</span>
+                  )}
+                </div>
+
+                {/* Capa */}
+                <div
+                  className={styles.bookCover}
+                  onClick={() => {
+                    setSelectedBook(book);
+                    setModalQty(1);
+                  }}
+                  title="Clique para ver sinopse e detalhes"
+                >
+                  {cover ? (
+                    <img
+                      src={cover}
+                      alt={book.title}
+                      className={styles.bookCoverImage}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      className={styles.bookCoverFallback}
+                      style={{ background: book.coverGradient }}
+                    >
+                      <BookOpen size={36} className={styles.coverBookIcon} />
+                      <span style={{ fontSize: '0.8rem', padding: '0 0.5rem', textAlign: 'center' }}>
+                        {book.title}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Corpo do Card */}
+                <div className={styles.bookCardBody}>
+                  <div className={styles.bookInfoTop}>
+                    <span className={styles.vikingCardGenre}>
+                      {book.genre}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <Star size={13} fill="#f59e0b" color="#f59e0b" />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{book.rating}</span>
+                    </div>
+                  </div>
+
+                  <h3
+                    className={styles.bookTitle}
+                    onClick={() => {
+                      setSelectedBook(book);
+                      setModalQty(1);
+                    }}
+                    title={book.title}
+                  >
+                    {book.title}
+                  </h3>
+
+                  <div className={styles.bookAuthorRow}>
+                    <span className={styles.bookAuthor}>{book.author}</span>
+                  </div>
+
+                  {/* Bloco de Preços */}
+                  <div className={styles.cardPricingBox}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <span className={styles.cardCurrentPrice}>
+                        <span className={styles.vikingCoinSymbol}>ᛗ</span>
+                        R$ {(book.price || 49.90).toFixed(2).replace('.', ',')}
+                      </span>
+                      {book.originalPrice && book.originalPrice > book.price && (
+                        <span className={styles.cardOldPrice}>
+                          R$ {book.originalPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                      )}
+                    </div>
+                    <span className={styles.cardInstallments}>
+                      ou 3x de R$ {((book.price || 49.90) / 3).toFixed(2).replace('.', ',')} sem juros
+                    </span>
+                  </div>
+
+                  {/* Botões de Ação */}
+                  <div className={styles.cardActions}>
+                    <button
+                      className={styles.btnAddToCart}
+                      onClick={() => addToCart(book, 1)}
+                      title="Adicionar à sacola de compras"
+                    >
+                      <ShoppingBag size={15} />
+                      <span>Adicionar</span>
+                    </button>
+                    <button
+                      className={`${styles.btnModalFav} ${fav ? styles.btnModalFavActive : ''}`}
+                      onClick={() => toggleFavorite(book)}
+                      title={fav ? 'Remover dos favoritos' : 'Favoritar livro'}
+                      style={{ width: '38px', height: '38px', padding: 0 }}
+                    >
+                      <Heart size={16} fill={fav ? '#ef4444' : 'none'} color={fav ? '#ef4444' : 'currentColor'} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Lista de Livros (Visualização Lista) */}
+      {!isLoading && displayedBooks.length > 0 && viewMode === 'list' && (
+        <div className={styles.booksList}>
+          {displayedBooks.map((book) => {
+            const cover = getOptimizedCoverUrl(book.coverImage);
+            const fav = isFavorited(book.id);
+
+            return (
+              <div key={book.id} className={styles.bookCardList}>
+                <div
+                  className={styles.bookCardListCover}
+                  onClick={() => {
+                    setSelectedBook(book);
+                    setModalQty(1);
+                  }}
+                >
+                  {cover ? (
+                    <img src={cover} alt={book.title} className={styles.bookCardListCoverImg} loading="lazy" />
+                  ) : (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        background: book.coverGradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <BookOpen size={24} color="#fff" />
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.bookCardListBody}>
+                  <div className={styles.bookCardListTop}>
+                    <div className={styles.bookCardListMeta}>
+                      <span className={styles.vikingCardGenre}>
+                        {book.genre}
+                      </span>
+                      <span>•</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                        {book.format} • {book.pages} págs.
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <Star size={13} fill="#f59e0b" color="#f59e0b" />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{book.rating}</span>
+                    </div>
+                  </div>
+
+                  <h3
+                    className={styles.bookCardListTitle}
+                    onClick={() => {
+                      setSelectedBook(book);
+                      setModalQty(1);
+                    }}
+                  >
+                    {book.title}
+                  </h3>
+                  <p className={styles.bookCardListAuthor}>Por {book.author}</p>
+                  <p className={styles.bookCardListSynopsis}>
+                    {book.synopsis && book.synopsis.length > 180
+                      ? book.synopsis.slice(0, 180) + '...'
+                      : book.synopsis}
+                  </p>
+
+                  <div className={styles.bookCardListFooter}>
+                    <div className={styles.bookCardListPrice}>
+                      <span className={styles.bookCardListCurrentPrice}>
+                        <span className={styles.vikingCoinSymbol}>ᛗ</span>
+                        R$ {(book.price || 49.90).toFixed(2).replace('.', ',')}
+                      </span>
+                      {book.originalPrice && book.originalPrice > book.price && (
+                        <span className={styles.bookCardListOldPrice}>
+                          R$ {book.originalPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className={styles.bookCardListActions}>
+                      <button
+                        className={`${styles.btnModalFav} ${fav ? styles.btnModalFavActive : ''}`}
+                        onClick={() => toggleFavorite(book)}
+                        style={{ width: '36px', height: '36px', padding: 0 }}
+                      >
+                        <Heart size={16} fill={fav ? '#ef4444' : 'none'} color={fav ? '#ef4444' : 'currentColor'} />
+                      </button>
+                      <button className={styles.btnAddToCart} onClick={() => addToCart(book, 1)}>
+                        <ShoppingBag size={15} />
+                        <span>Adicionar</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Paginação */}
+      {!isLoading && totalPages > 1 && (
+        <div className={styles.paginationWrapper} style={{ marginTop: '2.5rem' }}>
+          <div className={styles.paginationHeader}>
+            <span className={styles.paginationInfo}>
+              Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong> ({filteredBooks.length} obras)
+            </span>
+          </div>
+
+          <div className={styles.paginationPagesRow}>
+            <button
+              className={styles.paginationNavBtn}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              title="Página anterior"
+            >
+              <ChevronLeft size={16} />
+              <span>Anterior</span>
+            </button>
+
+            <div className={styles.paginationNumbers}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  if (totalPages <= 7) return true;
+                  if (p === 1 || p === totalPages) return true;
+                  return Math.abs(p - currentPage) <= 2;
+                })
+                .map((pageNum, idx, arr) => {
+                  const showEllipsisBefore = idx > 0 && pageNum - arr[idx - 1] > 1;
+
+                  return (
+                    <div key={pageNum} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      {showEllipsisBefore && <span className={styles.paginationEllipsis}>...</span>}
+                      <button
+                        className={`${styles.paginationNumber} ${
+                          currentPage === pageNum ? styles.paginationNumberActive : ''
+                        }`}
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <button
+              className={styles.paginationNavBtn}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              title="Próxima página"
+            >
+              <span>Próxima</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className={styles.pageWrapper}>
@@ -552,47 +954,52 @@ export default function CatalogoPage({ auth }) {
 
             {/* Header Actions */}
             <div className={styles.headerActions}>
-              <button
-                className={styles.btnCart}
-                onClick={() => setIsCartOpen(true)}
-                title="Abrir sacola de compras"
-                id="btn-cart-toggle"
-              >
-                <ShoppingBag size={18} />
-                <span className={styles.btnCartLabel}>Sacola</span>
-                {cartTotalItems > 0 && <span className={styles.cartBadge}>{cartTotalItems}</span>}
-              </button>
+              {currentUser ? (
+                <>
+                  <button
+                    className={styles.btnCart}
+                    onClick={() => setIsCartOpen(true)}
+                    title="Abrir sacola de compras"
+                    id="btn-cart-toggle"
+                  >
+                    <ShoppingBag size={18} />
+                    <span className={styles.btnCartLabel}>Sacola</span>
+                    {cartTotalItems > 0 && <span className={styles.cartBadge}>{cartTotalItems}</span>}
+                  </button>
 
-              {!currentUser ? (
+                  <div className={styles.userLoggedGroup}>
+                    <div className={styles.userBadge} title={currentUser.email}>
+                      <div className={styles.userAvatar}>
+                        {currentUser.full_name
+                          ? currentUser.full_name[0].toUpperCase()
+                          : currentUser.email
+                          ? currentUser.email[0].toUpperCase()
+                          : 'U'}
+                      </div>
+                      <span className={styles.userName}>
+                        {currentUser.full_name
+                          ? currentUser.full_name.split(' ')[0]
+                          : currentUser.email.split('@')[0]}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className={styles.btnLogout}
+                      title="Desconectar da conta"
+                    >
+                      <LogOut size={14} />
+                    </button>
+                  </div>
+                </>
+              ) : (
                 <div className={styles.authButtonGroup}>
                   <Link href="/login?tab=login" className={styles.btnLogin} id="btn-login">
                     <LogIn size={15} />
                     <span>Entrar</span>
                   </Link>
-                </div>
-              ) : (
-                <div className={styles.userLoggedGroup}>
-                  <div className={styles.userBadge} title={currentUser.email}>
-                    <div className={styles.userAvatar}>
-                      {currentUser.full_name
-                        ? currentUser.full_name[0].toUpperCase()
-                        : currentUser.email
-                        ? currentUser.email[0].toUpperCase()
-                        : 'U'}
-                    </div>
-                    <span className={styles.userName}>
-                      {currentUser.full_name
-                        ? currentUser.full_name.split(' ')[0]
-                        : currentUser.email.split('@')[0]}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className={styles.btnLogout}
-                    title="Desconectar da conta"
-                  >
-                    <LogOut size={14} />
-                  </button>
+                  <Link href="/login?tab=signup" className={styles.btnSignup} id="btn-signup">
+                    <span>Criar Conta</span>
+                  </Link>
                 </div>
               )}
 
@@ -603,540 +1010,341 @@ export default function CatalogoPage({ auth }) {
       </header>
 
       {/* Main Content */}
-      <main className={styles.container} style={{ paddingTop: '2.5rem', paddingBottom: '5rem' }}>
-        {/* Banner do Catálogo */}
-        <div className={styles.sectionHeadingCenter} style={{ marginBottom: '2.5rem' }}>
-          <span className={styles.subHeadingBadge}>
-            <Sparkles size={14} />
-            Acervo Oficial & Loja Online
-          </span>
-          <h1 className={styles.mainSectionTitle}>Catálogo Geral da Livraria</h1>
+      <main className={styles.container} style={{ paddingTop: '2.25rem', paddingBottom: '5rem' }}>
+        {/* Banner do Catálogo com Fita de Runas e Seletor Viking */}
+        <div className={styles.vikingHeaderBanner}>
+          {/* Fita de Runas Nórdicas */}
+          <div className={styles.vikingRuneRibbon}>
+            ᚲ • ᛟ • ᚾ • ᚷ • ᛋ • ᛒ • ᛟ • ᚲ • ᚨ • ᛉ • ᚠ
+          </div>
+
+          {/* Seletor de Modo de Layout: Salão Viking vs Modo Pergaminho */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div className={styles.vikingLayoutSwitcher} role="group" aria-label="Estilo do Catálogo">
+              <button
+                type="button"
+                className={`${styles.vikingLayoutSwitchBtn} ${layoutStyle === 'viking' ? styles.vikingLayoutSwitchBtnActive : ''}`}
+                onClick={() => setLayoutStyle('viking')}
+                title="Ativar layout rústico estilo Salão Viking com painel lateral de runas"
+              >
+                <Shield size={14} />
+                <span>Salão Viking (Sidebar)</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.vikingLayoutSwitchBtn} ${layoutStyle === 'classic' ? styles.vikingLayoutSwitchBtnActive : ''}`}
+                onClick={() => setLayoutStyle('classic')}
+                title="Ativar layout clássico horizontal com pílulas superiores"
+              >
+                <FileText size={14} />
+                <span>Modo Pergaminho (Topo)</span>
+              </button>
+            </div>
+          </div>
+
+          <h1 className={styles.mainSectionTitle}>
+            {layoutStyle === 'viking' ? 'Acervo do Grande Salão dos Tomos' : 'Catálogo Geral da Livraria'}
+          </h1>
           <p className={styles.mainSectionDesc}>
-            Explore títulos autênticos com integração direta à Open Library. Edições físicas e digitais
-            com frete grátis nacional acima de R$ 99 e entrega rápida.
+            {layoutStyle === 'viking'
+              ? 'Compêndio de obras raras, crônicas nórdicas e manuscritos preservados. Escolha seu gênero na tábua de runas sagradas e explore as relíquias literárias.'
+              : 'Explore títulos autênticos com integração direta à Open Library. Edições físicas e digitais com frete grátis nacional acima de R$ 99 e entrega rápida.'}
           </p>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginTop: '1.25rem'
-            }}
-          >
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.85rem',
-                color: 'var(--text-muted, #94a3b8)',
-                background: 'rgba(16, 185, 129, 0.08)',
-                padding: '0.35rem 0.85rem',
-                borderRadius: '999px',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
-              }}
-            >
-              <Truck size={14} color="#10b981" />
-              <span>Frete Grátis acima de R$ 99</span>
+          <div className={styles.catalogPerksRow}>
+            <div className={styles.catalogPerkBadge}>
+              <Truck size={15} className={styles.catalogPerkIcon} />
+              <span>{layoutStyle === 'viking' ? 'Envio Seguro pelos Mares (Frete Grátis acima de R$ 99)' : 'Frete Grátis acima de R$ 99'}</span>
             </div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.85rem',
-                color: 'var(--text-muted, #94a3b8)',
-                background: 'rgba(16, 185, 129, 0.08)',
-                padding: '0.35rem 0.85rem',
-                borderRadius: '999px',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
-              }}
-            >
-              <ShieldCheck size={14} color="#10b981" />
-              <span>Garantia de 30 dias para troca</span>
+            <div className={styles.catalogPerkBadge}>
+              <ShieldCheck size={15} className={styles.catalogPerkIcon} />
+              <span>{layoutStyle === 'viking' ? 'Juramento de Honra: Troca em até 30 sóis' : 'Garantia de 30 dias para troca'}</span>
             </div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.85rem',
-                color: 'var(--text-muted, #94a3b8)',
-                background: 'rgba(16, 185, 129, 0.08)',
-                padding: '0.35rem 0.85rem',
-                borderRadius: '999px',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
-              }}
-            >
-              <CreditCard size={14} color="#10b981" />
-              <span>Até 3x sem juros no cartão</span>
+            <div className={styles.catalogPerkBadge}>
+              <CreditCard size={15} className={styles.catalogPerkIcon} />
+              <span>{layoutStyle === 'viking' ? 'Tributo em até 3x sem acréscimo' : 'Até 3x sem juros no cartão'}</span>
             </div>
           </div>
         </div>
 
-        {/* ===== EXPLORADOR DO ACERVO ===== */}
-        <div className={styles.catalogExplorerWrapper}>
-          {/* Barra de Pesquisa e Ordenação */}
-          <div className={styles.searchBarContainer}>
-            <div className={styles.searchInputWrapper}>
-              <Search size={20} className={styles.searchIcon} />
-              <input
-                type="text"
-                placeholder="Pesquisar por título, autor, palavra-chave na API..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className={styles.searchInput}
-                id="catalog-search-input"
-              />
-              {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
-              {searchInput && (
+        {/* ===== MODO 1: SALÃO VIKING (2 COLUNAS: SIDEBAR RUNAS + GRID) ===== */}
+        {layoutStyle === 'viking' && (
+          <div className={styles.vikingCatalogContainer}>
+            {/* Sidebar Nórdica: Tábua de Runas & Guilda */}
+            <aside className={styles.vikingSidebar}>
+              <div className={styles.vikingSidebarHeader}>
+                <div className={styles.vikingShieldIcon}>
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <h3 className={styles.vikingSidebarTitle}>Tábua de Runas</h3>
+                  <span className={styles.vikingSidebarSubtitle}>Filtros & Categorias da Guilda</span>
+                </div>
+              </div>
+
+              {/* Lista de Gêneros com Runas Nórdicas */}
+              <div>
+                <div className={styles.vikingFilterSectionTitle}>
+                  <span>Gêneros Nórdicos</span>
+                  <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{books.length} obras</span>
+                </div>
+                <div className={styles.vikingGenreList}>
+                  {AVAILABLE_GENRES.map((g) => {
+                    const count = getGenreCount(g.id);
+                    const isActive = selectedGenre === g.id;
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        className={`${styles.vikingGenreBtn} ${isActive ? styles.vikingGenreBtnActive : ''}`}
+                        onClick={() => {
+                          setSelectedGenre(g.id);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <div className={styles.vikingGenreBtnLeft}>
+                          <span className={styles.vikingRuneGlyph}>{g.rune}</span>
+                          <span>{g.vikingName}</span>
+                        </div>
+                        <span className={styles.vikingGenreBadge}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Faixas de Preço / Tributo */}
+              <div>
+                <div className={styles.vikingFilterSectionTitle}>
+                  <span>Tributo & Moedas</span>
+                </div>
+                <div className={styles.vikingPriceFilters}>
+                  {PRICE_RANGES.map((pr) => {
+                    const isActive = priceFilter === pr.id;
+                    return (
+                      <button
+                        key={pr.id}
+                        type="button"
+                        className={`${styles.vikingPriceOption} ${isActive ? styles.vikingPriceOptionActive : ''}`}
+                        onClick={() => {
+                          setPriceFilter(pr.id);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <span className={styles.vikingPriceLabel}>{pr.label}</span>
+                        <span className={styles.vikingPriceDesc}>{pr.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Restaurar Filtros */}
+              {(selectedGenre !== 'Todos' || priceFilter !== 'all' || searchTerm) && (
                 <button
-                  className={styles.clearSearchBtn}
+                  type="button"
+                  className={styles.btnResetFilters}
                   onClick={() => {
+                    setSelectedGenre('Todos');
+                    setPriceFilter('all');
                     setSearchInput('');
                     setSearchTerm('');
-                  }}
-                  title="Limpar busca"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-
-            <div className={styles.searchControlsRight}>
-              {/* Ordenação */}
-              <div className={styles.sortSelectWrapper}>
-                <ArrowUpDown size={15} className={styles.sortIcon} />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className={styles.sortSelect}
-                  aria-label="Ordenar livros"
-                >
-                  <option value="sales">Mais Vendidos</option>
-                  <option value="price-asc">Menor Preço</option>
-                  <option value="price-desc">Maior Preço</option>
-                  <option value="rating">Melhor Avaliados</option>
-                  <option value="title">Título (A-Z)</option>
-                </select>
-              </div>
-
-              {/* Alternador de Grade/Lista */}
-              <div className={styles.viewModeToggleGroup}>
-                <button
-                  className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
-                  onClick={() => setViewMode('grid')}
-                  title="Visualização em Grade"
-                >
-                  <LayoutGrid size={16} />
-                </button>
-                <button
-                  className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
-                  onClick={() => setViewMode('list')}
-                  title="Visualização em Lista"
-                >
-                  <List size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Pílulas de Filtro por Gênero */}
-          <div className={styles.genreFiltersContainer}>
-            <span className={styles.genreFilterLabel}>
-              <Filter size={14} />
-              Gênero:
-            </span>
-            <div className={styles.genrePillsList}>
-              {AVAILABLE_GENRES.map((g) => (
-                <button
-                  key={g.id}
-                  className={`${styles.genrePill} ${selectedGenre === g.id ? styles.genrePillActive : ''}`}
-                  onClick={() => {
-                    setSelectedGenre(g.id);
                     setCurrentPage(1);
                   }}
                 >
-                  <span>{g.name}</span>
-                  {selectedGenre === g.id && (
-                    <span className={styles.genrePillCount}>{filteredBooks.length}</span>
-                  )}
+                  <RotateCcw size={14} />
+                  <span>Restaurar Filtros</span>
                 </button>
-              ))}
-            </div>
-          </div>
+              )}
 
-          {/* Meta informações do resultado */}
-          <div className={styles.catalogExplorerHeading}>
-            <div className={styles.catalogExplorerTitleGroup}>
-              <span className={styles.catalogExplorerBadge}>
-                <BookOpen size={13} />
-                Acervo Disponível
-              </span>
-              <h2 className={styles.catalogExplorerTitle}>
-                {selectedGenre === 'Todos' ? 'Todas as Obras' : `Gênero: ${selectedGenre}`}
-                {searchTerm && ` • Busca: "${searchTerm}"`}
-              </h2>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted, #94a3b8)' }}>
-                {filteredBooks.length} {filteredBooks.length === 1 ? 'livro' : 'livros'} encontrados
-              </span>
-
-              {/* Seletor de Itens por Página */}
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className={styles.sortSelect}
-                style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
-              >
-                <option value={12}>12 por página</option>
-                <option value={24}>24 por página</option>
-                <option value={36}>36 por página</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Estado de Carregamento */}
-          {isLoading && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4rem 1rem',
-                gap: '1rem'
-              }}
-            >
-              <Loader2 size={36} className={styles.searchSpinner} style={{ color: '#10b981' }} />
-              <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '0.95rem' }}>
-                Consultando obras em tempo real na Open Library...
-              </p>
-            </div>
-          )}
-
-          {/* Estado Vazio */}
-          {!isLoading && displayedBooks.length === 0 && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4rem 1rem',
-                textAlign: 'center',
-                gap: '1rem'
-              }}
-            >
-              <BookOpen size={48} color="#64748b" />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Nenhum livro encontrado</h3>
-              <p style={{ color: 'var(--text-muted, #94a3b8)', maxWidth: '400px' }}>
-                Não encontramos obras para o filtro selecionado. Tente pesquisar outro termo ou
-                selecionar outro gênero literário.
-              </p>
-              <button
-                className={styles.btnCartBrowse}
-                onClick={() => {
-                  setSearchInput('');
-                  setSearchTerm('');
-                  setSelectedGenre('Todos');
-                }}
-              >
-                Limpar Todos os Filtros
-              </button>
-            </div>
-          )}
-
-          {/* Grid de Livros (Visualização Grade) */}
-          {!isLoading && displayedBooks.length > 0 && viewMode === 'grid' && (
-            <div className={styles.booksGrid}>
-              {displayedBooks.map((book) => {
-                const cover = getOptimizedCoverUrl(book.coverImage);
-                const fav = isFavorited(book.id);
-
-                return (
-                  <div key={book.id} className={styles.bookCard}>
-                    {/* Badge superior */}
-                    <div className={styles.cardBadgeRow}>
-                      <span className={styles.customCardBadge}>{book.badge || 'Disponível'}</span>
-                      {book.discountPercent > 0 && (
-                        <span className={styles.cleanDiscountBadge}>-{book.discountPercent}% OFF</span>
-                      )}
-                    </div>
-
-                    {/* Capa */}
-                    <div
-                      className={styles.bookCover}
-                      onClick={() => {
-                        setSelectedBook(book);
-                        setModalQty(1);
-                      }}
-                      title="Clique para ver sinopse e detalhes"
-                    >
-                      {cover ? (
-                        <img
-                          src={cover}
-                          alt={book.title}
-                          className={styles.bookCoverImage}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div
-                          className={styles.bookCoverFallback}
-                          style={{ background: book.coverGradient }}
-                        >
-                          <BookOpen size={36} className={styles.coverBookIcon} />
-                          <span style={{ fontSize: '0.8rem', padding: '0 0.5rem', textAlign: 'center' }}>
-                            {book.title}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Corpo do Card */}
-                    <div className={styles.bookCardBody}>
-                      <div className={styles.bookInfoTop}>
-                        <span
-                          style={{
-                            fontSize: '0.75rem',
-                            textTransform: 'uppercase',
-                            fontWeight: 700,
-                            letterSpacing: '0.5px',
-                            color: '#10b981'
-                          }}
-                        >
-                          {book.genre}
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <Star size={13} fill="#f59e0b" color="#f59e0b" />
-                          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{book.rating}</span>
-                        </div>
-                      </div>
-
-                      <h3
-                        className={styles.bookTitle}
-                        onClick={() => {
-                          setSelectedBook(book);
-                          setModalQty(1);
-                        }}
-                        title={book.title}
-                      >
-                        {book.title}
-                      </h3>
-
-                      <div className={styles.bookAuthorRow}>
-                        <span className={styles.bookAuthor}>{book.author}</span>
-                      </div>
-
-                      {/* Bloco de Preços */}
-                      <div className={styles.cardPricingBox}>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                          <span className={styles.cardCurrentPrice}>
-                            R$ {(book.price || 49.90).toFixed(2).replace('.', ',')}
-                          </span>
-                          {book.originalPrice && book.originalPrice > book.price && (
-                            <span className={styles.cardOldPrice}>
-                              R$ {book.originalPrice.toFixed(2).replace('.', ',')}
-                            </span>
-                          )}
-                        </div>
-                        <span className={styles.cardInstallments}>
-                          ou 3x de R$ {((book.price || 49.90) / 3).toFixed(2).replace('.', ',')} sem juros
-                        </span>
-                      </div>
-
-                      {/* Botões de Ação */}
-                      <div className={styles.cardActions}>
-                        <button
-                          className={styles.btnAddToCart}
-                          onClick={() => addToCart(book, 1)}
-                          title="Adicionar à sacola de compras"
-                        >
-                          <ShoppingBag size={15} />
-                          <span>Adicionar</span>
-                        </button>
-                        <button
-                          className={`${styles.btnModalFav} ${fav ? styles.btnModalFavActive : ''}`}
-                          onClick={() => toggleFavorite(book)}
-                          title={fav ? 'Remover dos favoritos' : 'Favoritar livro'}
-                          style={{ width: '38px', height: '38px', padding: 0 }}
-                        >
-                          <Heart size={16} fill={fav ? '#ef4444' : 'none'} color={fav ? '#ef4444' : 'currentColor'} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Lista de Livros (Visualização Lista) */}
-          {!isLoading && displayedBooks.length > 0 && viewMode === 'list' && (
-            <div className={styles.booksList}>
-              {displayedBooks.map((book) => {
-                const cover = getOptimizedCoverUrl(book.coverImage);
-                const fav = isFavorited(book.id);
-
-                return (
-                  <div key={book.id} className={styles.bookCardList}>
-                    <div
-                      className={styles.bookCardListCover}
-                      onClick={() => {
-                        setSelectedBook(book);
-                        setModalQty(1);
-                      }}
-                    >
-                      {cover ? (
-                        <img src={cover} alt={book.title} className={styles.bookCardListCoverImg} loading="lazy" />
-                      ) : (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            background: book.coverGradient,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <BookOpen size={24} color="#fff" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className={styles.bookCardListBody}>
-                      <div className={styles.bookCardListTop}>
-                        <div className={styles.bookCardListMeta}>
-                          <span style={{ color: '#10b981', fontWeight: 600, fontSize: '0.8rem' }}>
-                            {book.genre}
-                          </span>
-                          <span>•</span>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                            {book.format} • {book.pages} págs.
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <Star size={13} fill="#f59e0b" color="#f59e0b" />
-                          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{book.rating}</span>
-                        </div>
-                      </div>
-
-                      <h3
-                        className={styles.bookCardListTitle}
-                        onClick={() => {
-                          setSelectedBook(book);
-                          setModalQty(1);
-                        }}
-                      >
-                        {book.title}
-                      </h3>
-                      <p className={styles.bookCardListAuthor}>Por {book.author}</p>
-                      <p className={styles.bookCardListSynopsis}>
-                        {book.synopsis && book.synopsis.length > 180
-                          ? book.synopsis.slice(0, 180) + '...'
-                          : book.synopsis}
-                      </p>
-
-                      <div className={styles.bookCardListFooter}>
-                        <div className={styles.bookCardListPrice}>
-                          <span className={styles.bookCardListCurrentPrice}>
-                            R$ {(book.price || 49.90).toFixed(2).replace('.', ',')}
-                          </span>
-                          {book.originalPrice && book.originalPrice > book.price && (
-                            <span className={styles.bookCardListOldPrice}>
-                              R$ {book.originalPrice.toFixed(2).replace('.', ',')}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className={styles.bookCardListActions}>
-                          <button
-                            className={`${styles.btnModalFav} ${fav ? styles.btnModalFavActive : ''}`}
-                            onClick={() => toggleFavorite(book)}
-                            style={{ width: '36px', height: '36px', padding: 0 }}
-                          >
-                            <Heart size={16} fill={fav ? '#ef4444' : 'none'} color={fav ? '#ef4444' : 'currentColor'} />
-                          </button>
-                          <button className={styles.btnAddToCart} onClick={() => addToCart(book, 1)}>
-                            <ShoppingBag size={15} />
-                            <span>Adicionar</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Paginação */}
-          {!isLoading && totalPages > 1 && (
-            <div className={styles.paginationWrapper} style={{ marginTop: '2.5rem' }}>
-              <div className={styles.paginationHeader}>
-                <span className={styles.paginationInfo}>
-                  Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong> ({filteredBooks.length} obras)
-                </span>
+              {/* Selo Nórdico de Autenticidade */}
+              <div className={styles.vikingSealCard}>
+                <ShieldCheck size={24} className={styles.vikingSealIcon} />
+                <span className={styles.vikingSealTitle}>Juramento do Mercador</span>
+                <p className={styles.vikingSealText}>
+                  Edições autênticas e tomos originais. Troca e devolução garantidas caso o pergaminho sofra avarias durante a travessia.
+                </p>
               </div>
+            </aside>
 
-              <div className={styles.paginationPagesRow}>
-                <button
-                  className={styles.paginationNavBtn}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  title="Página anterior"
-                >
-                  <ChevronLeft size={16} />
-                  <span>Anterior</span>
-                </button>
-
-                <div className={styles.paginationNumbers}>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((p) => {
-                      if (totalPages <= 7) return true;
-                      if (p === 1 || p === totalPages) return true;
-                      return Math.abs(p - currentPage) <= 2;
-                    })
-                    .map((pageNum, idx, arr) => {
-                      const showEllipsisBefore = idx > 0 && pageNum - arr[idx - 1] > 1;
-
-                      return (
-                        <div key={pageNum} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                          {showEllipsisBefore && <span className={styles.paginationEllipsis}>...</span>}
-                          <button
-                            className={`${styles.paginationNumber} ${
-                              currentPage === pageNum ? styles.paginationNumberActive : ''
-                            }`}
-                            onClick={() => handlePageChange(pageNum)}
-                          >
-                            {pageNum}
-                          </button>
-                        </div>
-                      );
-                    })}
+            {/* Conteúdo Principal do Salão Viking */}
+            <div className={styles.vikingMainContent}>
+              {/* Barra de Pesquisa e Ordenação */}
+              <div className={styles.vikingSearchBarContainer}>
+                <div className={styles.searchInputWrapper} style={{ flex: 1 }}>
+                  <Search size={20} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Buscar runa, título, autor ou palavra-chave no grande salão..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className={styles.searchInput}
+                    id="catalog-search-input-viking"
+                  />
+                  {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
+                  {searchInput && (
+                    <button
+                      className={styles.clearSearchBtn}
+                      onClick={() => {
+                        setSearchInput('');
+                        setSearchTerm('');
+                      }}
+                      title="Limpar busca"
+                      aria-label="Limpar busca"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
 
-                <button
-                  className={styles.paginationNavBtn}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  title="Próxima página"
-                >
-                  <span>Próxima</span>
-                  <ChevronRight size={16} />
-                </button>
+                <div className={styles.searchControlsRight}>
+                  {/* Ordenação */}
+                  <div className={styles.sortSelectWrapper}>
+                    <ArrowUpDown size={15} className={styles.sortIcon} />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className={styles.sortSelect}
+                      aria-label="Ordenar livros"
+                    >
+                      <option value="sales">Mais Procurados</option>
+                      <option value="price-asc">Menor Tributo</option>
+                      <option value="price-desc">Maior Tributo</option>
+                      <option value="rating">Maior Honra (Avaliação)</option>
+                      <option value="title">Tomos (A-Z)</option>
+                    </select>
+                  </div>
+
+                  {/* Alternador de Grade/Lista */}
+                  <div className={styles.viewModeToggle} role="group" aria-label="Modo de visualização">
+                    <button
+                      type="button"
+                      className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setViewMode('grid')}
+                      title="Visualização em Grade"
+                      aria-label="Visualização em Grade"
+                    >
+                      <LayoutGrid size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setViewMode('list')}
+                      title="Visualização em Lista"
+                      aria-label="Visualização em Lista"
+                    >
+                      <List size={17} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Renderização do Acervo (Heading, Grid/List, Paginação) */}
+              {renderBooksContent()}
+            </div>
+          </div>
+        )}
+
+        {/* ===== MODO 2: PERGAMINHO CLÁSSICO (HORIZONTAL) ===== */}
+        {layoutStyle === 'classic' && (
+          <div className={styles.catalogExplorerWrapper}>
+            {/* Barra de Pesquisa e Ordenação */}
+            <div className={styles.searchBarContainer}>
+              <div className={styles.searchInputWrapper}>
+                <Search size={20} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Buscar livro por título, autor, assunto ou palavra-chave..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className={styles.searchInput}
+                  id="catalog-search-input"
+                />
+                {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
+                {searchInput && (
+                  <button
+                    className={styles.clearSearchBtn}
+                    onClick={() => {
+                      setSearchInput('');
+                      setSearchTerm('');
+                    }}
+                    title="Limpar busca"
+                    aria-label="Limpar busca"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.searchControlsRight}>
+                <div className={styles.sortSelectWrapper}>
+                  <ArrowUpDown size={15} className={styles.sortIcon} />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className={styles.sortSelect}
+                    aria-label="Ordenar livros"
+                  >
+                    <option value="sales">Mais Vendidos</option>
+                    <option value="price-asc">Menor Preço</option>
+                    <option value="price-desc">Maior Preço</option>
+                    <option value="rating">Melhor Avaliados</option>
+                    <option value="title">Título (A-Z)</option>
+                  </select>
+                </div>
+
+                <div className={styles.viewModeToggle} role="group" aria-label="Modo de visualização">
+                  <button
+                    type="button"
+                    className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
+                    onClick={() => setViewMode('grid')}
+                    title="Visualização em Grade"
+                    aria-label="Visualização em Grade"
+                  >
+                    <LayoutGrid size={17} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
+                    onClick={() => setViewMode('list')}
+                    title="Visualização em Lista"
+                    aria-label="Visualização em Lista"
+                  >
+                    <List size={17} />
+                  </button>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Pílulas de Filtro por Gênero */}
+            <div className={styles.genreFiltersContainer}>
+              <span className={styles.genreFilterLabel}>
+                <Filter size={14} />
+                Gênero:
+              </span>
+              <div className={styles.genrePillsList}>
+                {AVAILABLE_GENRES.map((g) => (
+                  <button
+                    key={g.id}
+                    className={`${styles.genrePill} ${selectedGenre === g.id ? styles.genrePillActive : ''}`}
+                    onClick={() => {
+                      setSelectedGenre(g.id);
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <span>{g.name}</span>
+                    {selectedGenre === g.id && (
+                      <span className={styles.genrePillCount}>{filteredBooks.length}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Renderização do Acervo (Heading, Grid/List, Paginação) */}
+            {renderBooksContent()}
+          </div>
+        )}
       </main>
 
       {/* ===== MODAL DE DETALHES DO LIVRO ===== */}
@@ -1498,7 +1706,7 @@ export default function CatalogoPage({ auth }) {
               marginBottom: '0.75rem'
             }}
           >
-            <Library size={20} color="#10b981" />
+            <Library size={20} color="var(--color-gold-accent, #c69238)" />
             <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>BIBLIOTECH</strong>
           </div>
           <p style={{ fontSize: '0.85rem', maxWidth: '500px', margin: '0 auto 1rem' }}>

@@ -65,7 +65,7 @@ export function useAuth() {
     syncUserData();
 
     const handleStorageChange = (e) => {
-      if (e.key === "userData" || e.key === "token") {
+      if (!e || !e.key || e.key === "userData" || e.key === "token") {
         syncUserData();
       }
     };

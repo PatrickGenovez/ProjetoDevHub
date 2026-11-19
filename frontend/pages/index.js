@@ -1652,68 +1652,73 @@ export default function BookStore({ auth }) {
 
             {/* Header Actions: Sacola + Auth + Theme */}
             <div className={styles.headerActions}>
-              {/* Botão de Pesquisa de Gostos */}
-              <button
-                className={styles.btnSurveyHeader}
-                onClick={handleOpenSurvey}
-                title="Personalizar meus gêneros favoritos"
-                id="btn-open-survey"
-              >
-                <Sparkles size={15} />
-                <span className={styles.btnSurveyLabel}>Meus Gostos</span>
-                {preferredGenres.length > 0 && (
-                  <span className={styles.surveyActiveDot} title={`${preferredGenres.length} gêneros ativos`}></span>
-                )}
-              </button>
+              {currentUser ? (
+                <>
+                  {/* Botão de Pesquisa de Gostos (Apenas após login) */}
+                  <button
+                    className={styles.btnSurveyHeader}
+                    onClick={handleOpenSurvey}
+                    title="Personalizar meus gêneros favoritos"
+                    id="btn-open-survey"
+                  >
+                    <Sparkles size={15} />
+                    <span className={styles.btnSurveyLabel}>Meus Gostos</span>
+                    {preferredGenres.length > 0 && (
+                      <span className={styles.surveyActiveDot} title={`${preferredGenres.length} gêneros ativos`}></span>
+                    )}
+                  </button>
 
-              {/* Botão de Sacola de Compras */}
-              <button
-                className={styles.btnCart}
-                onClick={() => setIsCartOpen(true)}
-                title="Abrir sacola de compras"
-                id="btn-cart-toggle"
-              >
-                <ShoppingBag size={18} />
-                <span className={styles.btnCartLabel}>Sacola</span>
-                {cartTotalItems > 0 && (
-                  <span className={styles.cartBadge}>{cartTotalItems}</span>
-                )}
-              </button>
+                  {/* Botão de Sacola de Compras (Apenas após login) */}
+                  <button
+                    className={styles.btnCart}
+                    onClick={() => setIsCartOpen(true)}
+                    title="Abrir sacola de compras"
+                    id="btn-cart-toggle"
+                  >
+                    <ShoppingBag size={18} />
+                    <span className={styles.btnCartLabel}>Sacola</span>
+                    {cartTotalItems > 0 && (
+                      <span className={styles.cartBadge}>{cartTotalItems}</span>
+                    )}
+                  </button>
 
-              {!currentUser ? (
+                  <div className={styles.userLoggedGroup}>
+                    <div className={styles.userBadge} title={currentUser.email}>
+                      <div className={styles.userAvatar}>
+                        {currentUser.full_name
+                          ? currentUser.full_name[0].toUpperCase()
+                          : currentUser.email
+                          ? currentUser.email[0].toUpperCase()
+                          : 'U'}
+                      </div>
+                      <span className={styles.userName}>
+                        {currentUser.full_name ? currentUser.full_name.split(' ')[0] : currentUser.email.split('@')[0]}
+                      </span>
+                      {currentUser.plano_id && currentUser.plano_id !== 'visitante' && (
+                        <span className={styles.userPlanBadge}>
+                          {currentUser.plano_id === 'master' ? '👑 Master' : currentUser.plano_id === 'box-vip' ? '📦 VIP' : '📱 Digital'}
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      className={styles.btnLogout}
+                      onClick={handleLogout}
+                      title="Sair da conta"
+                    >
+                      <LogOut size={16} />
+                    </button>
+                  </div>
+                </>
+              ) : (
                 <div className={styles.authButtonGroup}>
                   <Link href="/login?tab=login" className={styles.btnLogin} id="btn-login">
                     <LogIn size={15} />
                     <span>Entrar</span>
                   </Link>
-                </div>
-              ) : (
-                <div className={styles.userLoggedGroup}>
-                  <div className={styles.userBadge} title={currentUser.email}>
-                    <div className={styles.userAvatar}>
-                      {currentUser.full_name
-                        ? currentUser.full_name[0].toUpperCase()
-                        : currentUser.email
-                        ? currentUser.email[0].toUpperCase()
-                        : 'U'}
-                    </div>
-                    <span className={styles.userName}>
-                      {currentUser.full_name ? currentUser.full_name.split(' ')[0] : currentUser.email.split('@')[0]}
-                    </span>
-                    {currentUser.plano_id && currentUser.plano_id !== 'visitante' && (
-                      <span className={styles.userPlanBadge}>
-                        {currentUser.plano_id === 'master' ? '👑 Master' : currentUser.plano_id === 'box-vip' ? '📦 VIP' : '📱 Digital'}
-                      </span>
-                    )}
-                  </div>
-
-                  <button
-                    className={styles.btnLogout}
-                    onClick={handleLogout}
-                    title="Sair da conta"
-                  >
-                    <LogOut size={16} />
-                  </button>
+                  <Link href="/login?tab=signup" className={styles.btnSignup} id="btn-signup">
+                    <span>Criar Conta</span>
+                  </Link>
                 </div>
               )}
 

@@ -31,6 +31,7 @@ import {
   ChevronUp,
   Share2,
   Calendar,
+  Shield,
   ShieldCheck,
   TrendingUp,
   Filter,
@@ -58,121 +59,132 @@ export const getOptimizedCoverUrl = (url) => {
   return url;
 };
 
-// Planos de Assinatura do Clube Literário
+// Planos de Assinatura do Clube Literário (Honras do Clã)
 const CLUB_PLANS = {
   digital: {
     id: 'digital',
-    name: 'Leitor Digital',
-    badge: '📱 Membro Digital',
+    name: 'Bardo Digital',
+    badge: '📱 Bardo do Clã Digital',
     monthlyPrice: 24.90,
     annualPrice: 19.90,
     color: '#8c5627',
-    description: 'Acesso ilimitado a +5.000 e-books, debates digitais e guias em PDF.',
+    rune: 'ᛞ',
+    description: 'Acesso ilimitado a +5.000 e-books, debates digitais e pergaminhos sagrados em PDF.',
     perks: [
-      'Acesso ao canal #leitor-digital-ebooks',
-      'Cupom de 10% OFF permanente na livraria',
-      'Download de guias de leitura em PDF',
-      'Votação mensal nas enquetes do clube'
+      'Acesso à câmara #bardo-digital-ebooks',
+      'Tributo de 10% OFF permanente na livraria',
+      'Download de guias e mapas literários em PDF',
+      'Votação mensal nos conselhos do clube'
     ]
   },
   'box-vip': {
     id: 'box-vip',
-    name: 'Box VIP Capa Dura',
-    badge: '📦 Membro Box VIP',
+    name: 'Guarda do Box Nobre',
+    badge: '📦 Guarda do Box VIP',
     monthlyPrice: 69.90,
     annualPrice: 59.90,
     color: '#8e1f1f',
-    description: '1 Livro surpresa em capa dura por mês, 3 mimos colecionáveis e canal com spoilers liberados.',
+    rune: 'ᚺ',
+    description: '1 Tomo surpresa em capa dura nobre por mês, 3 relíquias colecionáveis e spoilers liberados.',
     perks: [
-      'Acesso ao canal #espaco-box-capa-dura e #leitor-digital-ebooks',
-      'Debates com spoilers liberados do livro do mês',
-      'Cupom de 20% OFF permanente em todo o acervo',
-      'Unboxing exclusivo e votação do próximo livro'
+      'Acesso ao #salão-box-capa-dura e à câmara digital',
+      'Debates com revelações e profecias liberadas',
+      'Tributo de 20% OFF permanente em todo o acervo',
+      'Unboxing exclusivo e votação do próximo tomo'
     ]
   },
   master: {
     id: 'master',
-    name: 'Colecionador Master',
-    badge: '👑 Colecionador Master',
+    name: 'Mestre do Conselho Supremo',
+    badge: '👑 Mestre Colecionador',
     monthlyPrice: 119.90,
     annualPrice: 99.90,
     color: '#c69238',
-    description: 'Passe VIP total: 2 edições de luxo numeradas por mês e encontros fechados com autores.',
+    rune: 'ᛟ',
+    description: 'Passe de Honra Total: 2 edições de luxo numeradas por mês e encontros fechados com bardos e autores.',
     perks: [
-      'Passe VIP Total: Acesso a TODAS as salas e lounges exclusivos',
-      'Acesso aos Encontros Virtuais com Autores e Tradutores (Zoom)',
-      'Cupom VIP de 30% OFF vitalício em qualquer livro',
-      'Canal direto com curadores e pré-vendas antecipadas'
+      'Passe de Honra Total: Acesso a TODAS as câmaras e lounges sagrados',
+      'Audiência no Zoom com autores e tradutores das obras',
+      'Tributo VIP de 30% OFF vitalício em qualquer tomo',
+      'Voz direta com os mestres curadores do acervo'
     ]
   }
 };
 
-// Canais Públicos Abertos
+// Canais Públicos Abertos (Tábua de Runas dos Clãs)
 const PUBLIC_CHANNELS = [
-  { id: 'all', label: 'Todos os Canais', icon: MessageSquare, desc: 'Feed unificado público' },
-  { id: 'geral', label: '#geral-leituras', icon: MessageCircle, desc: 'Bate-papo livre sobre o que você está lendo' },
-  { id: 'resenhas', label: '#resenhas-e-criticas', icon: Star, desc: 'Avaliações detalhadas, notas e resenhas' },
-  { id: 'teorias', label: '#teorias-e-spoilers', icon: AlertTriangle, desc: 'Debates sobre reviravoltas com tag de spoiler' },
-  { id: 'indicacoes', label: '#indicacoes-literarias', icon: Lightbulb, desc: 'Dicas de livros e sugestões entre leitores' },
-  { id: 'citacoes', label: '#citacoes-marcantes', icon: Quote, desc: 'Trechos marcantes e quotes inesquecíveis' },
+  { id: 'all', label: 'Todos os Canais', vikingLabel: 'Todos os Pergaminhos', rune: 'ᛟ', icon: MessageSquare, desc: 'Feed unificado dos clãs' },
+  { id: 'geral', label: '#geral-leituras', vikingLabel: '#crônicas-gerais', rune: 'ᚲ', icon: MessageCircle, desc: 'Bate-papo livre sobre suas leituras atuais' },
+  { id: 'resenhas', label: '#resenhas-e-criticas', vikingLabel: '#resenhas-dos-bardos', rune: 'ᛒ', icon: Star, desc: 'Avaliações detalhadas, honras e resenhas críticas' },
+  { id: 'teorias', label: '#teorias-e-spoilers', vikingLabel: '#profecias-e-spoilers', rune: 'ᚦ', icon: AlertTriangle, desc: 'Debates sobre reviravoltas com selo de spoiler' },
+  { id: 'indicacoes', label: '#indicacoes-literarias', vikingLabel: '#indicações-sagradas', rune: 'ᛉ', icon: Lightbulb, desc: 'Dicas de livros e recomendações entre leitores' },
+  { id: 'citacoes', label: '#citacoes-marcantes', vikingLabel: '#versos-e-citações', rune: 'ᚨ', icon: Quote, desc: 'Trechos marcantes e versos imortais' },
 ];
 
-// Canais VIP Exclusivos Mediante Assinatura
+// Canais VIP Exclusivos Mediante Assinatura (Câmaras Nobres)
 const VIP_CHANNELS = [
   {
     id: 'vip-assinantes',
     label: '#sala-assinantes-vip',
+    vikingLabel: '#câmara-senhores-vip',
+    rune: 'ᚠ',
     icon: Gift,
     tier: 'all-vip',
-    requiredPlanName: 'Qualquer Assinatura Ativa (Digital, Box VIP ou Master)',
-    badge: 'Todos os Assinantes',
-    desc: 'Cupons exclusivos de 20% a 30% OFF, sorteios mensais e pré-vendas',
+    requiredPlanName: 'Qualquer Assinatura Ativa (Bardo, Guarda ou Mestre)',
+    badge: 'Membros de Honra',
+    desc: 'Cupons exclusivos de 20% a 30% OFF, sorteios mensais e pré-vendas de tomos',
     perks: [
-      'Cupons secretos mensais para compra de livros na loja',
-      'Sorteios de boxes especiais e kits de colecionador',
-      'Votação aberta para escolha da temática do mês'
+      'Cupons secretos mensais para compra de livros no acervo',
+      'Sorteios de caixas nórdicas e relíquias de colecionador',
+      'Votação aberta para a temática do próximo solstício'
     ]
   },
   {
     id: 'vip-digital',
     label: '#leitor-digital-ebooks',
+    vikingLabel: '#bardo-digital-ebooks',
+    rune: 'ᛞ',
     icon: Smartphone,
     tier: 'digital',
-    requiredPlanName: 'Plano Leitor Digital ou Master',
-    badge: 'Leitor Digital',
-    desc: 'Discussões dos e-books do app, guias de leitura em PDF e metas digitais',
+    requiredPlanName: 'Plano Bardo Digital ou Mestre',
+    badge: 'Bardo Digital',
+    desc: 'Discussões dos pergaminhos digitais, guias em PDF e metas de leitura',
     perks: [
-      'Debates dos e-books mensais da biblioteca digital',
-      'Download de PDFs complementares com árvores genealógicas e mapas',
-      'Dicas de formatação e notas de rodapé dos clássicos'
+      'Debates dos e-books mensais da biblioteca sagrada',
+      'Download de mapas, árvores genealógicas e crônicas em PDF',
+      'Anotações e notas históricas dos clássicos'
     ]
   },
   {
     id: 'vip-box',
     label: '#espaco-box-capa-dura',
+    vikingLabel: '#salão-box-capa-dura',
+    rune: 'ᚺ',
     icon: Package,
     tier: 'box-vip',
-    requiredPlanName: 'Plano Box VIP Capa Dura ou Master',
-    badge: 'Box VIP Capa Dura',
-    desc: 'Spoiler liberado do Livro do Mês, unboxing dos mimos e votações',
+    requiredPlanName: 'Plano Guarda do Box Nobre ou Mestre',
+    badge: 'Guarda do Box',
+    desc: 'Revelações do Tomo do Mês, unboxing dos mimos de metal e votações',
     perks: [
       'Debate completo com spoilers liberados da caixa do mês',
-      'Galeria de fotos do unboxing dos mimos colecionáveis',
-      'Enquete decisória da obra que virá na próxima caixa'
+      'Galeria de fotos do unboxing das relíquias colecionáveis',
+      'Enquete decisória do tomo que virá na próxima remessa'
     ]
   },
   {
     id: 'vip-master',
     label: '#lounge-colecionador-master',
+    vikingLabel: '#lounge-mestre-supremo',
+    rune: '👑',
     icon: Crown,
     tier: 'master',
-    requiredPlanName: 'Plano Colecionador Master',
-    badge: 'Colecionador Master',
-    desc: 'Links dos encontros virtuais com autores, tradutores e edições numeradas',
+    requiredPlanName: 'Plano Mestre do Conselho Supremo',
+    badge: 'Mestre Supremo',
+    desc: 'Audiências virtuais com bardos, autores, tradutores e tomos numerados',
     perks: [
-      'Acesso direto aos links dos Encontros no Zoom com autores e tradutores',
+      'Audiência direta no Zoom com autores e tradutores',
       'Galeria de fotos das edições de luxo numeradas exclusivas',
-      'Linha direta de sugestões com a equipe de curadores da Bibliotech'
+      'Voz ativa junto aos mestres curadores da Bibliotech'
     ]
   }
 ];
@@ -544,33 +556,33 @@ export default function ComunidadePage({ auth }) {
       const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'patrick@bibliotech.com', password: 'admin123' })
+        body: JSON.stringify({ email: 'elza@bibliotech.com', password: 'admin123' })
       });
       const data = await res.json();
       if (res.ok && data.token && data.user) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userData', JSON.stringify(data.user));
         setCurrentUser(data.user);
-        setUserPlan(data.user.plano_id || 'box-vip');
+        setUserPlan(data.user.plano_id || 'master');
         window.dispatchEvent(new Event('storage'));
-        showToast('👤 Conectado como Patrick Genovez (Admin / Box VIP)!');
+        showToast(`👤 Conectado como ${data.user.full_name} (Mestre Supremo / Master)!`);
         return;
       }
     } catch (e) {}
 
     const demo = {
-      id: 1,
-      full_name: 'Patrick Genovez',
-      email: 'patrick@bibliotech.com',
-      plano_id: 'box-vip',
-      role: 'admin'
+      id: 1795090887963,
+      full_name: 'Elza',
+      email: 'elza@bibliotech.com',
+      plano_id: 'master',
+      role: 'user'
     };
     localStorage.setItem('userData', JSON.stringify(demo));
     localStorage.setItem('token', 'demo-token');
     setCurrentUser(demo);
-    setUserPlan('box-vip');
+    setUserPlan('master');
     window.dispatchEvent(new Event('storage'));
-    showToast('👤 Conectado como Patrick Genovez!');
+    showToast('👤 Conectado como Elza (Mestre Supremo)!');
   };
 
   // Alterar Nome de Exibição do Usuário Ativo
@@ -942,51 +954,51 @@ export default function ComunidadePage({ auth }) {
                 </span>
               ) : (
                 <span className={`${styles.vipBadgeCurrent} ${styles.vipBadgeFree}`}>
-                  <span>Leitor Visitante</span>
+                  <span>Forasteiro / Visitante</span>
                 </span>
               )}
 
               <span className={styles.vipStatusText}>
                 {userPlan === 'none'
-                  ? 'Assine o Clube Literário para desbloquear as Salas VIP secretas e cupons exclusivos.'
-                  : `Seu plano desbloqueia salas exclusivas e cupons na comunidade.`}
+                  ? 'Una-se aos Clãs Literários para desbloquear as Câmaras Secretas e tributos especiais.'
+                  : `Sua honra de membro desbloqueia câmaras exclusivas e tributos de ouro na comunidade.`}
               </span>
             </div>
 
             {/* Simulador rápido para alternar/testar cada assinatura */}
             <div className={styles.vipSimulatorGroup}>
-              <span className={styles.simulatorLabel}>Alternar Perfil:</span>
+              <span className={styles.simulatorLabel}>Honra do Clã:</span>
               <button
                 type="button"
                 className={`${styles.btnSimulatorPill} ${userPlan === 'none' ? styles.btnSimulatorPillActive : ''}`}
                 onClick={() => handleSelectSimulatedPlan('none')}
-                title="Ver como Leitor Visitante"
+                title="Ver como Visitante"
               >
-                Gratuito
+                Forasteiro
               </button>
               <button
                 type="button"
                 className={`${styles.btnSimulatorPill} ${userPlan === 'digital' ? styles.btnSimulatorPillActive : ''}`}
                 onClick={() => handleSelectSimulatedPlan('digital')}
-                title="Simular Plano Leitor Digital"
+                title="Simular Plano Bardo Digital"
               >
-                📱 Digital
+                📱 Bardo
               </button>
               <button
                 type="button"
                 className={`${styles.btnSimulatorPill} ${userPlan === 'box-vip' ? styles.btnSimulatorPillActive : ''}`}
                 onClick={() => handleSelectSimulatedPlan('box-vip')}
-                title="Simular Plano Box VIP"
+                title="Simular Plano Guarda do Box"
               >
-                📦 Box VIP
+                📦 Guarda Box
               </button>
               <button
                 type="button"
                 className={`${styles.btnSimulatorPill} ${userPlan === 'master' ? styles.btnSimulatorPillActive : ''}`}
                 onClick={() => handleSelectSimulatedPlan('master')}
-                title="Simular Plano Master"
+                title="Simular Mestre do Conselho"
               >
-                👑 Master
+                👑 Mestre Supremo
               </button>
 
               <button
@@ -995,26 +1007,31 @@ export default function ComunidadePage({ auth }) {
                 onClick={() => setIsSubscribeModalOpen(true)}
               >
                 <Crown size={14} />
-                <span>Planos & Vantagens</span>
+                <span>Honras & Alianças</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Hero Banner do Salão Literário */}
+      {/* Hero Banner do Salão dos Clãs Nórdicos */}
       <section className={styles.communityHero}>
         <div className={styles.container}>
           <div className={styles.heroCard}>
+            {/* Runa nórdica ribbon */}
+            <div className={styles.vikingRuneRibbon}>
+              ᛟ • ᚲ • ᛒ • ᛉ • ᚠ • ᚦ • ᚺ • ᚨ • ᛗ • ᛞ
+            </div>
+
             <div className={styles.heroTopRow}>
               <div className={styles.heroTagGroup}>
                 <span className={styles.heroPillBadge}>
-                  <Sparkles size={14} />
-                  <span>Salão Literário & Clube VIP</span>
+                  <Shield size={14} />
+                  <span>Círculo dos Clãs & Salão de Debates</span>
                 </span>
                 <div className={styles.onlineBadge}>
                   <span className={styles.onlinePulse}></span>
-                  <span>842 leitores conectados agora</span>
+                  <span>842 bardos conectados agora</span>
                 </div>
               </div>
 
@@ -1026,31 +1043,32 @@ export default function ComunidadePage({ auth }) {
                 }}
               >
                 <Plus size={16} />
-                <span>Nova Mensagem no Canal</span>
+                <span>Registrar Pergaminho no Salão</span>
               </button>
             </div>
 
             <div className={styles.heroMainContent}>
               <div className={styles.heroTextGroup}>
-                <h1 className={styles.heroTitle}>Canal de Comunicação dos Leitores</h1>
+                <h1 className={styles.heroTitle}>Círculo dos Clãs Literários</h1>
                 <p className={styles.heroDesc}>
-                  O ponto de encontro dos apaixonados por literatura. Participe dos debates abertos ou acesse as
-                  <strong> Salas VIP exclusivas de assinantes</strong> para conferir unboxings, spoilers liberados do livro do mês e links para encontros com autores.
+                  O santuário dos bardos, sábios e guardiões da palavra escrita. Compartilhe suas crônicas,
+                  debata os segredos e profecias das obras, ou acesse as
+                  <strong> Câmaras Secretas dos Clãs de Honra</strong> para conferir unboxings, spoilers liberados e audiências com autores.
                 </p>
               </div>
 
               <div className={styles.heroStatsRow}>
                 <div className={styles.heroStatBox}>
                   <span className={styles.heroStatNum}>+3.400</span>
-                  <span className={styles.heroStatLabel}>Mensagens</span>
+                  <span className={styles.heroStatLabel}>Crônicas</span>
                 </div>
                 <div className={styles.heroStatBox}>
-                  <span className={styles.heroStatNum}>4 Salas VIP</span>
-                  <span className={styles.heroStatLabel}>Por Assinatura</span>
+                  <span className={styles.heroStatNum}>4 Câmaras</span>
+                  <span className={styles.heroStatLabel}>Exclusivas (VIP)</span>
                 </div>
                 <div className={styles.heroStatBox}>
                   <span className={styles.heroStatNum}>30% OFF</span>
-                  <span className={styles.heroStatLabel}>Cupons VIP</span>
+                  <span className={styles.heroStatLabel}>Moedas de Honra</span>
                 </div>
               </div>
             </div>
@@ -1061,15 +1079,20 @@ export default function ComunidadePage({ auth }) {
       {/* Grid Principal do Canal */}
       <main className={styles.container}>
         <div className={styles.communityGrid}>
-          {/* COLUNA 1: NAVEGAÇÃO DE CANAIS ABERTOS & SALAS VIP */}
+          {/* COLUNA 1: TÁBUA DE RUNAS & CÂMARAS NOBRES */}
           <aside className={styles.leftSidebar}>
-            {/* CANAIS PÚBLICOS */}
+            {/* TÁBUA DE RUNAS (CANAIS PÚBLICOS) */}
             <div className={styles.channelsCard}>
               <div className={styles.channelsCardHeader}>
-                <span className={styles.channelsCardTitle}>
-                  <MessageSquare size={16} />
-                  <span>Canais Abertos</span>
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className={styles.vikingShieldIcon}>
+                    <Shield size={18} />
+                  </div>
+                  <div>
+                    <span className={styles.channelsCardTitle}>Tábua de Runas</span>
+                    <span style={{ fontSize: '0.70rem', color: 'var(--color-text-muted)', display: 'block' }}>Canais Abertos da Guilda</span>
+                  </div>
+                </div>
               </div>
 
               <div className={styles.channelsList}>
@@ -1090,8 +1113,9 @@ export default function ComunidadePage({ auth }) {
                       title={ch.desc}
                     >
                       <div className={styles.channelLeftGroup}>
+                        <span className={styles.vikingRuneGlyph}>{ch.rune}</span>
                         <Icon size={16} />
-                        <span>{ch.label}</span>
+                        <span>{ch.vikingLabel || ch.label}</span>
                       </div>
                       <span className={styles.channelBadgeCount}>{count}</span>
                     </button>
@@ -1100,14 +1124,19 @@ export default function ComunidadePage({ auth }) {
               </div>
             </div>
 
-            {/* SALAS VIP EXCLUSIVAS DE ASSINANTES */}
+            {/* CÂMARAS NOBRES (SALAS VIP) */}
             <div className={styles.vipChannelsCard}>
               <div className={styles.vipChannelsHeader}>
-                <span className={styles.vipChannelsTitle}>
-                  <Crown size={16} />
-                  <span>Salas VIP de Assinantes</span>
-                </span>
-                <span className={styles.vipSectionBadge}>Exclusivo</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className={styles.vikingShieldIcon}>
+                    <Crown size={18} />
+                  </div>
+                  <div>
+                    <span className={styles.vipChannelsTitle}>Câmaras Nobres</span>
+                    <span style={{ fontSize: '0.70rem', color: 'var(--color-text-muted)', display: 'block' }}>Salas Exclusivas dos Clãs</span>
+                  </div>
+                </div>
+                <span className={styles.vipSectionBadge}>Honra VIP</span>
               </div>
 
               <div className={styles.channelsList}>
@@ -1126,16 +1155,17 @@ export default function ComunidadePage({ auth }) {
                       title={ch.desc}
                     >
                       <div className={styles.channelLeftGroup}>
+                        <span className={styles.vikingRuneGlyph}>{ch.rune}</span>
                         <Icon size={16} />
-                        <span>{ch.label}</span>
+                        <span>{ch.vikingLabel || ch.label}</span>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span className={styles.channelBadgeCount}>{count}</span>
                         {isUnlocked ? (
-                          <Unlock size={14} className={styles.vipUnlockIcon} title="Acesso Liberado" />
+                          <Unlock size={14} className={styles.vipUnlockIcon} title="Honra Liberada" />
                         ) : (
-                          <Lock size={14} className={styles.vipLockIcon} title={`Requer: ${ch.requiredPlanName}`} />
+                          <Lock size={14} className={styles.vipLockIcon} title={`Requer aliança: ${ch.requiredPlanName}`} />
                         )}
                       </div>
                     </button>
@@ -1148,20 +1178,29 @@ export default function ComunidadePage({ auth }) {
             <div className={styles.bookFilterCard}>
               <span className={styles.filterCardTitle}>
                 <BookOpen size={14} />
-                <span>Filtrar por Obra</span>
+                <span>Filtrar por Tomo do Acervo</span>
               </span>
               <select
                 className={styles.bookSelect}
                 value={selectedBookFilter}
                 onChange={(e) => setSelectedBookFilter(e.target.value)}
               >
-                <option value="all">Todas as Obras ({posts.length} conversas)</option>
+                <option value="all">Todos os Tomos ({posts.length} crônicas)</option>
                 {STORE_BOOKS.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.title} — {b.author}
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Selo Nórdico de Convivência */}
+            <div className={styles.vikingSealNotice}>
+              <ShieldCheck size={24} style={{ color: 'var(--color-gold-accent, #c69238)' }} />
+              <span className={styles.vikingSealNoticeTitle}>Código dos Bardos</span>
+              <p className={styles.vikingSealNoticeText}>
+                Toda crônica compartilhada neste salão enriquece o saber dos clãs. Honre seus companheiros de leitura e mantenha os selos de spoiler intactos.
+              </p>
             </div>
           </aside>
 
@@ -1199,22 +1238,23 @@ export default function ComunidadePage({ auth }) {
                 </div>
 
                 <span className={styles.vipPaywallReqBadge}>
+                  <Shield size={13} style={{ verticalAlign: 'middle', marginRight: '5px' }} />
                   {currentVipChannel.requiredPlanName}
                 </span>
 
                 <h2 className={styles.vipPaywallTitle}>
-                  Canal Exclusivo para Assinantes
+                  Câmara Nobre dos Assinantes do Clã
                 </h2>
 
                 <p className={styles.vipPaywallDesc}>
-                  O canal <strong>{currentVipChannel.label}</strong> é um espaço fechado para membros do Clube Bibliotech.
-                  {currentVipChannel.desc}.
+                  O santuário <strong>{currentVipChannel.vikingLabel || currentVipChannel.label}</strong> é um espaço fechado para membros do Clube Bibliotech.
+                  {' '}{currentVipChannel.desc}.
                 </p>
 
                 <div className={styles.vipPerksList}>
                   {currentVipChannel.perks.map((perk, i) => (
                     <div key={i} className={styles.vipPerkItem}>
-                      <CheckCircle2 size={16} color="#f59e0b" style={{ flexShrink: 0 }} />
+                      <CheckCircle2 size={16} color="#e5b352" style={{ flexShrink: 0 }} />
                       <span>{perk}</span>
                     </div>
                   ))}
@@ -1227,7 +1267,7 @@ export default function ComunidadePage({ auth }) {
                     onClick={() => setIsSubscribeModalOpen(true)}
                   >
                     <Crown size={17} />
-                    <span>Conhecer Planos & Assinar</span>
+                    <span>Conhecer Alianças & Forjar Pacto</span>
                   </button>
 
                   <button
@@ -1240,7 +1280,7 @@ export default function ComunidadePage({ auth }) {
                     }}
                   >
                     <Zap size={16} />
-                    <span>Simular Acesso deste Canal</span>
+                    <span>Provar Honra do Canal (Simular Acesso)</span>
                   </button>
                 </div>
               </div>
@@ -1252,7 +1292,7 @@ export default function ComunidadePage({ auth }) {
                     <Search size={17} className={styles.searchIcon} />
                     <input
                       type="text"
-                      placeholder="Pesquisar conversas, teorias, autores ou livros..."
+                      placeholder="Buscar pergaminhos, profecias, bardos ou tomos sagrados..."
                       className={styles.searchInput}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -1270,18 +1310,18 @@ export default function ComunidadePage({ auth }) {
                             {(currentUser.full_name || currentUser.name || 'U')[0].toUpperCase()}
                           </div>
                           <span className={styles.composerAuthorName}>
-                            {currentUser.full_name || currentUser.name || 'Leitor'}
+                            {currentUser.full_name || currentUser.name || 'Bardo do Clã'}
                           </span>
                         </div>
 
                         <span className={styles.composerChannelTag}>
-                          Postando em #{newPostChannel}
+                          Gravar em #{newPostChannel}
                         </span>
                       </div>
 
                       <input
                         type="text"
-                        placeholder="Título da sua mensagem ou resenha..."
+                        placeholder="Título da sua crônica ou resenha..."
                         className={styles.composerTitleInput}
                         value={newPostTitle}
                         onChange={(e) => setNewPostTitle(e.target.value)}
@@ -1289,7 +1329,7 @@ export default function ComunidadePage({ auth }) {
                       />
 
                       <textarea
-                        placeholder="Compartilhe suas ideias com outros leitores: o que achou da trama, dos personagens ou do desfecho?"
+                        placeholder="Compartilhe suas palavras com os clãs: o que achou da trama, dos personagens, dos segredos ou do desfecho?"
                         className={styles.composerTextarea}
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
@@ -1304,18 +1344,18 @@ export default function ComunidadePage({ auth }) {
                             value={newPostChannel}
                             onChange={(e) => setNewPostChannel(e.target.value)}
                           >
-                            <optgroup label="Canais Públicos">
-                              <option value="geral">#geral-leituras</option>
-                              <option value="resenhas">#resenhas-e-criticas</option>
-                              <option value="teorias">#teorias-e-spoilers</option>
-                              <option value="indicacoes">#indicacoes-literarias</option>
-                              <option value="citacoes">#citacoes-marcantes</option>
+                            <optgroup label="📜 Canais Públicos do Salão">
+                              <option value="geral">ᚲ #crônicas-gerais</option>
+                              <option value="resenhas">ᛒ #resenhas-dos-bardos</option>
+                              <option value="teorias">ᛉ #profecias-e-spoilers</option>
+                              <option value="indicacoes">ᚠ #indicações-sagradas</option>
+                              <option value="citacoes">ᚦ #versos-e-citações</option>
                             </optgroup>
-                            <optgroup label="Salas VIP (Assinantes)">
-                              <option value="vip-assinantes">🎟️ #sala-assinantes-vip</option>
-                              <option value="vip-digital">📱 #leitor-digital-ebooks</option>
-                              <option value="vip-box">📦 #espaco-box-capa-dura</option>
-                              <option value="vip-master">👑 #lounge-colecionador-master</option>
+                            <optgroup label="👑 Câmaras Nobres (Guardiões & Mestres)">
+                              <option value="vip-assinantes">🎟️ ᛟ #câmara-senhores-vip</option>
+                              <option value="vip-digital">📱 ᛞ #bardo-digital-ebooks</option>
+                              <option value="vip-box">📦 ᚺ #salão-box-capa-dura</option>
+                              <option value="vip-master">👑 ᚨ #lounge-mestre-supremo</option>
                             </optgroup>
                           </select>
 
@@ -1327,7 +1367,7 @@ export default function ComunidadePage({ auth }) {
                           >
                             {STORE_BOOKS.map((b) => (
                               <option key={b.id} value={b.id}>
-                                📖 {b.title}
+                                📜 {b.title}
                               </option>
                             ))}
                           </select>
@@ -1338,8 +1378,8 @@ export default function ComunidadePage({ auth }) {
                               <Star
                                 key={star}
                                 size={16}
-                                fill={star <= newPostRating ? '#f59e0b' : 'transparent'}
-                                color={star <= newPostRating ? '#f59e0b' : '#94a3b8'}
+                                fill={star <= newPostRating ? '#e5b352' : 'transparent'}
+                                color={star <= newPostRating ? '#e5b352' : '#8c7b6c'}
                                 onClick={() => setNewPostRating(star)}
                               />
                             ))}
@@ -1352,13 +1392,13 @@ export default function ComunidadePage({ auth }) {
                               checked={newPostSpoiler}
                               onChange={(e) => setNewPostSpoiler(e.target.checked)}
                             />
-                            <span>⚠️ Spoiler</span>
+                            <span>⚠️ Runa de Revelação (Spoiler)</span>
                           </label>
                         </div>
 
                         <button type="submit" className={styles.btnSubmitPost}>
                           <Send size={15} />
-                          <span>Publicar no Canal</span>
+                          <span>Selar & Publicar Pergaminho</span>
                         </button>
                       </div>
                     </form>
@@ -1366,15 +1406,15 @@ export default function ComunidadePage({ auth }) {
                     <div className={styles.guestNoticeCard}>
                       <div className={styles.guestNoticeText}>
                         <span className={styles.guestNoticeTitle}>
-                          Participe das conversas no Canal dos Leitores!
+                          Participe do Salão dos Bardos e Leitores!
                         </span>
                         <span className={styles.guestNoticeDesc}>
-                          Faça login para compartilhar suas resenhas, teorias e responder aos outros leitores.
+                          Registre sua presença para compartilhar crônicas, desvendar profecias e debater com os clãs literários.
                         </span>
                       </div>
                       <Link href="/login?tab=login" className={styles.btnLogin}>
                         <LogIn size={15} />
-                        <span>Entrar ou Cadastrar</span>
+                        <span>Apresentar-se ao Salão (Entrar)</span>
                       </Link>
                     </div>
                   )}
@@ -1385,9 +1425,9 @@ export default function ComunidadePage({ auth }) {
                   {filteredPosts.length === 0 ? (
                     <div className={styles.guestNoticeCard}>
                       <div className={styles.guestNoticeText}>
-                        <span className={styles.guestNoticeTitle}>Nenhuma mensagem encontrada</span>
+                        <span className={styles.guestNoticeTitle}>Nenhum pergaminho encontrado no salão</span>
                         <span className={styles.guestNoticeDesc}>
-                          Não há conversas neste canal ou com o termo pesquisado. Seja o primeiro a publicar!
+                          Não há crônicas gravadas neste canal ou com as runas pesquisadas. Seja o primeiro bardo a registrar suas palavras!
                         </span>
                       </div>
                     </div>
@@ -1450,8 +1490,8 @@ export default function ComunidadePage({ auth }) {
                                 <h4 className={styles.attachedTitle}>{post.bookTitle}</h4>
                                 <p className={styles.attachedAuthor}>{post.bookAuthor}</p>
                               </div>
-                              <Link href={`/#catalogo-section`} className={styles.btnViewBookStore}>
-                                Ver na Loja
+                              <Link href="/catalogo" className={styles.btnViewBookStore}>
+                                Explorar Tomo no Acervo
                               </Link>
                             </div>
                           )}
@@ -1466,8 +1506,8 @@ export default function ComunidadePage({ auth }) {
                                   <Star
                                     key={star}
                                     size={14}
-                                    fill={star <= post.rating ? '#f59e0b' : 'transparent'}
-                                    color={star <= post.rating ? '#f59e0b' : '#cbd5e1'}
+                                    fill={star <= post.rating ? '#e5b352' : 'transparent'}
+                                    color={star <= post.rating ? '#e5b352' : '#695745'}
                                   />
                                 ))}
                               </div>
@@ -1478,9 +1518,9 @@ export default function ComunidadePage({ auth }) {
                               <div
                                 className={styles.spoilerBox}
                                 onClick={() => toggleSpoiler(post.id)}
-                                title="Clique para revelar o spoiler"
+                                title="Romper o selo para ler a profecia"
                               >
-                                ⚠️ Esta mensagem contém SPOILERS da obra. Clique para revelar.
+                                ⚠️ Pergaminho lacrado com Runa de Segredo (SPOILERS). Toque para romper o selo e revelar a profecia.
                               </div>
                             ) : (
                               <p
@@ -1503,53 +1543,53 @@ export default function ComunidadePage({ auth }) {
                           {/* Barra de Reações e Botão de Respostas */}
                           <div className={styles.postActionBar}>
                             <div className={styles.reactionGroup}>
-                              {/* ❤️ Amei */}
+                              {/* ❤️ Honra */}
                               <button
                                 type="button"
                                 className={`${styles.btnReaction} ${
                                   userLikes.includes(`${post.id}_love`) ? styles.btnReactionActive : ''
                                 }`}
                                 onClick={() => handleReaction(post.id, 'love')}
-                                title="Amei essa resenha"
+                                title="Tributo de Honra"
                               >
                                 <span>❤️</span>
                                 <span>{post.reactions?.love || 0}</span>
                               </button>
 
-                              {/* 🔥 Incrível */}
+                              {/* 🔥 Fogo Sagrado */}
                               <button
                                 type="button"
                                 className={`${styles.btnReaction} ${
                                   userLikes.includes(`${post.id}_fire`) ? styles.btnReactionActive : ''
                                 }`}
                                 onClick={() => handleReaction(post.id, 'fire')}
-                                title="Incrível debate"
+                                title="Fogo Sagrado do Debate"
                               >
                                 <span>🔥</span>
                                 <span>{post.reactions?.fire || 0}</span>
                               </button>
 
-                              {/* 💡 Inspirador */}
+                              {/* 💡 Sabedoria */}
                               <button
                                 type="button"
                                 className={`${styles.btnReaction} ${
                                   userLikes.includes(`${post.id}_bulb`) ? styles.btnReactionActive : ''
                                 }`}
                                 onClick={() => handleReaction(post.id, 'bulb')}
-                                title="Boa observação"
+                                title="Sabedoria Ancestral"
                               >
                                 <span>💡</span>
                                 <span>{post.reactions?.bulb || 0}</span>
                               </button>
 
-                              {/* 👏 Concordo */}
+                              {/* 👏 Glória */}
                               <button
                                 type="button"
                                 className={`${styles.btnReaction} ${
                                   userLikes.includes(`${post.id}_agree`) ? styles.btnReactionActive : ''
                                 }`}
                                 onClick={() => handleReaction(post.id, 'agree')}
-                                title="Concordo plenamente"
+                                title="Glória & Concordância Plena"
                               >
                                 <span>👏</span>
                                 <span>{post.reactions?.agree || 0}</span>
@@ -1565,7 +1605,7 @@ export default function ComunidadePage({ auth }) {
                             >
                               <MessageCircle size={15} />
                               <span>
-                                {post.replies?.length || 0} respostas{' '}
+                                {post.replies?.length || 0} ecos de resposta{' '}
                                 {isThreadOpen ? '▲' : '▼'}
                               </span>
                             </button>
@@ -1604,7 +1644,7 @@ export default function ComunidadePage({ auth }) {
                               >
                                 <input
                                   type="text"
-                                  placeholder={`Responder para @${post.authorName}...`}
+                                  placeholder={`Gravar resposta para @${post.authorName}...`}
                                   className={styles.replyInput}
                                   value={replyText}
                                   onChange={(e) =>
@@ -1615,7 +1655,7 @@ export default function ComunidadePage({ auth }) {
                                   }
                                 />
                                 <button type="submit" className={styles.btnSendReply}>
-                                  Enviar
+                                  Ecoar Resposta
                                 </button>
                               </form>
                             </div>
@@ -1635,11 +1675,11 @@ export default function ComunidadePage({ auth }) {
             <div className={`${styles.widgetCard} ${styles.widgetCardGold}`}>
               <span className={`${styles.widgetTitle} ${styles.widgetTitleGold}`}>
                 <Crown size={16} />
-                <span>Enquete dos Assinantes</span>
+                <span>Enquete dos Senhores do Clã</span>
               </span>
 
               <p className={styles.pollQuestion}>
-                🗳️ <strong>Qual clássico em Edição Especial de Luxo você quer na próxima caixa do Clube?</strong>
+                🗳️ <strong>Qual clássico em Edição de Luxo com encadernação nobre você quer na próxima remessa do Clube?</strong>
               </p>
 
               <div className={styles.pollOptionsList}>
@@ -1699,7 +1739,7 @@ export default function ComunidadePage({ auth }) {
               </div>
 
               <div className={styles.pollFooter}>
-                <span>Total de {totalPollVotes} votos de assinantes ativos</span>
+                <span>Total de {totalPollVotes} votos dos membros do clã</span>
               </div>
             </div>
 
@@ -1707,14 +1747,14 @@ export default function ComunidadePage({ auth }) {
             <div className={`${styles.widgetCard} ${styles.widgetCardGold}`}>
               <span className={`${styles.widgetTitle} ${styles.widgetTitleGold}`}>
                 <Tag size={16} />
-                <span>Cupons dos Assinantes</span>
+                <span>Mural de Cupons de Honra</span>
               </span>
 
               <div className={styles.couponBox}>
                 <div>
                   <div className={styles.couponCode}>CLUBE20</div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>
-                    20% OFF em qualquer livro
+                    20% OFF em qualquer tomo do acervo
                   </div>
                 </div>
                 <button
@@ -1722,7 +1762,7 @@ export default function ComunidadePage({ auth }) {
                   className={styles.btnCopyCoupon}
                   onClick={() => handleCopyCoupon('CLUBE20')}
                 >
-                  Copiar
+                  Copiar Código
                 </button>
               </div>
 
@@ -1730,7 +1770,7 @@ export default function ComunidadePage({ auth }) {
                 <div>
                   <div className={styles.couponCode}>MASTER30</div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>
-                    30% OFF (Exclusivo Master)
+                    30% OFF (Exclusivo Mestre do Conselho)
                   </div>
                 </div>
                 <button
@@ -1738,7 +1778,7 @@ export default function ComunidadePage({ auth }) {
                   className={styles.btnCopyCoupon}
                   onClick={() => handleCopyCoupon('MASTER30')}
                 >
-                  Copiar
+                  Copiar Código
                 </button>
               </div>
             </div>
@@ -1747,7 +1787,7 @@ export default function ComunidadePage({ auth }) {
             <div className={styles.widgetCard}>
               <span className={styles.widgetTitle}>
                 <Award size={16} />
-                <span>Top Leitores da Semana</span>
+                <span>Bardos em Destaque na Semana</span>
               </span>
 
               <div className={styles.rankingList}>
@@ -1756,7 +1796,7 @@ export default function ComunidadePage({ auth }) {
                     <span className={styles.rankingPosition}>🥇</span>
                     <span className={styles.rankingName}>Mariana Silva</span>
                   </div>
-                  <span className={styles.rankingPoints}>1.420 pts</span>
+                  <span className={styles.rankingPoints}>1.420 runas</span>
                 </div>
 
                 <div className={styles.rankingItem}>
@@ -1764,7 +1804,7 @@ export default function ComunidadePage({ auth }) {
                     <span className={styles.rankingPosition}>🥈</span>
                     <span className={styles.rankingName}>Lucas Ferreira</span>
                   </div>
-                  <span className={styles.rankingPoints}>1.180 pts</span>
+                  <span className={styles.rankingPoints}>1.180 runas</span>
                 </div>
 
                 <div className={styles.rankingItem}>
@@ -1772,7 +1812,7 @@ export default function ComunidadePage({ auth }) {
                     <span className={styles.rankingPosition}>🥉</span>
                     <span className={styles.rankingName}>Camila Rocha</span>
                   </div>
-                  <span className={styles.rankingPoints}>940 pts</span>
+                  <span className={styles.rankingPoints}>940 runas</span>
                 </div>
 
                 <div className={styles.rankingItem}>
@@ -1780,7 +1820,7 @@ export default function ComunidadePage({ auth }) {
                     <span className={styles.rankingPosition}>4º</span>
                     <span className={styles.rankingName}>Thiago Mendes</span>
                   </div>
-                  <span className={styles.rankingPoints}>820 pts</span>
+                  <span className={styles.rankingPoints}>820 runas</span>
                 </div>
               </div>
             </div>
@@ -1789,7 +1829,7 @@ export default function ComunidadePage({ auth }) {
             <div className={styles.widgetCard}>
               <span className={styles.widgetTitle}>
                 <Coffee size={16} />
-                <span>Livro do Mês no Clube</span>
+                <span>Tomo Sagrado do Mês no Clã</span>
               </span>
 
               <div className={styles.clubSpotlightCard}>
@@ -1804,7 +1844,7 @@ export default function ComunidadePage({ auth }) {
                   <h4 className={styles.clubSpotlightTitle}>Duna</h4>
                   <p className={styles.clubSpotlightAuthor}>Frank Herbert</p>
                   <span className={styles.clubSpotlightGoal}>
-                    Meta: Capítulos 1 a 12
+                    Meta do Clã: Capítulos 1 a 12
                   </span>
                 </div>
               </div>
@@ -1814,20 +1854,20 @@ export default function ComunidadePage({ auth }) {
             <div className={styles.widgetCard}>
               <span className={styles.widgetTitle}>
                 <ShieldCheck size={16} />
-                <span>Diretrizes do Canal</span>
+                <span>Código de Honra do Salão</span>
               </span>
 
               <div className={styles.guidelineItem}>
                 <span>🤝</span>
-                <span>Respeito com as opiniões e interpretações de outros leitores.</span>
+                <span>Respeito sagrado com as interpretações e visões de todos os bardos.</span>
               </div>
               <div className={styles.guidelineItem}>
                 <span>⚠️</span>
-                <span>Sempre marque a opção "Contém Spoiler" ao falar de finais.</span>
+                <span>Sempre sele com a Runa de Spoiler os trechos que revelam o clímax e finais.</span>
               </div>
               <div className={styles.guidelineItem}>
                 <span>🔒</span>
-                <span>Respeite o sigilo das conversas das salas VIP com autores.</span>
+                <span>Sigilo absoluto nas deliberações das Câmaras Nobres com autores.</span>
               </div>
             </div>
           </aside>
@@ -1841,11 +1881,11 @@ export default function ComunidadePage({ auth }) {
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
                 <h2 className={styles.modalTitle}>
-                  <Crown size={24} color="#f59e0b" />
-                  <span>Assinaturas do Clube Bibliotech</span>
+                  <Crown size={24} color="#e5b352" />
+                  <span>Alianças & Ordens do Clube Bibliotech</span>
                 </h2>
                 <p className={styles.modalSubtitle}>
-                  Escolha o plano ideal para você e desbloqueie acesso imediato às Salas VIP exclusivas de leitores.
+                  Escolha o seu grau de honra e desbloqueie acesso imediato às Câmaras Secretas dos Clãs Literários.
                 </p>
               </div>
 
@@ -1868,33 +1908,33 @@ export default function ComunidadePage({ auth }) {
                 }`}
               >
                 <div>
-                  <span className={styles.modalPlanBadge}>Digital</span>
-                  <h3 className={styles.modalPlanName}>Leitor Digital</h3>
+                  <span className={styles.modalPlanBadge}>ᛞ Bardo Digital</span>
+                  <h3 className={styles.modalPlanName}>Bardo Digital</h3>
                   <div className={styles.modalPlanPriceRow}>
                     <span className={styles.modalPlanPriceCurrency}>R$</span>
                     <span className={styles.modalPlanPriceValue}>24,90</span>
                     <span className={styles.modalPlanPricePeriod}>/mês</span>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    Acesso a debates de e-books, clube mensal digital e guias em PDF.
+                    Acesso a debates de e-books, clube mensal digital e tomos sagrados em formato digital.
                   </p>
 
                   <div className={styles.modalPlanPerksList}>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Desbloqueia #leitor-digital-ebooks</span>
+                      <span>Desbloqueia ᛞ #bardo-digital-ebooks</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Desbloqueia #sala-assinantes-vip</span>
+                      <span>Desbloqueia ᛟ #câmara-senhores-vip</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Cupom de 10% OFF vitalício</span>
+                      <span>Tributo de 10% OFF vitalício no acervo</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Download de guias de leitura</span>
+                      <span>Acesso aos pergaminhos e guias de leitura</span>
                     </div>
                   </div>
                 </div>
@@ -1910,7 +1950,7 @@ export default function ComunidadePage({ auth }) {
                   }}
                   disabled={userPlan === 'digital'}
                 >
-                  {userPlan === 'digital' ? 'Seu Plano Atual' : 'Assinar Leitor Digital'}
+                  {userPlan === 'digital' ? 'Seu Pacto Atual' : 'Forjar Aliança Bardo Digital'}
                 </button>
               </div>
 
@@ -1920,34 +1960,34 @@ export default function ComunidadePage({ auth }) {
               >
                 <div>
                   <span className={`${styles.modalPlanBadge} ${styles.modalPlanBadgeGold}`}>
-                    Mais Popular • Clube VIP
+                    Mais Escolhido • Ordem do Box Nobre
                   </span>
-                  <h3 className={styles.modalPlanName}>Box VIP Capa Dura</h3>
+                  <h3 className={styles.modalPlanName}>Guarda do Box Nobre</h3>
                   <div className={styles.modalPlanPriceRow}>
                     <span className={styles.modalPlanPriceCurrency}>R$</span>
                     <span className={styles.modalPlanPriceValue}>69,90</span>
                     <span className={styles.modalPlanPricePeriod}>/mês</span>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    1 Livro surpresa em capa dura por mês, 3 mimos colecionáveis e canal com spoilers liberados.
+                    1 Tomo sagrado surpresa em capa dura por mês, 3 relíquias colecionáveis e câmara com spoilers liberados.
                   </p>
 
                   <div className={styles.modalPlanPerksList}>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Desbloqueia #espaco-box-capa-dura</span>
+                      <span>Desbloqueia ᚺ #salão-box-capa-dura</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Desbloqueia #sala-assinantes-vip</span>
+                      <span>Desbloqueia ᛟ #câmara-senhores-vip</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Cupom de 20% OFF vitalício</span>
+                      <span>Tributo de 20% OFF vitalício no acervo</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Enquete de votação da próxima caixa</span>
+                      <span>Voto na escolha da próxima remessa de tomos</span>
                     </div>
                   </div>
                 </div>
@@ -1963,7 +2003,7 @@ export default function ComunidadePage({ auth }) {
                   }}
                   disabled={userPlan === 'box-vip'}
                 >
-                  {userPlan === 'box-vip' ? 'Seu Plano Atual' : 'Quero o Box VIP'}
+                  {userPlan === 'box-vip' ? 'Seu Pacto Atual' : 'Selar Pacto do Box Nobre'}
                 </button>
               </div>
 
@@ -1975,34 +2015,34 @@ export default function ComunidadePage({ auth }) {
               >
                 <div>
                   <span className={`${styles.modalPlanBadge} ${styles.modalPlanBadgeGold}`}>
-                    Passe Total • Edição Master
+                    Grau Máximo • Ordem Suprema
                   </span>
-                  <h3 className={styles.modalPlanName}>Colecionador Master</h3>
+                  <h3 className={styles.modalPlanName}>Mestre do Conselho Supremo</h3>
                   <div className={styles.modalPlanPriceRow}>
                     <span className={styles.modalPlanPriceCurrency}>R$</span>
                     <span className={styles.modalPlanPriceValue}>119,90</span>
                     <span className={styles.modalPlanPricePeriod}>/mês</span>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    Passe VIP total para TODAS as salas, 2 livros numerados e encontros fechados com autores.
+                    Passe supremo a todas as câmaras, 2 tomos sagrados numerados e audiências virtuais com grandes autores.
                   </p>
 
                   <div className={styles.modalPlanPerksList}>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Passe VIP Total: Desbloqueia TODAS as salas</span>
+                      <span>Passe Supremo: Acesso a TODAS as câmaras nobres</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Links dos Encontros Virtuais com Autores (Zoom)</span>
+                      <span>Audiências exclusivas com autores consagrados</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Cupom VIP de 30% OFF vitalício</span>
+                      <span>Tributo Supremo de 30% OFF vitalício</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Canal direto com curadores da Bibliotech</span>
+                      <span>Conselho direto com os curadores da Bibliotech</span>
                     </div>
                   </div>
                 </div>
@@ -2018,7 +2058,7 @@ export default function ComunidadePage({ auth }) {
                   }}
                   disabled={userPlan === 'master'}
                 >
-                  {userPlan === 'master' ? 'Seu Plano Atual' : 'Assinar Colecionador Master'}
+                  {userPlan === 'master' ? 'Seu Pacto Atual' : 'Ascender a Mestre Supremo'}
                 </button>
               </div>
             </div>
@@ -2031,10 +2071,10 @@ export default function ComunidadePage({ auth }) {
         <div className={styles.container}>
           <div className={styles.footerContent}>
             <span>
-              &copy; {new Date().getFullYear()} Bibliotech Livraria & Clube Literário • Canal de Comunicação & Salas VIP de Assinantes.
+              &copy; {new Date().getFullYear()} Bibliotech Livraria & Clube Literário • Salão dos Clãs, Câmaras Nobres & Pergaminhos de Leitores.
             </span>
-            <Link href="/" className={styles.footerLink}>
-              ← Voltar para a Loja & Catálogo
+            <Link href="/catalogo" className={styles.footerLink}>
+              ← Retornar ao Grande Salão da Loja & Catálogo
             </Link>
           </div>
         </div>

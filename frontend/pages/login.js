@@ -110,10 +110,10 @@ export default function LoginPage() {
   };
 
   // Acesso Rápido Demo (1 Clique para testes com credenciais oficiais)
-  const handleDemoLogin = async () => {
+  const handleQuickLogin = async (userEmail, userPass, userName, userPlan = 'master') => {
     setLoading(true);
     setErrorMsg('');
-    setSuccessMsg('Entrando com a conta de Patrick Genovez...');
+    setSuccessMsg(`Entrando com a conta de ${userName}...`);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -121,8 +121,8 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'patrick@bibliotech.com',
-          password: 'admin123'
+          email: userEmail,
+          password: userPass
         })
       });
 
@@ -132,26 +132,26 @@ export default function LoginPage() {
         localStorage.setItem('userData', JSON.stringify(data.user));
         window.dispatchEvent(new Event('storage'));
         setSuccessMsg(`Bem-vindo(a), ${data.user.full_name}! Redirecionando...`);
-        const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/comunidade');
+        const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/');
         setTimeout(() => {
           router.push(target);
         }, 600);
       } else {
-        throw new Error(data.error || 'Erro ao autenticar conta demo.');
+        throw new Error(data.error || 'Erro ao autenticar conta.');
       }
     } catch (err) {
       // Fallback de contingência caso o servidor esteja inacessível
       const fallbackUser = {
-        id: 1,
-        email: 'patrick@bibliotech.com',
-        full_name: 'Patrick Genovez',
-        plano_id: 'box-vip',
-        role: 'admin'
+        id: userEmail.includes('elza') ? 1795090887963 : 1,
+        email: userEmail,
+        full_name: userName,
+        plano_id: userPlan,
+        role: userEmail.includes('patrick') ? 'admin' : 'user'
       };
       localStorage.setItem('token', 'demo-jwt-token');
       localStorage.setItem('userData', JSON.stringify(fallbackUser));
       window.dispatchEvent(new Event('storage'));
-      const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/comunidade');
+      const target = router.query.redirect === 'survey' ? '/?onboarding=true' : (router.query.redirect || '/');
       setTimeout(() => {
         router.push(target);
       }, 600);
@@ -159,6 +159,8 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleDemoLogin = () => handleQuickLogin('elza@bibliotech.com', 'admin123', 'Elza', 'master');
 
   // Submit Sign Up
   const handleSignup = async (e) => {
@@ -464,29 +466,57 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <div style={{ textAlign: 'center', marginTop: '14px' }}>
-                <button
-                  type="button"
-                  onClick={handleDemoLogin}
-                  style={{
-                    background: 'rgba(245, 158, 11, 0.12)',
-                    border: '1px dashed #f59e0b',
-                    color: '#f59e0b',
-                    padding: '9px 16px',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    transition: 'all 0.2s ease'
-                  }}
-                  title="Entrar imediatamente como usuário de teste para criar posts e respostas"
-                >
-                  <Sparkles size={14} />
-                  <span>Acesso Rápido de Teste (1 Clique)</span>
-                </button>
+              <div style={{ textAlign: 'center', marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary, #999)' }}>
+                  Acesso rápido para testes com 1 clique:
+                </span>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin('elza@bibliotech.com', 'admin123', 'Elza', 'master')}
+                    style={{
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      border: '1px solid #10b981',
+                      color: '#10b981',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.84rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Entrar imediatamente como Elza (Plano Master)"
+                  >
+                    <Sparkles size={14} />
+                    <span>Entrar como Elza (Master)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin('patrick@bibliotech.com', 'admin123', 'Patrick Genovez', 'master')}
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      border: '1px dashed #f59e0b',
+                      color: '#f59e0b',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.84rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Entrar como Patrick Genovez (Admin)"
+                  >
+                    <Sparkles size={14} />
+                    <span>Entrar como Patrick (Admin)</span>
+                  </button>
+                </div>
               </div>
             </form>
           )}
