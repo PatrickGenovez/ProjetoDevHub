@@ -1580,11 +1580,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  width: 100%;
   max-width: 980px;
-  margin: 0 auto 28px;
-  padding: 6px 0;
+  margin: 0 auto 16px;
+  padding: 2px 0;
 }
 
 .genreFilterLabel {
@@ -1614,16 +1613,29 @@
 .genrePillsList {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 4px 6px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 179, 82, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.genrePillsList::-webkit-scrollbar {
+  height: 4px;
+}
+
+.genrePillsList::-webkit-scrollbar-thumb {
+  background: rgba(229, 179, 82, 0.3);
+  border-radius: 4px;
 }
 
 .genrePill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 16px;
+  padding: 7px 15px;
   border-radius: 999px;
   background: #ede2cd;
   border: 1px solid var(--color-parchment-border);
@@ -1633,6 +1645,8 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(60, 35, 15, 0.05);
 }
@@ -1642,6 +1656,48 @@
   border-color: var(--color-gold-accent);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(60, 35, 15, 0.12);
+}
+
+/* Meta status e contagem discreta do catálogo */
+.catalogResultMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 20px;
+  padding: 10px 4px 14px;
+  border-bottom: 1px solid rgba(198, 146, 56, 0.15);
+  font-size: 0.86rem;
+  color: var(--color-text-secondary);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+:global([data-theme="dark"]) .catalogResultMetaRow {
+  color: #a69886;
+  border-bottom: 1px solid rgba(229, 179, 82, 0.15);
+}
+
+.catalogResultCount strong {
+  color: var(--color-text-primary);
+}
+
+:global([data-theme="dark"]) .catalogResultCount strong {
+  color: #fbf6ec;
+}
+
+.catalogResultBadge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-gold-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:global([data-theme="dark"]) .catalogResultBadge {
+  color: #e5b352;
 }
 
 :global([data-theme="dark"]) .genrePill {

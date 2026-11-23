@@ -1153,17 +1153,23 @@ export default function BookStore({ auth }) {
   };
 
   const genresList = useMemo(() => {
-    const fromBooks = books.map((b) => b.genre).filter(Boolean);
-    const standardGenres = [
+    const genresWithBooks = new Set();
+    books.forEach((b) => {
+      if (b.genre && b.genre.trim()) {
+        genresWithBooks.add(b.genre.trim());
+      }
+    });
+    const preferredOrder = [
       'Clássicos',
       'Romance',
       'Ficção Científica',
       'Fantasia',
-      'Suspense & Mistério',
       'História & Biografias',
-      'Tecnologia'
+      'Suspense & Mistério'
     ];
-    return ['Todos', ...Array.from(new Set([...standardGenres, ...fromBooks]))];
+    const ordered = preferredOrder.filter((g) => genresWithBooks.has(g));
+    const others = Array.from(genresWithBooks).filter((g) => !preferredOrder.includes(g));
+    return ['Todos', ...ordered, ...others];
   }, [books]);
 
   const filteredLocalBooks = useMemo(() => {
@@ -1625,25 +1631,25 @@ export default function BookStore({ auth }) {
         {/* ===== 4. SEÇÃO DO CATÁLOGO DE LIVROS À VENDA ===== */}
         <section id="catalogo-section" className={styles.booksSection}>
           <div className={styles.container}>
-            {/* Cabeçalho Principal da Seção */}
+            {/* Cabeçalho Principal Clean */}
             <div className={styles.sectionHeadingCenter}>
-              <span className={styles.subHeadingBadge}>Loja & Catálogo Oficial</span>
-              <h2 className={styles.mainSectionTitle}>Livraria Online & Catálogo de Obras</h2>
+              <span className={styles.subHeadingBadge}>ᛟ Acervo Literário</span>
+              <h2 className={styles.mainSectionTitle}>Catálogo de Livros</h2>
               <p className={styles.mainSectionDesc}>
-                Explore nosso acervo com pronta entrega para todo o Brasil, edições especiais e os títulos favoritos dos nossos leitores.
+                Explore nosso acervo completo com pronta entrega para todo o Brasil • <strong style={{ color: '#e5b352' }}>Frete Grátis e 20% OFF para membros VIP</strong>
               </p>
             </div>
 
             {/* ===== EXPLORADOR COMPLETO DO ACERVO ===== */}
             <div className={styles.catalogExplorerWrapper}>
 
-              {/* Barra de Pesquisa e Ordenação */}
+              {/* Barra Unificada: Busca + Ordenação + Grade/Lista */}
               <div className={styles.searchBarContainer}>
                 <div className={styles.searchInputWrapper}>
-                  <Search size={20} className={styles.searchIcon} />
+                  <Search size={18} className={styles.searchIcon} />
                   <input
                     type="text"
-                    placeholder="Pesquisar livro por título, autor, assunto..."
+                    placeholder="Buscar livro por título, autor, assunto..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className={styles.searchInput}
@@ -1667,12 +1673,78 @@ export default function BookStore({ auth }) {
                   )}
                 </div>
 
-                {searchSource === 'local' && (
-                  <div className={styles.searchControlsRight}>
-                    {/* Botão de Pesquisa de Gêneros */}
+                <div className={styles.searchControlsRight}>
+                  {/* Ordenação */}
+                  <div className={styles.sortSelectWrapper}>
+                    <ArrowUpDown size={15} className={styles.sortIcon} />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className={styles.sortSelect}
+                      id="sort-select"
+                      aria-label="Ordenar livros"
+                    >
+                      <option value="sales">Mais Populares</option>
+                      <option value="price-asc">Menor Preço</option>
+                      <option value="price-desc">Maior Preço</option>
+                      <option value="rating">Melhor Avaliados</option>
+                      <option value="title">Título (A-Z)</option>
+                    </select>
+                  </div>
+
+                  {/* Alternador de Modo de Visualização: Grade vs Lista */}
+                  <div className={styles.viewModeToggle} title="Alternar formato de exibição">
                     <button
-                      className={`${styles.btnGenrePreferences} ${
-                        preferredGenres.length > 0 ? styles.btnGenrePreferencesActive : ''
+                      type="button"
+                      className={`${styles.viewModeBtn} ${catalogViewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setCatalogViewMode('grid')}
+                      title="Exibição em Grade"
+                      aria-label="Grade"
+                    >
+                      <LayoutGrid size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.viewModeBtn} ${catalogViewMode === 'list' ? styles.viewModeBtnActive : ''}`}
+                      onClick={() => setCatalogViewMode('list')}
+                      title="Exibição em Lista"
+                      aria-label="Lista"
+                    >
+                      <List size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Abas de Categorias / Gêneros (Linha única limpa e fluida) */}
+              {searchSource === 'local' && (
+                <div className={styles.genreFiltersContainer}>
+                  <div className={styles.genrePillsList}>
+                    {genresList.map((genre) => {
+                      const count = genre === 'Todos'
+                        ? books.length
+                        : books.filter((b) => b.genre && b.genre.toLowerCase() === genre.toLowerCase()).length;
+                      const isActive = !filterOnlyPreferred && selectedGenre === genre;
+
+                      return (
+                        <button
+                          key={genre}
+                          className={`${styles.genrePill} ${isActive ? styles.genrePillActive : ''}`}
+                          onClick={() => {
+                            setFilterOnlyPreferred(false);
+                            setSelectedGenre(genre);
+                          }}
+                        >
+                          <span>{genre}</span>
+                          <span className={styles.genrePillCount}>{count}</span>
+                        </button>
+                      );
+                    })}
+
+                    {/* Botão claro e direto para os gostos pessoais do leitor */}
+                    <button
+                      className={`${styles.genrePill} ${styles.genrePillPreferred} ${
+                        filterOnlyPreferred ? styles.genrePillActivePreferred : ''
                       }`}
                       onClick={() => {
                         if (!currentUser) {
@@ -1682,150 +1754,51 @@ export default function BookStore({ auth }) {
                         if (preferredGenres.length === 0) {
                           setIsSurveyModalOpen(true);
                         } else {
-                          setFilterOnlyPreferred(!filterOnlyPreferred);
-                        }
-                      }}
-                      title="Personalizar meus gêneros favoritos"
-                      id="btn-genre-preferences"
-                    >
-                      <Sparkles size={17} className={styles.prefIcon} />
-                      <span>Meus Gêneros</span>
-                      {preferredGenres.length > 0 && (
-                        <span className={styles.prefCountBadge}>{preferredGenres.length}</span>
-                      )}
-                    </button>
-
-                    {/* Ordenação para Vendas */}
-                    <div className={styles.sortSelectWrapper}>
-                      <ArrowUpDown size={16} className={styles.sortIcon} />
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className={styles.sortSelect}
-                        id="sort-select"
-                      >
-                        <option value="sales">Mais Populares / Vendidos</option>
-                        <option value="price-asc">Menor Preço</option>
-                        <option value="price-desc">Maior Preço</option>
-                        <option value="rating">Melhor Avaliados</option>
-                        <option value="title">Título (A-Z)</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Genre Pills */}
-              {searchSource === 'local' && (
-                <div className={styles.genreFiltersContainer}>
-                  <span className={styles.genreFilterLabel}>
-                    <Filter size={14} />
-                    Filtrar:
-                  </span>
-                  <div className={styles.genrePillsList}>
-                    {/* Pílula Especial de Gêneros da Pesquisa */}
-                    <button
-                      className={`${styles.genrePill} ${styles.genrePillPreferred} ${
-                        filterOnlyPreferred ? styles.genrePillActivePreferred : ''
-                      }`}
-                      onClick={() => {
-                        if (preferredGenres.length === 0) {
-                          setIsSurveyModalOpen(true);
-                        } else {
                           const next = !filterOnlyPreferred;
                           setFilterOnlyPreferred(next);
                           if (next) {
                             setSelectedGenre('Todos');
                             showToast(`Filtrando por ${preferredGenres.length} gêneros selecionados!`);
                           } else {
-                            showToast('Exibindo catálogo completo da livraria');
+                            showToast('Exibindo catálogo completo');
                           }
                         }
                       }}
-                      title="Filtrar pelos seus gêneros favoritos"
+                      title="Ver livros nos meus gêneros preferidos"
                     >
-                      <Sparkles size={14} />
-                      <span>⭐ Meus Favoritos</span>
-                      {preferredGenres.length > 0 ? (
+                      <Sparkles size={13} />
+                      <span>Recomendados para mim</span>
+                      {preferredGenres.length > 0 && (
                         <span className={styles.genrePillCount}>{preferredGenres.length}</span>
-                      ) : (
-                        <span className={styles.genrePillConfigHint}>Responder</span>
                       )}
                     </button>
-
-                    {genresList.map((genre) => (
-                      <button
-                        key={genre}
-                        className={`${styles.genrePill} ${
-                          !filterOnlyPreferred && selectedGenre === genre ? styles.genrePillActive : ''
-                        }`}
-                        onClick={() => {
-                          setFilterOnlyPreferred(false);
-                          setSelectedGenre(genre);
-                        }}
-                      >
-                        <span>{genre}</span>
-                        <span className={styles.genrePillCount}>
-                          {genre === 'Todos'
-                            ? books.length
-                            : books.filter((b) => b.genre.toLowerCase() === genre.toLowerCase()).length}
-                        </span>
-                      </button>
-                    ))}
                   </div>
                 </div>
               )}
 
-              {/* Sub-cabeçalho com Título, Total e Alternador de Modo de Visualização */}
-              <div className={styles.catalogExplorerHeading}>
-                <div className={styles.catalogExplorerTitleGroup}>
-                  <span className={styles.catalogExplorerBadge}>
-                    <Sparkles size={13} />
-                    Estante Completa
-                  </span>
-                  <h3 className={styles.catalogExplorerTitle}>
-                    {filterOnlyPreferred
-                      ? `⭐ Livros nos seus gêneros preferidos (${preferredGenres.length} temas)`
-                      : selectedGenre === 'Todos'
-                      ? 'Todos os Livros à Venda'
-                      : `Categoria: ${selectedGenre}`}
-                  </h3>
-                  <p className={styles.catalogExplorerSubtitle}>
-                    Exibindo {visibleBooks.length} de {displayedBooks.length} obras com pronta entrega e garantia de qualidade
-                  </p>
-                </div>
+              {/* Barra de Status e Contagem Sutil */}
+              <div className={styles.catalogResultMetaRow}>
+                <span className={styles.catalogResultCount}>
+                  Exibindo <strong>{visibleBooks.length}</strong> de <strong>{displayedBooks.length}</strong> obras disponíveis
+                  {selectedGenre !== 'Todos' && !filterOnlyPreferred && ` • Categoria: ${selectedGenre}`}
+                  {filterOnlyPreferred && ` • Seleção recomendada (${preferredGenres.length} temas)`}
+                  {searchTerm && ` • Busca: "${searchTerm}"`}
+                </span>
 
-                <div className={styles.catalogViewControls}>
-                  {/* Modo de Visualização: Grade vs Lista */}
-                  <div className={styles.viewModeToggle} title="Alternar formato de exibição">
-                    <button
-                      type="button"
-                      className={`${styles.viewModeBtn} ${catalogViewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
-                      onClick={() => setCatalogViewMode('grid')}
-                      title="Exibição em Grade de Cards"
-                      aria-label="Grade"
-                    >
-                      <LayoutGrid size={17} />
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.viewModeBtn} ${catalogViewMode === 'list' ? styles.viewModeBtnActive : ''}`}
-                      onClick={() => setCatalogViewMode('list')}
-                      title="Exibição em Lista Detalhada"
-                      aria-label="Lista"
-                    >
-                      <List size={17} />
-                    </button>
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span className={styles.catalogResultBadge}>
+                    ⚡ Pronta entrega nacional
+                  </span>
 
                   {searchSource === 'local' && (
                     <button
                       className={styles.btnAddBook}
                       onClick={() => setIsAddModalOpen(true)}
                       id="btn-add-book-section"
+                      title="Cadastrar nova obra no catálogo"
                     >
-                      <Plus size={16} />
-                      <span>Cadastrar Livro</span>
+                      <Plus size={14} />
+                      <span>Novo Livro</span>
                     </button>
                   )}
                 </div>
