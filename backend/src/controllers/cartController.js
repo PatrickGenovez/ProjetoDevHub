@@ -20,7 +20,6 @@ class CartController {
       next(error);
     }
   }
-
   /**
    * Salvar/Substituir itens do carrinho do usuário autenticado
    * PUT /api/cart

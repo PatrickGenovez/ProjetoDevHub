@@ -1,0 +1,407 @@
+{
+  "info": {
+    "_postman_id": "bibliotech-api-collection",
+    "name": "Bibliotech API - Livraria & Clube",
+    "description": "Coleção de testes completa para a API do projeto Bibliotech (Backend Node.js/Express)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00. Health Check",
+      "item": [
+        {
+          "name": "Verificar Status da API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Verifica se a API está online e respondendo na porta 5000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01. Autenticação (/auth)",
+      "item": [
+        {
+          "name": "Login (Admin / Clube) - Salva Token Automático",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set('token', response.token);",
+                  "    console.log('Token JWT capturado com sucesso!');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patrick@bibliotech.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Realiza login e salva automaticamente o token JWT na variável da coleção."
+          }
+        },
+        {
+          "name": "Cadastro de Novo Usuário (Register)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Novo Leitor\",\n  \"email\": \"leitor.novo@bibliotech.com\",\n  \"password\": \"senha123\",\n  \"plano_id\": \"anual_vip\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Obter Perfil Autenticado (/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Retorna os dados do usuário autenticado a partir do token JWT."
+          }
+        },
+        {
+          "name": "Atualizar Plano do Usuário (/auth/plan)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plano_id\": \"anual_vip\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/plan",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "plan"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Catálogo de Livros (/books)",
+      "item": [
+        {
+          "name": "Listar Livros (Com Paginação e Busca)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books?page=1&limit=10&genre=Ficção Científica",
+              "host": ["{{baseUrl}}"],
+              "path": ["books"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "genre", "value": "Ficção Científica" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "sort", "value": "price-asc", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Novo Livro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Duna\",\n  \"author\": \"Frank Herbert\",\n  \"genre\": \"Ficção Científica\",\n  \"synopsis\": \"Em um futuro distante, Paul Atreides viaja para Arrakis...\",\n  \"price\": 59.90,\n  \"originalPrice\": 79.90,\n  \"year\": 1965,\n  \"pages\": 680,\n  \"stock\": 15,\n  \"badge\": \"Destaque\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["books"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Carrinho de Compras (/cart)",
+      "item": [
+        {
+          "name": "Obter Carrinho do Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Salvar / Substituir Carrinho",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"id\": \"local-101\",\n      \"title\": \"Memórias Póstumas de Brás Cubas\",\n      \"author\": \"Machado de Assis\",\n      \"price\": 49.90,\n      \"quantity\": 2\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Mesclar Carrinho (Merge)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"id\": \"local-102\",\n      \"title\": \"Dom Casmurro\",\n      \"author\": \"Machado de Assis\",\n      \"price\": 39.90,\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/merge",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "merge"]
+            }
+          }
+        },
+        {
+          "name": "Esvaziar Carrinho",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Checkout, Cupons e Frete",
+      "item": [
+        {
+          "name": "Listar Cupons Ativos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/checkout/coupons",
+              "host": ["{{baseUrl}}"],
+              "path": ["checkout", "coupons"]
+            }
+          }
+        },
+        {
+          "name": "Validar Cupom de Desconto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"CLUBE20\",\n  \"subtotal\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/checkout/coupons/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["checkout", "coupons", "validate"]
+            }
+          }
+        },
+        {
+          "name": "Calcular Frete (ViaCEP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"01001-000\",\n  \"subtotal\": 120.00,\n  \"couponCode\": \"CLUBE20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/checkout/shipping/calculate",
+              "host": ["{{baseUrl}}"],
+              "path": ["checkout", "shipping", "calculate"]
+            }
+          }
+        },
+        {
+          "name": "Consultar Endereço por CEP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/checkout/shipping/cep/01001000",
+              "host": ["{{baseUrl}}"],
+              "path": ["checkout", "shipping", "cep", "01001000"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Multi-Tenant (/tenants)",
+      "item": [
+        {
+          "name": "Listar Franquias / Tenants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants"]
+            }
+          }
+        },
+        {
+          "name": "Provisionar Nova Franquia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bibliotech Campinas\",\n  \"slug\": \"campinas\",\n  \"cnpj\": \"12.345.678/0001-90\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Sprints PDF",
+      "item": [
+        {
+          "name": "Gerar / Baixar PDF de Sprints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sprints-pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints-pdf"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

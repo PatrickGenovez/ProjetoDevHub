@@ -53,7 +53,7 @@ class CheckoutController {
    */
   static async calculateShipping(req, res, next) {
     try {
-      const { cep, subtotal = 0, couponCode } = req.body;
+      const { cep, subtotal = 0, couponCode, isVip = false } = req.body;
 
       if (!cep) {
         return ApiResponse.badRequest(res, 'Informe o CEP para cálculo do frete.');
@@ -70,7 +70,8 @@ class CheckoutController {
       const shippingData = await ShippingService.calculate({
         cep,
         subtotal,
-        isFreeShippingCoupon
+        isFreeShippingCoupon,
+        isVip
       });
 
       return ApiResponse.success(res, shippingData, 'Opções de frete calculadas com sucesso');

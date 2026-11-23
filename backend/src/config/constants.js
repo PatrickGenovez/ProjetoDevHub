@@ -32,9 +32,11 @@ const USER_ROLES = {
 
 const PLANS = {
   VISITOR: 'visitante',
-  DIGITAL: 'digital',
-  BOX_VIP: 'box-vip',
-  MASTER: 'master'
+  VIP: 'vip',
+  // Legados para retrocompatibilidade
+  DIGITAL: 'vip',
+  BOX_VIP: 'vip',
+  MASTER: 'vip'
 };
 
 module.exports = {

@@ -73,8 +73,9 @@ class ShippingService {
 
   /**
    * Calcular opções de frete (PAC e SEDEX) por CEP e subtotal da compra
+   * Usuários VIP possuem Frete Grátis Total para qualquer lugar do Brasil
    */
-  static async calculate({ cep, subtotal = 0, isFreeShippingCoupon = false }) {
+  static async calculate({ cep, subtotal = 0, isFreeShippingCoupon = false, isVip = false }) {
     const cleanCep = String(cep || '').replace(/\D/g, '');
     if (cleanCep.length !== 8) {
       throw new Error('CEP inválido. Informe um CEP com 8 dígitos numéricos.');
@@ -96,17 +97,21 @@ class ShippingService {
     }
 
     const numSubtotal = Math.max(0, parseFloat(subtotal) || 0);
-    const qualifiesForFreeShipping = isFreeShippingCoupon || numSubtotal >= FREE_SHIPPING_THRESHOLD;
+    const qualifiesForFreeShipping = isVip || isFreeShippingCoupon || numSubtotal >= FREE_SHIPPING_THRESHOLD;
 
-    // PAC: se atingir o valor de frete grátis, preço é 0
+    // PAC: se for VIP ou atingir o valor de frete grátis, preço é 0
     const pacPrice = qualifiesForFreeShipping ? 0.0 : regionConfig.pac;
     const sedexPrice = regionConfig.sedex;
 
     const options = [
       {
         id: 'pac',
-        name: 'PAC Econômico',
-        description: qualifiesForFreeShipping ? 'Frete Grátis Promocional' : 'Entrega padrão com rastreamento',
+        name: isVip ? 'PAC VIP Nacional (Frete Grátis)' : 'PAC Econômico',
+        description: isVip
+          ? 'Benefício Membro VIP: Frete Grátis para todo o Brasil'
+          : qualifiesForFreeShipping
+          ? 'Frete Grátis Promocional'
+          : 'Entrega padrão com rastreamento',
         price: pacPrice,
         formattedPrice: pacPrice === 0 ? 'GRÁTIS' : `R$ ${pacPrice.toFixed(2).replace('.', ',')}`,
         estimatedDays: regionConfig.daysPac,
@@ -132,7 +137,8 @@ class ShippingService {
       regionName: regionConfig.name,
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
       qualifiesForFreeShipping,
-      amountNeededForFreeShipping: Math.max(0, parseFloat((FREE_SHIPPING_THRESHOLD - numSubtotal).toFixed(2))),
+      isVip,
+      amountNeededForFreeShipping: isVip ? 0 : Math.max(0, parseFloat((FREE_SHIPPING_THRESHOLD - numSubtotal).toFixed(2))),
       options
     };
   }
