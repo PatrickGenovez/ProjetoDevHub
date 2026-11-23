@@ -1,0 +1,232 @@
+/* ===== PLANO DE FUNDO: PERGAMINHO ANCESTRAL & LAREIRA NÓRDICA ===== */
+
+.parchmentContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--color-bg-primary);
+  transition: background-color 0.4s ease;
+  contain: strict;
+  transform: translateZ(0);
+}
+
+/* Modo Claro: Pergaminho Natural Iluminado à Vela */
+:global([data-theme="light"]) .parchmentContainer,
+:global(:root:not([data-theme="dark"])) .parchmentContainer {
+  background: radial-gradient(circle at 50% 15%, #fbf6ec 0%, #f4ebd9 45%, #e9dbc3 100%);
+}
+
+/* Modo Escuro: Salão de Carvalho Nórdico & Brasas da Forja */
+:global([data-theme="dark"]) .parchmentContainer {
+  background: radial-gradient(circle at 50% 15%, #1d1611 0%, #15100c 50%, #0c0806 100%);
+}
+
+/* Camada 1: Marca d'água de Runas Nórdicas Sutis */
+.runicWatermark {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%238c5627' fill-opacity='0.055'%3E%3Cpath d='M20 15 L20 45 M20 22 L35 15 M20 32 L35 25 M60 15 L60 45 M60 30 L75 15 M60 30 L75 45 M100 15 L100 45 M90 20 L110 40 M90 40 L110 20 M20 75 L20 105 M15 80 L35 90 M60 75 L60 105 M50 85 L70 85 M100 75 L100 105 M100 85 L115 75 M100 95 L115 105' stroke='%238c5627' stroke-width='1.5' stroke-linecap='round' fill='none' stroke-opacity='0.06'/%3E%3Ccircle cx='60' cy='60' r='1.5' fill='%238c5627' fill-opacity='0.08'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 30%, black 30%, transparent 92%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 30%, black 30%, transparent 92%);
+  opacity: 0.85;
+  transition: opacity 0.4s ease;
+}
+
+:global([data-theme="dark"]) .runicWatermark {
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e5b352' fill-opacity='0.06'%3E%3Cpath d='M20 15 L20 45 M20 22 L35 15 M20 32 L35 25 M60 15 L60 45 M60 30 L75 15 M60 30 L75 45 M100 15 L100 45 M90 20 L110 40 M90 40 L110 20 M20 75 L20 105 M15 80 L35 90 M60 75 L60 105 M50 85 L70 85 M100 75 L100 105 M100 85 L115 75 M100 95 L115 105' stroke='%23e5b352' stroke-width='1.5' stroke-linecap='round' fill='none' stroke-opacity='0.07'/%3E%3Ccircle cx='60' cy='60' r='1.5' fill='%23e5b352' fill-opacity='0.09'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.95;
+}
+
+/* Camada 2: Textura de Grão de Pergaminho / Fibras de Papiro */
+.parchmentTexture {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(140, 86, 39, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 85%);
+  opacity: 0.7;
+}
+
+:global([data-theme="dark"]) .parchmentTexture {
+  background-image: radial-gradient(rgba(229, 179, 82, 0.1) 1.2px, transparent 1.2px);
+  opacity: 0.75;
+}
+
+/* Camada 3: Luz Ambiente da Lareira & Brasas da Forja */
+.hearthGlowWrapper {
+  position: absolute;
+  inset: -60px;
+  filter: blur(28px);
+  -webkit-filter: blur(28px);
+  opacity: 0.85;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+:global([data-theme="dark"]) .hearthGlowWrapper {
+  filter: blur(32px);
+  -webkit-filter: blur(32px);
+  opacity: 0.95;
+}
+
+/* Brilho 1: Ouro Antigo / Vela Quente (Centro Superior) */
+.emberGlowPrimary {
+  position: absolute;
+  top: -10%;
+  left: 20%;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(198, 146, 56, 0.22) 0%, rgba(140, 86, 39, 0.1) 55%, transparent 75%);
+  animation: floatHearthEmber 20s ease-in-out infinite alternate;
+}
+
+:global([data-theme="dark"]) .emberGlowPrimary {
+  background: radial-gradient(circle, rgba(229, 179, 82, 0.2) 0%, rgba(201, 59, 43, 0.12) 55%, transparent 75%);
+}
+
+/* Brilho 2: Carmesim do Selo Real & Brasas Vivas (Canto Direito) */
+.emberGlowWarm {
+  position: absolute;
+  top: 8%;
+  right: 12%;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(142, 31, 31, 0.16) 0%, rgba(198, 146, 56, 0.08) 55%, transparent 75%);
+  animation: floatHearthWarm 24s ease-in-out infinite alternate-reverse;
+}
+
+:global([data-theme="dark"]) .emberGlowWarm {
+  background: radial-gradient(circle, rgba(201, 59, 43, 0.22) 0%, rgba(229, 179, 82, 0.1) 55%, transparent 75%);
+}
+
+/* Brilho 3: Vela Tremulante (Meio Esquerda) */
+.candleFlicker {
+  position: absolute;
+  top: 45%;
+  left: 10%;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 178, 74, 0.18) 0%, rgba(198, 146, 56, 0.06) 60%, transparent 80%);
+  animation: flickerCandle 14s ease-in-out infinite alternate;
+}
+
+:global([data-theme="dark"]) .candleFlicker {
+  background: radial-gradient(circle, rgba(247, 206, 122, 0.16) 0%, rgba(175, 114, 57, 0.08) 55%, transparent 75%);
+}
+
+/* Brilho 4: Halo Ambarino do Pergaminho */
+.parchmentHalo {
+  position: absolute;
+  bottom: 5%;
+  right: 15%;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(140, 86, 39, 0.14) 0%, rgba(198, 146, 56, 0.05) 60%, transparent 80%);
+  animation: floatHearthEmber 22s ease-in-out infinite alternate-reverse;
+}
+
+:global([data-theme="dark"]) .parchmentHalo {
+  background: radial-gradient(circle, rgba(229, 179, 82, 0.14) 0%, rgba(142, 31, 31, 0.08) 55%, transparent 75%);
+}
+
+/* Camada 4: Feixe de Archote / Lanterna de Mesa */
+.torchBeam {
+  position: absolute;
+  top: -20%;
+  left: 18%;
+  width: 65%;
+  height: 140%;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(198, 146, 56, 0.035) 45%,
+    rgba(229, 179, 82, 0.045) 50%,
+    transparent 55%
+  );
+  transform: rotate(-16deg);
+  pointer-events: none;
+}
+
+:global([data-theme="dark"]) .torchBeam {
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(229, 179, 82, 0.04) 45%,
+    rgba(201, 59, 43, 0.04) 50%,
+    transparent 55%
+  );
+}
+
+/* Camada 5: Vinheta Envelhecida nas Bordas (Folio Antigo) */
+.vignetteOverlay {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 120px rgba(83, 51, 27, 0.08);
+  pointer-events: none;
+}
+
+:global([data-theme="dark"]) .vignetteOverlay {
+  box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.65);
+}
+
+/* Animações Orgânicas Suaves de Lareira & Vela */
+@keyframes floatHearthEmber {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(40px, 35px, 0) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-30px, 60px, 0) scale(0.95);
+    opacity: 0.85;
+  }
+}
+
+@keyframes floatHearthWarm {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-45px, 40px, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(25px, -35px, 0) scale(0.94);
+  }
+}
+
+@keyframes flickerCandle {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.96) translate3d(0, 0, 0);
+  }
+  25% {
+    opacity: 0.95;
+    transform: scale(1.04) translate3d(-10px, 5px, 0);
+  }
+  50% {
+    opacity: 0.82;
+    transform: scale(0.98) translate3d(15px, -8px, 0);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.05) translate3d(5px, 10px, 0);
+  }
+  100% {
+    opacity: 0.78;
+    transform: scale(0.97) translate3d(0, 0, 0);
+  }
+}

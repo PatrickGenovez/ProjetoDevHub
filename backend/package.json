@@ -4,7 +4,10 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "db:setup": "node src/scripts/setupDatabase.js",
+    "db:setup:multitenant": "node src/scripts/setupMultiTenant.js",
+    "pdf:db": "node src/scripts/generateDatabaseStudyPdf.js"
   },
   "keywords": [],
   "author": "",
