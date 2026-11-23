@@ -409,14 +409,27 @@ export default function CatalogoPage({ auth }) {
     return cart.reduce((acc, item) => acc + (item.price || 49.90) * (item.quantity || 1), 0);
   }, [cart]);
 
+  // Identifica se o usuário é Membro VIP
+  const isVip = useMemo(() => {
+    if (!currentUser) return false;
+    const plan = String(currentUser.plano_id || currentUser.subscription || currentUser.plan || '').toLowerCase();
+    return plan === 'vip' || plan === 'master' || plan === 'box-vip' || Boolean(currentUser.isVip);
+  }, [currentUser]);
+
+  const vipDiscount = useMemo(() => {
+    if (!isVip) return 0;
+    return parseFloat((cartSubtotal * 0.20).toFixed(2));
+  }, [isVip, cartSubtotal]);
+
   const shippingCost = useMemo(() => {
+    if (isVip) return 0; // VIP = Frete totalmente grátis para todo o Brasil
     if (cartSubtotal >= 99 || cartSubtotal === 0) return 0;
     return shippingMethod === 'sedex' ? 24.90 : 12.90;
-  }, [cartSubtotal, shippingMethod]);
+  }, [isVip, cartSubtotal, shippingMethod]);
 
   const cartTotal = useMemo(() => {
-    return cartSubtotal + shippingCost;
-  }, [cartSubtotal, shippingCost]);
+    return Math.max(0, cartSubtotal - vipDiscount + shippingCost);
+  }, [cartSubtotal, vipDiscount, shippingCost]);
 
   // Favoritos
   const toggleFavorite = (book) => {
@@ -677,7 +690,7 @@ export default function CatalogoPage({ auth }) {
 
                   {/* Bloco de Preços */}
                   <div className={styles.cardPricingBox}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
                       <span className={styles.cardCurrentPrice}>
                         <span className={styles.vikingCoinSymbol}>ᛗ</span>
                         R$ {(book.price || 49.90).toFixed(2).replace('.', ',')}
@@ -687,6 +700,9 @@ export default function CatalogoPage({ auth }) {
                           R$ {book.originalPrice.toFixed(2).replace('.', ',')}
                         </span>
                       )}
+                      <span style={{ fontSize: '0.70rem', color: '#c69238', fontWeight: 700, background: 'rgba(198, 146, 56, 0.12)', padding: '2px 6px', borderRadius: '4px' }}>
+                        VIP: R$ {((book.price || 49.90) * 0.8).toFixed(2).replace('.', ',')}
+                      </span>
                     </div>
                     <span className={styles.cardInstallments}>
                       ou 3x de R$ {((book.price || 49.90) / 3).toFixed(2).replace('.', ',')} sem juros
@@ -1405,10 +1421,16 @@ export default function CatalogoPage({ auth }) {
                     <span style={{ color: 'var(--text-muted)' }}>Subtotal</span>
                     <span>R$ {cartSubtotal.toFixed(2).replace('.', ',')}</span>
                   </div>
+                  {isVip && vipDiscount > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#c69238', fontWeight: 600 }}>
+                      <span>⭐ Desconto Membro VIP (20%)</span>
+                      <span>- R$ {vipDiscount.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Frete</span>
-                    <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit' }}>
-                      {shippingCost === 0 ? 'GRÁTIS' : `R$ ${shippingCost.toFixed(2).replace('.', ',')}`}
+                    <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit', fontWeight: shippingCost === 0 ? 700 : 400 }}>
+                      {isVip ? 'GRÁTIS (VIP Brasil)' : shippingCost === 0 ? 'GRÁTIS' : `R$ ${shippingCost.toFixed(2).replace('.', ',')}`}
                     </span>
                   </div>
                   <div

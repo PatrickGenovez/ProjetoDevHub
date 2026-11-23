@@ -83,60 +83,24 @@ export const getOptimizedCoverUrl = (url) => {
 const DEFAULT_BOOKS = [];
 
 
-// Planos de Assinatura do Clube Literário
+// Planos de Assinatura do Clube Literário - Plano VIP Único
 const SUBSCRIPTION_PLANS = [
   {
-    id: 'digital',
-    name: 'Leitor Digital',
-    badge: 'Iniciante',
-    monthlyPrice: 24.90,
-    annualPrice: 19.90,
-    description: 'Ideal para quem ama ler no Kindle, tablet ou celular onde quer que vá.',
+    id: 'vip',
+    name: 'Membro VIP',
+    badge: '⭐ Clube Literário VIP',
+    monthlyPrice: 29.90,
+    description: 'Desconto permanente em todo o acervo e entrega grátis ilimitada para todo o Brasil.',
     features: [
-      'Acesso ilimitado a +5.000 e-books no app',
-      'Clube de debate literário online mensal',
-      '10% de desconto em qualquer livro físico da loja',
-      'Newsletter semanal com recomendações de curadores',
-      'Cancelamento fácil a qualquer momento'
-    ],
-    popular: false,
-    ctaText: 'Assinar Leitor Digital'
-  },
-  {
-    id: 'box-vip',
-    name: 'Box VIP Capa Dura',
-    badge: 'Mais Popular • Clube do Livro',
-    monthlyPrice: 69.90,
-    annualPrice: 59.90,
-    description: 'A experiência literária mais amada: livro surpresa selecionado a dedo e mimos colecionáveis.',
-    features: [
-      '1 Livro físico surpresa em Capa Dura por mês',
-      '3 Mimos literários colecionáveis (pin, marcador, ecobag)',
-      'Revista guia de leitura exclusiva com entrevistas',
-      '20% de desconto em todo o catálogo da livraria',
-      'Frete Grátis nacional garantido',
-      'Acesso antecipado a pré-vendas de grandes autores'
+      '20% de desconto exclusivo em todos os livros da livraria',
+      'Frete 100% Grátis para todo o Brasil (sem valor mínimo)',
+      'Acesso total e ilimitado às salas VIP da Comunidade',
+      'Brinde literário colecionável em cada pedido',
+      'Acesso prioritário a pré-vendas e edições especiais',
+      'Cancelamento fácil a qualquer momento sem taxas'
     ],
     popular: true,
-    ctaText: 'Quero o Box VIP'
-  },
-  {
-    id: 'master',
-    name: 'Colecionador Master',
-    badge: 'Edição Premium',
-    monthlyPrice: 119.90,
-    annualPrice: 99.90,
-    description: 'Para bibliófilos exigentes que buscam edições de luxo numeradas e itens de coleção.',
-    features: [
-      '2 Livros físicos em Edições Especiais / Luxo numeradas',
-      'Kit completo com 5 brindes premium temáticos',
-      'Encontros virtuais fechados com autores e tradutores',
-      '30% de desconto vitalício em qualquer livro da loja',
-      'Frete Expresso Grátis prioritário',
-      'Embalagem de luxo rígida com acabamento aveludado'
-    ],
-    popular: false,
-    ctaText: 'Assinar Colecionador Master'
+    ctaText: 'Assinar Plano VIP'
   }
 ];
 
@@ -695,23 +659,35 @@ export default function BookStore({ auth }) {
     return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   }, [cart]);
 
+  // Identifica se o usuário é Membro VIP
+  const isVip = useMemo(() => {
+    const plan = String(currentUser?.plano_id || userPlan || '').toLowerCase();
+    return plan === 'vip' || plan === 'master' || plan === 'box-vip';
+  }, [currentUser, userPlan]);
+
+  // Desconto Exclusivo VIP nos Livros (20%)
+  const cartVipDiscount = useMemo(() => {
+    if (!isVip) return 0;
+    return parseFloat((cartSubtotal * 0.20).toFixed(2));
+  }, [isVip, cartSubtotal]);
+
   const freeShippingThreshold = 99.0;
-  const isFreeShipping = cartSubtotal >= freeShippingThreshold;
-  const missingForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
-  const freeShippingProgress = Math.min(
-    100,
-    Math.round((cartSubtotal / freeShippingThreshold) * 100)
-  );
+  const isFreeShipping = isVip || cartSubtotal >= freeShippingThreshold;
+  const missingForFreeShipping = isVip ? 0 : Math.max(0, freeShippingThreshold - cartSubtotal);
+  const freeShippingProgress = isVip
+    ? 100
+    : Math.min(100, Math.round((cartSubtotal / freeShippingThreshold) * 100));
 
   const cartDiscount = useMemo(() => {
     if (!appliedCoupon) return 0;
+    const base = Math.max(0, cartSubtotal - cartVipDiscount);
     if (appliedCoupon.discountAmount) return appliedCoupon.discountAmount;
-    if (appliedCoupon.discountPercent) return (cartSubtotal * appliedCoupon.discountPercent) / 100;
+    if (appliedCoupon.discountPercent) return (base * appliedCoupon.discountPercent) / 100;
     return 0;
-  }, [cartSubtotal, appliedCoupon]);
+  }, [cartSubtotal, cartVipDiscount, appliedCoupon]);
 
-  const shippingCost = cart.length === 0 || isFreeShipping || appliedCoupon?.isShippingFree ? 0 : 14.90;
-  const cartTotal = Math.max(0, cartSubtotal - cartDiscount + shippingCost);
+  const shippingCost = cart.length === 0 || isVip || isFreeShipping || appliedCoupon?.isShippingFree ? 0 : 14.90;
+  const cartTotal = Math.max(0, cartSubtotal - cartVipDiscount - cartDiscount + shippingCost);
 
   // Aplicação de Cupom com validação em tempo real no backend
   const handleApplyCoupon = async (e) => {
@@ -806,8 +782,7 @@ export default function BookStore({ auth }) {
       showToast('Por favor, informe seu e-mail para assinar.');
       return;
     }
-    const currentPrice =
-      billingCycle === 'mensal' ? selectedPlan.monthlyPrice : selectedPlan.annualPrice;
+    const currentPrice = selectedPlan.monthlyPrice;
 
     setUserPlan(selectedPlan.id);
     if (currentUser) {
@@ -830,7 +805,7 @@ export default function BookStore({ auth }) {
     }
 
     showToast(
-      `🎉 Parabéns! Você assinou o "${selectedPlan.name}" (${billingCycle === 'mensal' ? 'Mensal' : 'Anual - 2 Meses Grátis'}) por R$ ${currentPrice.toFixed(2)}/mês!`
+      `🎉 Parabéns! Você assinou o "${selectedPlan.name}" por R$ ${currentPrice.toFixed(2).replace('.', ',')}/mês!`
     );
     setIsPlanModalOpen(false);
   };
@@ -1410,7 +1385,7 @@ export default function BookStore({ auth }) {
                       </span>
                       {currentUser.plano_id && currentUser.plano_id !== 'visitante' && (
                         <span className={styles.userPlanBadge}>
-                          {currentUser.plano_id === 'master' ? '👑 Master' : currentUser.plano_id === 'box-vip' ? '📦 VIP' : '📱 Digital'}
+                          ⭐ Membro VIP
                         </span>
                       )}
                     </div>
@@ -1568,44 +1543,26 @@ export default function BookStore({ auth }) {
                 <Sparkles size={14} />
                 Clube Literário Bibliotech
               </span>
-              <h2 className={styles.mainSectionTitle}>Escolha o Plano de Assinatura Perfeito</h2>
+              <h2 className={styles.mainSectionTitle}>Plano VIP Exclusivo</h2>
               <p className={styles.mainSectionDesc}>
-                Receba caixas surpresa todo mês na sua porta com edições especiais, brindes colecionáveis e descontos exclusivos na nossa livraria online.
+                Assine o Clube VIP e aproveite 20% de desconto permanente em todos os livros e frete 100% grátis para todo o Brasil.
               </p>
-
-              {/* Seletor Mensal / Anual */}
-              <div className={styles.billingToggleWrapper}>
-                <div className={styles.billingToggle}>
-                  <button
-                    className={`${styles.billingToggleBtn} ${billingCycle === 'mensal' ? styles.billingToggleActive : ''}`}
-                    onClick={() => setBillingCycle('mensal')}
-                  >
-                    Assinatura Mensal
-                  </button>
-                  <button
-                    className={`${styles.billingToggleBtn} ${billingCycle === 'anual' ? styles.billingToggleActive : ''}`}
-                    onClick={() => setBillingCycle('anual')}
-                  >
-                    <span>Plano Anual</span>
-                    <span className={styles.annualBadgeOffer}>2 MESES GRÁTIS</span>
-                  </button>
-                </div>
-              </div>
             </div>
 
-            {/* Grid dos 3 Planos */}
-            <div className={styles.plansGrid}>
+            {/* Card do Plano VIP */}
+            <div className={styles.plansGrid} style={{ display: 'flex', justifyContent: 'center' }}>
               {SUBSCRIPTION_PLANS.map((plan) => {
-                const currentPrice = billingCycle === 'mensal' ? plan.monthlyPrice : plan.annualPrice;
+                const currentPrice = plan.monthlyPrice;
                 return (
                   <div
                     key={plan.id}
                     className={`${styles.planCard} ${plan.popular ? styles.planCardPopular : ''}`}
+                    style={{ maxWidth: '440px', width: '100%' }}
                   >
                     {plan.popular && (
                       <div className={styles.popularRibbon}>
                         <Sparkles size={13} />
-                        <span>MAIS POPULAR</span>
+                        <span>PLANO EXCLUSIVO</span>
                       </div>
                     )}
 
@@ -1623,11 +1580,6 @@ export default function BookStore({ auth }) {
                         </span>
                         <span className={styles.planPeriod}>/mês</span>
                       </div>
-                      {billingCycle === 'anual' && (
-                        <div className={styles.planSavingsHint}>
-                          Cobrado anualmente (Economia de 15% + Brindes extras)
-                        </div>
-                      )}
                     </div>
 
                     <div className={styles.planDivider}></div>
@@ -2691,6 +2643,13 @@ export default function BookStore({ auth }) {
                     <span>R$ {cartSubtotal.toFixed(2).replace('.', ',')}</span>
                   </div>
 
+                  {isVip && cartVipDiscount > 0 && (
+                    <div className={`${styles.summaryLine} ${styles.summaryDiscount}`} style={{ color: '#c69238', fontWeight: 600 }}>
+                      <span>⭐ Desconto VIP (20%)</span>
+                      <span>- R$ {cartVipDiscount.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  )}
+
                   {cartDiscount > 0 && (
                     <div className={`${styles.summaryLine} ${styles.summaryDiscount}`}>
                       <span>Desconto ({appliedCoupon.code})</span>
@@ -2701,7 +2660,9 @@ export default function BookStore({ auth }) {
                   <div className={styles.summaryLine}>
                     <span>Frete</span>
                     <span>
-                      {shippingCost === 0 ? (
+                      {isVip ? (
+                        <strong className={styles.freeShippingGreen}>GRÁTIS (VIP Brasil)</strong>
+                      ) : shippingCost === 0 ? (
                         <strong className={styles.freeShippingGreen}>GRÁTIS</strong>
                       ) : (
                         `R$ ${shippingCost.toFixed(2).replace('.', ',')}`
@@ -2769,10 +2730,10 @@ export default function BookStore({ auth }) {
             <div className={styles.planModalSummary}>
               <div className={styles.planModalPriceBox}>
                 <span className={styles.planModalCycleLabel}>
-                  Ciclo Selecionado: <strong>{billingCycle === 'mensal' ? 'Mensal' : 'Anual (2 Meses Grátis)'}</strong>
+                  Mensalidade VIP
                 </span>
                 <div className={styles.planModalPriceVal}>
-                  R$ <strong>{(billingCycle === 'mensal' ? selectedPlan.monthlyPrice : selectedPlan.annualPrice).toFixed(2).replace('.', ',')}</strong> /mês
+                  R$ <strong>{selectedPlan.monthlyPrice.toFixed(2).replace('.', ',')}</strong> /mês
                 </div>
               </div>
 

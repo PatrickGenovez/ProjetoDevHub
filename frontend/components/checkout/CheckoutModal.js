@@ -14,7 +14,8 @@ import {
   Check,
   AlertCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Crown
 } from 'lucide-react';
 import styles from './CheckoutModal.module.css';
 
@@ -62,6 +63,13 @@ export default function CheckoutModal({
     }
   }, [currentUser]);
 
+  // Identifica se o usuário possui plano VIP ativo
+  const isVip = useMemo(() => {
+    if (!currentUser) return false;
+    const plan = String(currentUser.plano_id || currentUser.subscription || currentUser.plan || '').toLowerCase();
+    return plan === 'vip' || plan === 'master' || plan === 'box-vip' || Boolean(currentUser.isVip);
+  }, [currentUser]);
+
   // Cálculos de Itens e Subtotal
   const cartTotalItems = useMemo(() => {
     return cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
@@ -74,8 +82,24 @@ export default function CheckoutModal({
     }, 0);
   }, [cart]);
 
-  // Frete Selecionado
+  // Desconto Exclusivo de Membro VIP (20% em todas as compras de livros)
+  const vipDiscount = useMemo(() => {
+    if (!isVip) return 0;
+    const val = (cartSubtotal * 0.20);
+    return parseFloat(val.toFixed(2));
+  }, [isVip, cartSubtotal]);
+
+  // Frete Selecionado (Membros VIP possuem Frete Grátis Total para todo o Brasil)
   const selectedShipping = useMemo(() => {
+    if (isVip) {
+      return {
+        id: 'pac-vip',
+        name: 'PAC VIP Nacional (Frete Grátis)',
+        price: 0,
+        estimatedDeliveryText: '3 a 6 dias úteis',
+        isFree: true
+      };
+    }
     if (!shippingOptions || shippingOptions.length === 0) {
       // Frete padrão se ainda não calculou por CEP
       const isFree = cartSubtotal >= 99 || appliedCoupon?.isShippingFree;
@@ -89,35 +113,36 @@ export default function CheckoutModal({
     }
     const found = shippingOptions.find((opt) => opt.id === selectedShippingMethod);
     return found || shippingOptions[0];
-  }, [shippingOptions, selectedShippingMethod, cartSubtotal, appliedCoupon]);
+  }, [isVip, shippingOptions, selectedShippingMethod, cartSubtotal, appliedCoupon]);
 
-  const shippingCost = selectedShipping ? selectedShipping.price : 0;
+  const shippingCost = isVip ? 0 : (selectedShipping ? selectedShipping.price : 0);
 
   // Valor do Desconto do Cupom
   const couponDiscount = useMemo(() => {
     if (!appliedCoupon) return 0;
+    const base = Math.max(0, cartSubtotal - vipDiscount);
     if (appliedCoupon.type === 'percentage') {
-      const val = (cartSubtotal * appliedCoupon.value) / 100;
+      const val = (base * appliedCoupon.value) / 100;
       return parseFloat(val.toFixed(2));
     }
     if (appliedCoupon.type === 'fixed') {
-      return Math.min(appliedCoupon.value, cartSubtotal);
+      return Math.min(appliedCoupon.value, base);
     }
     return 0;
-  }, [appliedCoupon, cartSubtotal]);
+  }, [appliedCoupon, cartSubtotal, vipDiscount]);
 
-  // Desconto Extra do PIX (5% sobre produtos pós-cupom)
+  // Desconto Extra do PIX (5% sobre produtos pós-descontos)
   const pixDiscount = useMemo(() => {
     if (paymentMethod !== 'pix') return 0;
-    const base = Math.max(0, cartSubtotal - couponDiscount);
+    const base = Math.max(0, cartSubtotal - vipDiscount - couponDiscount);
     return parseFloat((base * 0.05).toFixed(2));
-  }, [paymentMethod, cartSubtotal, couponDiscount]);
+  }, [paymentMethod, cartSubtotal, vipDiscount, couponDiscount]);
 
   // Total Final
   const finalTotal = useMemo(() => {
-    const total = cartSubtotal - couponDiscount + shippingCost - pixDiscount;
+    const total = cartSubtotal - vipDiscount - couponDiscount + shippingCost - pixDiscount;
     return Math.max(0, parseFloat(total.toFixed(2)));
-  }, [cartSubtotal, couponDiscount, shippingCost, pixDiscount]);
+  }, [cartSubtotal, vipDiscount, couponDiscount, shippingCost, pixDiscount]);
 
   // Formatação de Máscara de CEP (00000-000)
   const handleCepChange = (e) => {
@@ -153,7 +178,8 @@ export default function CheckoutModal({
         body: JSON.stringify({
           cep: rawCep,
           subtotal: cartSubtotal,
-          couponCode: appliedCoupon?.code || undefined
+          couponCode: appliedCoupon?.code || undefined,
+          isVip
         })
       });
 
@@ -321,6 +347,43 @@ export default function CheckoutModal({
           <form onSubmit={handleConfirmOrder} className={styles.body}>
             {/* Coluna Esquerda: Entrega, Cupom e Pagamento */}
             <div className={styles.leftCol}>
+              {/* Banner de Status VIP */}
+              {isVip ? (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  background: 'rgba(198, 146, 56, 0.12)',
+                  border: '1px solid #c69238',
+                  borderRadius: '10px',
+                  padding: '12px 16px',
+                  marginBottom: '1rem',
+                  color: 'var(--color-gold-accent, #c69238)'
+                }}>
+                  <Crown size={22} style={{ flexShrink: 0, color: '#e5b352' }} />
+                  <div style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
+                    <strong style={{ display: 'block', color: 'var(--color-gold-light, #e5b352)' }}>Membro VIP Ativo!</strong>
+                    <span>Você tem <strong>20% de desconto</strong> nos livros e <strong>Frete Grátis</strong> garantido para todo o Brasil.</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'rgba(140, 86, 39, 0.06)',
+                  border: '1px dashed rgba(140, 86, 39, 0.25)',
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                  marginBottom: '1rem',
+                  fontSize: '0.82rem',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  <Sparkles size={16} style={{ color: '#c69238', flexShrink: 0 }} />
+                  <span>Assine o <strong>Plano VIP</strong> da Bibliotech para ter 20% OFF em todos os livros e frete 100% grátis!</span>
+                </div>
+              )}
+
               {/* 1. Entrega e Cálculo de Frete */}
               <div className={styles.section}>
                 <div className={styles.sectionHeader}>
@@ -702,6 +765,17 @@ export default function CheckoutModal({
                   <span>R$ {cartSubtotal.toFixed(2).replace('.', ',')}</span>
                 </div>
 
+                {/* Desconto VIP */}
+                {isVip && vipDiscount > 0 && (
+                  <div className={`${styles.summaryRow} ${styles.summaryDiscount}`} style={{ color: '#c69238', fontWeight: 600 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <Crown size={14} />
+                      <span>Desconto Membro VIP (20%)</span>
+                    </span>
+                    <span>- R$ {vipDiscount.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                )}
+
                 {appliedCoupon && couponDiscount > 0 && (
                   <div className={`${styles.summaryRow} ${styles.summaryDiscount}`}>
                     <span>Cupom {appliedCoupon.code}</span>
@@ -710,7 +784,7 @@ export default function CheckoutModal({
                 )}
 
                 <div className={styles.summaryRow}>
-                  <span>Frete ({selectedShipping?.name || 'PAC'})</span>
+                  <span>Frete {isVip ? '(Membro VIP Brasil)' : `(${selectedShipping?.name || 'PAC'})`}</span>
                   <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit', fontWeight: shippingCost === 0 ? 700 : 400 }}>
                     {shippingCost === 0 ? 'GRÁTIS' : `R$ ${shippingCost.toFixed(2).replace('.', ',')}`}
                   </span>
