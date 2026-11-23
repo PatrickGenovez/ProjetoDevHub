@@ -473,7 +473,7 @@ export default function LoginPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <button
                     type="button"
-                    onClick={() => handleQuickLogin('elza@bibliotech.com', 'admin123', 'Elza', 'master')}
+                    onClick={() => handleQuickLogin('elza@bibliotech.com', 'admin123', 'Elza', 'vip')}
                     style={{
                       background: 'rgba(16, 185, 129, 0.12)',
                       border: '1px solid #10b981',
@@ -488,10 +488,10 @@ export default function LoginPage() {
                       gap: '6px',
                       transition: 'all 0.2s ease'
                     }}
-                    title="Entrar imediatamente como Elza (Plano Master)"
+                    title="Entrar imediatamente como Elza (Plano VIP)"
                   >
                     <Sparkles size={14} />
-                    <span>Entrar como Elza (Master)</span>
+                    <span>Entrar como Elza (VIP)</span>
                   </button>
 
                   <button

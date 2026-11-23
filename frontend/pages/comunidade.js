@@ -60,52 +60,49 @@ export const getOptimizedCoverUrl = (url) => {
   return url;
 };
 
-// Planos de Assinatura do Clube Literário
+// Planos de Assinatura do Clube Literário - Plano VIP Único
 const CLUB_PLANS = {
-  digital: {
-    id: 'digital',
-    name: 'Leitor Digital',
-    badge: '📱 Membro Digital',
-    monthlyPrice: 24.90,
-    annualPrice: 19.90,
-    color: '#8c5627',
-    description: 'Acesso ilimitado a +5.000 e-books, debates digitais e guias de leitura em PDF.',
+  vip: {
+    id: 'vip',
+    name: 'Membro VIP',
+    badge: '⭐ Membro VIP',
+    monthlyPrice: 29.90,
+    color: '#c69238',
+    description: 'Acesso VIP completo à comunidade, 20% de desconto em todos os livros e Frete Grátis para todo o Brasil.',
     perks: [
-      'Acesso à sala #leitor-digital-ebooks',
-      'Desconto de 10% permanente na livraria',
-      'Download de guias literários em PDF',
-      'Votação mensal nas escolhas do clube'
+      'Acesso livre a todas as salas exclusivas e debates VIP',
+      '20% de desconto exclusivo em todo o acervo de livros',
+      'Frete 100% Grátis para todo o Brasil (sem valor mínimo)',
+      'Brindes literários colecionáveis a cada pedido'
     ]
   },
+  // Retrocompatibilidade
   'box-vip': {
-    id: 'box-vip',
-    name: 'Box VIP Literário',
-    badge: '📦 Membro Box VIP',
-    monthlyPrice: 69.90,
-    annualPrice: 59.90,
-    color: '#8e1f1f',
-    description: '1 Livro surpresa em capa dura por mês, 3 brindes colecionáveis e sala com spoilers liberados.',
-    perks: [
-      'Acesso ao #espaco-box-capa-dura e à sala digital',
-      'Debates com spoilers liberados',
-      'Desconto de 20% permanente em todo o catálogo',
-      'Unboxing exclusivo e votação do próximo livro'
-    ]
+    id: 'vip',
+    name: 'Membro VIP',
+    badge: '⭐ Membro VIP',
+    monthlyPrice: 29.90,
+    color: '#c69238',
+    description: 'Acesso VIP completo à comunidade, 20% de desconto em todos os livros e Frete Grátis para todo o Brasil.',
+    perks: ['Acesso livre a todas as salas exclusivas e debates VIP', '20% de desconto exclusivo', 'Frete Grátis Brasil']
   },
   master: {
-    id: 'master',
-    name: 'Colecionador Master',
-    badge: '👑 Membro Master',
-    monthlyPrice: 119.90,
-    annualPrice: 99.90,
+    id: 'vip',
+    name: 'Membro VIP',
+    badge: '⭐ Membro VIP',
+    monthlyPrice: 29.90,
     color: '#c69238',
-    description: 'Passe VIP Total: 2 edições de luxo numeradas por mês e encontros fechados com autores.',
-    perks: [
-      'Passe VIP Total: Acesso a TODAS as salas exclusivas',
-      'Encontros virtuais no Zoom com autores e tradutores',
-      'Desconto VIP de 30% permanente em qualquer livro',
-      'Canal direto com os curadores da Bibliotech'
-    ]
+    description: 'Acesso VIP completo à comunidade, 20% de desconto em todos os livros e Frete Grátis para todo o Brasil.',
+    perks: ['Acesso livre a todas as salas exclusivas e debates VIP', '20% de desconto exclusivo', 'Frete Grátis Brasil']
+  },
+  digital: {
+    id: 'vip',
+    name: 'Membro VIP',
+    badge: '⭐ Membro VIP',
+    monthlyPrice: 29.90,
+    color: '#c69238',
+    description: 'Acesso VIP completo à comunidade, 20% de desconto em todos os livros e Frete Grátis para todo o Brasil.',
+    perks: ['Acesso livre a todas as salas exclusivas e debates VIP', '20% de desconto exclusivo', 'Frete Grátis Brasil']
   }
 };
 
@@ -486,15 +483,9 @@ export default function ComunidadePage({ auth }) {
     const vipChannel = VIP_CHANNELS.find((ch) => ch.id === channelId);
     if (!vipChannel) return true; // Canal público: acesso livre
 
-    if (!userPlan || userPlan === 'none') return false;
-    if (userPlan === 'master') return true; // Master tem acesso ilimitado
-
-    if (vipChannel.tier === 'all-vip') return ['digital', 'box-vip', 'master'].includes(userPlan);
-    if (vipChannel.tier === 'digital') return ['digital', 'master'].includes(userPlan);
-    if (vipChannel.tier === 'box-vip') return ['box-vip', 'master'].includes(userPlan);
-    if (vipChannel.tier === 'master') return userPlan === 'master';
-
-    return false;
+    if (!userPlan || userPlan === 'none' || userPlan === 'visitante') return false;
+    // Qualquer assinante VIP tem acesso total a todas as salas VIP
+    return ['vip', 'master', 'box-vip', 'digital'].includes(userPlan);
   };
 
   // Troca rápida de plano / Simulador VIP
@@ -729,10 +720,7 @@ export default function ComunidadePage({ auth }) {
     const authorName = currentUser.full_name || currentUser.name || currentUser.email.split('@')[0];
 
     // Badge VIP no autor se for assinante
-    let authorBadge = 'Leitor Ativo';
-    if (userPlan === 'master') authorBadge = '👑 Colecionador Master';
-    else if (userPlan === 'box-vip') authorBadge = '📦 Membro Box VIP';
-    else if (userPlan === 'digital') authorBadge = '📱 Leitor Digital';
+    let authorBadge = ['vip', 'master', 'box-vip'].includes(userPlan) ? '⭐ Membro VIP' : 'Leitor Ativo';
 
     const newPost = {
       id: Date.now(),
@@ -1883,95 +1871,42 @@ export default function ComunidadePage({ auth }) {
               </button>
             </div>
 
-            {/* Grid dos 3 Planos */}
-            <div className={styles.modalPlansGrid}>
-              {/* 1. Leitor Digital */}
-              <div
-                className={`${styles.modalPlanCard} ${
-                  userPlan === 'digital' ? styles.modalPlanCardFeatured : ''
-                }`}
-              >
-                <div>
-                  <span className={styles.modalPlanBadge}>Leitor Digital</span>
-                  <h3 className={styles.modalPlanName}>Leitor Digital</h3>
-                  <div className={styles.modalPlanPriceRow}>
-                    <span className={styles.modalPlanPriceCurrency}>R$</span>
-                    <span className={styles.modalPlanPriceValue}>24,90</span>
-                    <span className={styles.modalPlanPricePeriod}>/mês</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    Ideal para quem ama ler e-books, participar de debates online e baixar guias de leitura em PDF.
-                  </p>
-
-                  <div className={styles.modalPlanPerksList}>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Acesso à sala #leitor-digital-ebooks</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Acesso à sala #sala-assinantes-vip</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Desconto permanente de 10% no catálogo</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Acesso aos guias de leitura e mapas literários</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className={`${styles.btnConfirmPlanChoice} ${
-                    userPlan === 'digital' ? styles.btnPlanCurrent : ''
-                  }`}
-                  onClick={() => {
-                    handleSelectSimulatedPlan('digital');
-                    setIsSubscribeModalOpen(false);
-                  }}
-                  disabled={userPlan === 'digital'}
-                >
-                  {userPlan === 'digital' ? 'Seu Plano Atual' : 'Assinar Leitor Digital'}
-                </button>
-              </div>
-
-              {/* 2. Box VIP Capa Dura */}
+            {/* Card Único do Plano VIP */}
+            <div className={styles.modalPlansGrid} style={{ display: 'flex', justifyContent: 'center' }}>
               <div
                 className={`${styles.modalPlanCard} ${styles.modalPlanCardFeatured}`}
+                style={{ maxWidth: '440px', width: '100%' }}
               >
                 <div>
                   <span className={`${styles.modalPlanBadge} ${styles.modalPlanBadgeGold}`}>
-                    Mais Popular • Edição Especial
+                    ⭐ Plano VIP Exclusivo
                   </span>
-                  <h3 className={styles.modalPlanName}>Box VIP Literário</h3>
+                  <h3 className={styles.modalPlanName}>Membro VIP</h3>
                   <div className={styles.modalPlanPriceRow}>
                     <span className={styles.modalPlanPriceCurrency}>R$</span>
-                    <span className={styles.modalPlanPriceValue}>69,90</span>
+                    <span className={styles.modalPlanPriceValue}>29,90</span>
                     <span className={styles.modalPlanPricePeriod}>/mês</span>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    1 Livro surpresa em capa dura por mês, 3 brindes colecionáveis e canal com spoilers liberados.
+                    Acesso completo a todas as salas da comunidade, 20% de desconto em qualquer livro e Frete 100% Grátis para todo o Brasil.
                   </p>
 
                   <div className={styles.modalPlanPerksList}>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Acesso à sala #espaco-box-capa-dura</span>
+                      <span>Acesso a todas as salas VIP e debates exclusivos</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Acesso à sala #sala-assinantes-vip</span>
+                      <span>20% de desconto exclusivo em todos os livros</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Desconto permanente de 20% no catálogo</span>
+                      <span>Frete 100% Grátis para todo o Brasil</span>
                     </div>
                     <div className={styles.modalPlanPerkItem}>
                       <Check size={16} />
-                      <span>Voto na escolha da próxima caixa mensal</span>
+                      <span>Brindes colecionáveis e votação de títulos</span>
                     </div>
                   </div>
                 </div>
@@ -1979,70 +1914,15 @@ export default function ComunidadePage({ auth }) {
                 <button
                   type="button"
                   className={`${styles.btnConfirmPlanChoice} ${styles.btnConfirmPlanChoiceGold} ${
-                    userPlan === 'box-vip' ? styles.btnPlanCurrent : ''
+                    userPlan === 'vip' ? styles.btnPlanCurrent : ''
                   }`}
                   onClick={() => {
-                    handleSelectSimulatedPlan('box-vip');
+                    handleSelectSimulatedPlan('vip');
                     setIsSubscribeModalOpen(false);
                   }}
-                  disabled={userPlan === 'box-vip'}
+                  disabled={userPlan === 'vip'}
                 >
-                  {userPlan === 'box-vip' ? 'Seu Plano Atual' : 'Assinar Box VIP'}
-                </button>
-              </div>
-
-              {/* 3. Colecionador Master */}
-              <div
-                className={`${styles.modalPlanCard} ${
-                  userPlan === 'master' ? styles.modalPlanCardFeatured : ''
-                }`}
-              >
-                <div>
-                  <span className={`${styles.modalPlanBadge} ${styles.modalPlanBadgeGold}`}>
-                    Experiência Completa • Master
-                  </span>
-                  <h3 className={styles.modalPlanName}>Colecionador Master</h3>
-                  <div className={styles.modalPlanPriceRow}>
-                    <span className={styles.modalPlanPriceCurrency}>R$</span>
-                    <span className={styles.modalPlanPriceValue}>119,90</span>
-                    <span className={styles.modalPlanPricePeriod}>/mês</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-                    Passe total a todas as salas, 2 livros numerados e encontros exclusivos com autores.
-                  </p>
-
-                  <div className={styles.modalPlanPerksList}>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Acesso total a TODAS as salas exclusivas</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Encontros virtuais com autores e especialistas</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Desconto permanente de 30% em toda a livraria</span>
-                    </div>
-                    <div className={styles.modalPlanPerkItem}>
-                      <Check size={16} />
-                      <span>Canal direto com os curadores da Bibliotech</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className={`${styles.btnConfirmPlanChoice} ${styles.btnConfirmPlanChoiceGold} ${
-                    userPlan === 'master' ? styles.btnPlanCurrent : ''
-                  }`}
-                  onClick={() => {
-                    handleSelectSimulatedPlan('master');
-                    setIsSubscribeModalOpen(false);
-                  }}
-                  disabled={userPlan === 'master'}
-                >
-                  {userPlan === 'master' ? 'Seu Plano Atual' : 'Assinar Colecionador Master'}
+                  {userPlan === 'vip' ? 'Seu Plano Atual' : 'Assinar Plano VIP'}
                 </button>
               </div>
             </div>
