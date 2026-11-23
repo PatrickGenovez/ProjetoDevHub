@@ -2946,84 +2946,31 @@
 }
 
 /* =========================================================
-   ===== PADRONIZAÇÃO VIKING: CÍRCULO DOS CLÃS & SALÃO =====
+   ===== CANAIS & DIRETRIZES DA COMUNIDADE =====
    ========================================================= */
 
-.vikingRuneRibbon {
-  font-family: var(--font-rune, 'Cinzel', serif);
-  font-size: 0.85rem;
-  letter-spacing: 0.35em;
-  color: var(--color-gold-accent, #c69238);
-  opacity: 0.85;
-  margin-bottom: 0.85rem;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-:global([data-theme="dark"]) .vikingRuneRibbon {
-  color: #e5b352;
-  text-shadow: 0 0 10px rgba(229, 179, 82, 0.4);
-}
-
-.vikingShieldIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #8e1f1f 0%, #6e1616 100%);
-  border: 1px solid #c69238;
+.channelCategoryIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(142, 31, 31, 0.08);
+  border: 1px solid rgba(142, 31, 31, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f7ce7a;
-  box-shadow: 0 2px 10px rgba(142, 31, 31, 0.4);
+  color: var(--color-primary, #8e1f1f);
   flex-shrink: 0;
 }
 
-:global([data-theme="dark"]) .vikingShieldIcon {
-  background: linear-gradient(135deg, #c93b2b 0%, #8e1f1f 100%);
-  border-color: #e5b352;
-  box-shadow: 0 0 14px rgba(201, 59, 43, 0.45);
-}
-
-.vikingRuneGlyph {
-  font-family: var(--font-rune, 'Cinzel', serif);
-  font-size: 0.95rem;
-  color: var(--color-gold-accent, #c69238);
-  width: 18px;
-  text-align: center;
-  font-weight: 800;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-:global([data-theme="dark"]) .vikingRuneGlyph {
-  color: #e5b352;
-  text-shadow: 0 0 8px rgba(229, 179, 82, 0.3);
-}
-
-.vikingClanBadge {
-  font-family: var(--font-heading);
-  font-size: 0.70rem;
-  font-weight: 850;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(140, 86, 39, 0.12);
-  color: var(--color-primary);
-  border: 1px solid var(--color-gold-accent);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-:global([data-theme="dark"]) .vikingClanBadge {
-  background: rgba(229, 179, 82, 0.15);
+:global([data-theme="dark"]) .channelCategoryIcon {
+  background: rgba(229, 179, 82, 0.12);
+  border-color: rgba(229, 179, 82, 0.25);
   color: #f7ce7a;
-  border-color: rgba(229, 179, 82, 0.45);
 }
 
-.vikingSealNotice {
-  background: rgba(140, 86, 39, 0.06);
-  border: 1px dashed var(--color-parchment-border);
+.communityRulesCard {
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e5e7eb);
   border-radius: 12px;
   padding: 16px 14px;
   text-align: center;
@@ -3032,40 +2979,31 @@
   align-items: center;
   gap: 8px;
   margin-top: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
-:global([data-theme="dark"]) .vikingSealNotice {
-  background: rgba(0, 0, 0, 0.35);
-  border-color: rgba(229, 179, 82, 0.3);
+:global([data-theme="dark"]) .communityRulesCard {
+  background: rgba(24, 24, 27, 0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
-.vikingSealNoticeTitle {
+.rulesTitle {
   font-family: var(--font-heading);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--color-text-primary);
+  letter-spacing: 0.3px;
 }
 
-:global([data-theme="dark"]) .vikingSealNoticeTitle {
-  color: #f7ce7a;
+:global([data-theme="dark"]) .rulesTitle {
+  color: #f3f4f6;
 }
 
-.vikingSealNoticeText {
-  font-size: 0.72rem;
+.rulesText {
+  font-size: 0.74rem;
   color: var(--color-text-muted);
-  line-height: 1.4;
-}
-
-.vikingReactionRune {
-  font-family: var(--font-rune, 'Cinzel', serif);
-  font-size: 0.9rem;
-  color: var(--color-gold-accent);
-  margin-right: 2px;
-}
-
-:global([data-theme="dark"]) .vikingReactionRune {
-  color: #e5b352;
+  line-height: 1.45;
+  margin: 0;
 }
 

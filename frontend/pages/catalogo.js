@@ -67,6 +67,7 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import CheckoutModal from '../components/checkout/CheckoutModal';
+import Footer from '../components/common/Footer';
 import styles from '../styles/index.module.css';
 
 // Otimizador de URL de imagem de capas (converte para tamanho médio -M.jpg reduzindo peso da imagem)
@@ -78,24 +79,24 @@ export const getOptimizedCoverUrl = (url) => {
   return url;
 };
 
-// Gêneros disponíveis no catálogo com iconografia e runas nórdicas
+// Gêneros disponíveis no catálogo
 const AVAILABLE_GENRES = [
-  { id: 'Todos', name: 'Todos os Gêneros', vikingName: 'Todos os Tomos', rune: 'ᛟ', icon: Layers },
-  { id: 'Clássicos', name: 'Clássicos', vikingName: 'Clássicos Antigos', rune: 'ᚲ', icon: Crown },
-  { id: 'Romance', name: 'Romance', vikingName: 'Romances & Bardos', rune: 'ᛒ', icon: Heart },
-  { id: 'Ficção Científica', name: 'Ficção Científica', vikingName: 'Ficção & Profecias', rune: 'ᛉ', icon: Sparkles },
-  { id: 'Fantasia', name: 'Fantasia', vikingName: 'Fantasia & Mitos', rune: 'ᚠ', icon: Flame },
-  { id: 'Suspense & Mistério', name: 'Suspense & Mistério', vikingName: 'Mistérios & Segredos', rune: 'ᚦ', icon: Lock },
-  { id: 'História & Biografias', name: 'História & Biografias', vikingName: 'Crônicas de Batalha', rune: 'ᚺ', icon: Award },
-  { id: 'Tecnologia', name: 'Tecnologia & Programação', vikingName: 'Alquimia & Códigos', rune: 'ᚨ', icon: SlidersHorizontal }
+  { id: 'Todos', name: 'Todos os Gêneros' },
+  { id: 'Clássicos', name: 'Clássicos' },
+  { id: 'Romance', name: 'Romance' },
+  { id: 'Ficção Científica', name: 'Ficção Científica' },
+  { id: 'Fantasia', name: 'Fantasia' },
+  { id: 'Suspense & Mistério', name: 'Suspense & Mistério' },
+  { id: 'História & Biografias', name: 'História & Biografias' },
+  { id: 'Tecnologia', name: 'Tecnologia' }
 ];
 
-// Faixas de preço / tributo nórdico
+// Faixas de preço
 const PRICE_RANGES = [
-  { id: 'all', label: 'Todos os Valores', desc: 'Qualquer tributo' },
-  { id: 'under30', label: 'Até R$ 30,00', desc: 'Peças de Prata (Econômico)' },
-  { id: '30to60', label: 'R$ 30 a R$ 60', desc: 'Moedas de Ouro (Padrão)' },
-  { id: 'over60', label: 'Acima de R$ 60', desc: 'Tomos Nobres (Raros)' }
+  { id: 'all', label: 'Todos os Preços' },
+  { id: 'under30', label: 'Até R$ 30' },
+  { id: '30to60', label: 'R$ 30 a R$ 60' },
+  { id: 'over60', label: 'Acima de R$ 60' }
 ];
 
 export default function CatalogoPage({ auth }) {
@@ -110,7 +111,6 @@ export default function CatalogoPage({ auth }) {
   const [isSearching, setIsSearching] = useState(false);
   const [sortBy, setSortBy] = useState('sales'); // 'sales' | 'price-asc' | 'price-desc' | 'rating' | 'title'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
-  const [layoutStyle, setLayoutStyle] = useState('viking'); // 'viking' | 'classic'
   const [priceFilter, setPriceFilter] = useState('all'); // 'all' | 'under30' | '30to60' | 'over60'
 
   // Paginação
@@ -519,14 +519,10 @@ export default function CatalogoPage({ auth }) {
         <div className={styles.catalogExplorerTitleGroup}>
           <span className={styles.catalogExplorerBadge}>
             <BookOpen size={13} />
-            {layoutStyle === 'viking' ? 'Relíquias do Grande Salão' : 'Acervo Disponível'}
+            Acervo Disponível
           </span>
           <h2 className={styles.catalogExplorerTitle}>
-            {selectedGenre === 'Todos'
-              ? layoutStyle === 'viking'
-                ? 'Todos os Tomos & Manuscritos'
-                : 'Todas as Obras'
-              : `Gênero: ${selectedGenre}`}
+            {selectedGenre === 'Todos' ? 'Todas as Obras' : `Gênero: ${selectedGenre}`}
             {searchTerm && ` • Busca: "${searchTerm}"`}
             {priceFilter !== 'all' && ` • ${PRICE_RANGES.find((p) => p.id === priceFilter)?.label}`}
           </h2>
@@ -567,9 +563,9 @@ export default function CatalogoPage({ auth }) {
             gap: '1rem'
           }}
         >
-          <Loader2 size={36} className={styles.searchSpinner} style={{ color: 'var(--color-gold-accent, #c69238)' }} />
+          <Loader2 size={36} className={styles.searchSpinner} style={{ color: 'var(--color-primary, #8e1f1f)' }} />
           <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '0.95rem' }}>
-            Consultando obras em tempo real na biblioteca sagrada...
+            Carregando catálogo de livros...
           </p>
         </div>
       )}
@@ -587,10 +583,10 @@ export default function CatalogoPage({ auth }) {
             gap: '1rem'
           }}
         >
-          <BookOpen size={48} color="#c69238" />
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Nenhum tomo encontrado</h3>
+          <BookOpen size={48} color="var(--color-primary, #8e1f1f)" />
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Nenhum livro encontrado</h3>
           <p style={{ color: 'var(--text-muted, #94a3b8)', maxWidth: '420px' }}>
-            Não encontramos pergaminhos para as runas e filtros selecionados. Tente pesquisar outro termo ou restaurar os filtros originais.
+            Não encontramos resultados para os filtros selecionados. Tente buscar outro termo ou limpar os filtros.
           </p>
           <button
             className={styles.btnCartBrowse}
@@ -601,7 +597,7 @@ export default function CatalogoPage({ auth }) {
               setPriceFilter('all');
             }}
           >
-            Restaurar Todos os Filtros
+            Limpar Filtros
           </button>
         </div>
       )}
@@ -1010,341 +1006,112 @@ export default function CatalogoPage({ auth }) {
       </header>
 
       {/* Main Content */}
-      <main className={styles.container} style={{ paddingTop: '2.25rem', paddingBottom: '5rem' }}>
-        {/* Banner do Catálogo com Fita de Runas e Seletor Viking */}
-        <div className={styles.vikingHeaderBanner}>
-          {/* Fita de Runas Nórdicas */}
-          <div className={styles.vikingRuneRibbon}>
-            ᚲ • ᛟ • ᚾ • ᚷ • ᛋ • ᛒ • ᛟ • ᚲ • ᚨ • ᛉ • ᚠ
-          </div>
-
-          {/* Seletor de Modo de Layout: Salão Viking vs Modo Pergaminho */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div className={styles.vikingLayoutSwitcher} role="group" aria-label="Estilo do Catálogo">
-              <button
-                type="button"
-                className={`${styles.vikingLayoutSwitchBtn} ${layoutStyle === 'viking' ? styles.vikingLayoutSwitchBtnActive : ''}`}
-                onClick={() => setLayoutStyle('viking')}
-                title="Ativar layout rústico estilo Salão Viking com painel lateral de runas"
-              >
-                <Shield size={14} />
-                <span>Salão Viking (Sidebar)</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.vikingLayoutSwitchBtn} ${layoutStyle === 'classic' ? styles.vikingLayoutSwitchBtnActive : ''}`}
-                onClick={() => setLayoutStyle('classic')}
-                title="Ativar layout clássico horizontal com pílulas superiores"
-              >
-                <FileText size={14} />
-                <span>Modo Pergaminho (Topo)</span>
-              </button>
-            </div>
-          </div>
-
-          <h1 className={styles.mainSectionTitle}>
-            {layoutStyle === 'viking' ? 'Acervo do Grande Salão dos Tomos' : 'Catálogo Geral da Livraria'}
-          </h1>
+      <main className={styles.container} style={{ paddingTop: '2.5rem', paddingBottom: '5rem' }}>
+        {/* Cabeçalho Clean do Catálogo */}
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <h1 className={styles.mainSectionTitle}>Catálogo de Livros</h1>
           <p className={styles.mainSectionDesc}>
-            {layoutStyle === 'viking'
-              ? 'Compêndio de obras raras, crônicas nórdicas e manuscritos preservados. Escolha seu gênero na tábua de runas sagradas e explore as relíquias literárias.'
-              : 'Explore títulos autênticos com integração direta à Open Library. Edições físicas e digitais com frete grátis nacional acima de R$ 99 e entrega rápida.'}
+            Explore títulos autênticos com integração direta à Open Library. Edições físicas e digitais com entrega rápida para todo o Brasil.
           </p>
-
-          <div className={styles.catalogPerksRow}>
-            <div className={styles.catalogPerkBadge}>
-              <Truck size={15} className={styles.catalogPerkIcon} />
-              <span>{layoutStyle === 'viking' ? 'Envio Seguro pelos Mares (Frete Grátis acima de R$ 99)' : 'Frete Grátis acima de R$ 99'}</span>
-            </div>
-            <div className={styles.catalogPerkBadge}>
-              <ShieldCheck size={15} className={styles.catalogPerkIcon} />
-              <span>{layoutStyle === 'viking' ? 'Juramento de Honra: Troca em até 30 sóis' : 'Garantia de 30 dias para troca'}</span>
-            </div>
-            <div className={styles.catalogPerkBadge}>
-              <CreditCard size={15} className={styles.catalogPerkIcon} />
-              <span>{layoutStyle === 'viking' ? 'Tributo em até 3x sem acréscimo' : 'Até 3x sem juros no cartão'}</span>
-            </div>
-          </div>
         </div>
 
-        {/* ===== MODO 1: SALÃO VIKING (2 COLUNAS: SIDEBAR RUNAS + GRID) ===== */}
-        {layoutStyle === 'viking' && (
-          <div className={styles.vikingCatalogContainer}>
-            {/* Sidebar Nórdica: Tábua de Runas & Guilda */}
-            <aside className={styles.vikingSidebar}>
-              <div className={styles.vikingSidebarHeader}>
-                <div className={styles.vikingShieldIcon}>
-                  <Shield size={20} />
-                </div>
-                <div>
-                  <h3 className={styles.vikingSidebarTitle}>Tábua de Runas</h3>
-                  <span className={styles.vikingSidebarSubtitle}>Filtros & Categorias da Guilda</span>
-                </div>
-              </div>
-
-              {/* Lista de Gêneros com Runas Nórdicas */}
-              <div>
-                <div className={styles.vikingFilterSectionTitle}>
-                  <span>Gêneros Nórdicos</span>
-                  <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{books.length} obras</span>
-                </div>
-                <div className={styles.vikingGenreList}>
-                  {AVAILABLE_GENRES.map((g) => {
-                    const count = getGenreCount(g.id);
-                    const isActive = selectedGenre === g.id;
-                    return (
-                      <button
-                        key={g.id}
-                        type="button"
-                        className={`${styles.vikingGenreBtn} ${isActive ? styles.vikingGenreBtnActive : ''}`}
-                        onClick={() => {
-                          setSelectedGenre(g.id);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        <div className={styles.vikingGenreBtnLeft}>
-                          <span className={styles.vikingRuneGlyph}>{g.rune}</span>
-                          <span>{g.vikingName}</span>
-                        </div>
-                        <span className={styles.vikingGenreBadge}>{count}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Faixas de Preço / Tributo */}
-              <div>
-                <div className={styles.vikingFilterSectionTitle}>
-                  <span>Tributo & Moedas</span>
-                </div>
-                <div className={styles.vikingPriceFilters}>
-                  {PRICE_RANGES.map((pr) => {
-                    const isActive = priceFilter === pr.id;
-                    return (
-                      <button
-                        key={pr.id}
-                        type="button"
-                        className={`${styles.vikingPriceOption} ${isActive ? styles.vikingPriceOptionActive : ''}`}
-                        onClick={() => {
-                          setPriceFilter(pr.id);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        <span className={styles.vikingPriceLabel}>{pr.label}</span>
-                        <span className={styles.vikingPriceDesc}>{pr.desc}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Restaurar Filtros */}
-              {(selectedGenre !== 'Todos' || priceFilter !== 'all' || searchTerm) && (
+        <div className={styles.catalogExplorerWrapper}>
+          {/* Barra de Pesquisa e Ordenação */}
+          <div className={styles.searchBarContainer}>
+            <div className={styles.searchInputWrapper}>
+              <Search size={20} className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Buscar livro por título, autor, assunto ou palavra-chave..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className={styles.searchInput}
+                id="catalog-search-input"
+              />
+              {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
+              {searchInput && (
                 <button
-                  type="button"
-                  className={styles.btnResetFilters}
+                  className={styles.clearSearchBtn}
                   onClick={() => {
-                    setSelectedGenre('Todos');
-                    setPriceFilter('all');
                     setSearchInput('');
                     setSearchTerm('');
+                  }}
+                  title="Limpar busca"
+                  aria-label="Limpar busca"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            <div className={styles.searchControlsRight}>
+              <div className={styles.sortSelectWrapper}>
+                <ArrowUpDown size={15} className={styles.sortIcon} />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className={styles.sortSelect}
+                  aria-label="Ordenar livros"
+                >
+                  <option value="sales">Mais Vendidos</option>
+                  <option value="price-asc">Menor Preço</option>
+                  <option value="price-desc">Maior Preço</option>
+                  <option value="rating">Melhor Avaliados</option>
+                  <option value="title">Título (A-Z)</option>
+                </select>
+              </div>
+
+              <div className={styles.viewModeToggle} role="group" aria-label="Modo de visualização">
+                <button
+                  type="button"
+                  className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="Visualização em Grade"
+                  aria-label="Visualização em Grade"
+                >
+                  <LayoutGrid size={17} />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="Visualização em Lista"
+                  aria-label="Visualização em Lista"
+                >
+                  <List size={17} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Pílulas de Filtro por Gênero */}
+          <div className={styles.genreFiltersContainer}>
+            <span className={styles.genreFilterLabel}>
+              <Filter size={14} />
+              Gênero:
+            </span>
+            <div className={styles.genrePillsList}>
+              {AVAILABLE_GENRES.map((g) => (
+                <button
+                  key={g.id}
+                  className={`${styles.genrePill} ${selectedGenre === g.id ? styles.genrePillActive : ''}`}
+                  onClick={() => {
+                    setSelectedGenre(g.id);
                     setCurrentPage(1);
                   }}
                 >
-                  <RotateCcw size={14} />
-                  <span>Restaurar Filtros</span>
-                </button>
-              )}
-
-              {/* Selo Nórdico de Autenticidade */}
-              <div className={styles.vikingSealCard}>
-                <ShieldCheck size={24} className={styles.vikingSealIcon} />
-                <span className={styles.vikingSealTitle}>Juramento do Mercador</span>
-                <p className={styles.vikingSealText}>
-                  Edições autênticas e tomos originais. Troca e devolução garantidas caso o pergaminho sofra avarias durante a travessia.
-                </p>
-              </div>
-            </aside>
-
-            {/* Conteúdo Principal do Salão Viking */}
-            <div className={styles.vikingMainContent}>
-              {/* Barra de Pesquisa e Ordenação */}
-              <div className={styles.vikingSearchBarContainer}>
-                <div className={styles.searchInputWrapper} style={{ flex: 1 }}>
-                  <Search size={20} className={styles.searchIcon} />
-                  <input
-                    type="text"
-                    placeholder="Buscar runa, título, autor ou palavra-chave no grande salão..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className={styles.searchInput}
-                    id="catalog-search-input-viking"
-                  />
-                  {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
-                  {searchInput && (
-                    <button
-                      className={styles.clearSearchBtn}
-                      onClick={() => {
-                        setSearchInput('');
-                        setSearchTerm('');
-                      }}
-                      title="Limpar busca"
-                      aria-label="Limpar busca"
-                    >
-                      <X size={16} />
-                    </button>
+                  <span>{g.name}</span>
+                  {selectedGenre === g.id && (
+                    <span className={styles.genrePillCount}>{filteredBooks.length}</span>
                   )}
-                </div>
-
-                <div className={styles.searchControlsRight}>
-                  {/* Ordenação */}
-                  <div className={styles.sortSelectWrapper}>
-                    <ArrowUpDown size={15} className={styles.sortIcon} />
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className={styles.sortSelect}
-                      aria-label="Ordenar livros"
-                    >
-                      <option value="sales">Mais Procurados</option>
-                      <option value="price-asc">Menor Tributo</option>
-                      <option value="price-desc">Maior Tributo</option>
-                      <option value="rating">Maior Honra (Avaliação)</option>
-                      <option value="title">Tomos (A-Z)</option>
-                    </select>
-                  </div>
-
-                  {/* Alternador de Grade/Lista */}
-                  <div className={styles.viewModeToggle} role="group" aria-label="Modo de visualização">
-                    <button
-                      type="button"
-                      className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
-                      onClick={() => setViewMode('grid')}
-                      title="Visualização em Grade"
-                      aria-label="Visualização em Grade"
-                    >
-                      <LayoutGrid size={17} />
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
-                      onClick={() => setViewMode('list')}
-                      title="Visualização em Lista"
-                      aria-label="Visualização em Lista"
-                    >
-                      <List size={17} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Renderização do Acervo (Heading, Grid/List, Paginação) */}
-              {renderBooksContent()}
+                </button>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* ===== MODO 2: PERGAMINHO CLÁSSICO (HORIZONTAL) ===== */}
-        {layoutStyle === 'classic' && (
-          <div className={styles.catalogExplorerWrapper}>
-            {/* Barra de Pesquisa e Ordenação */}
-            <div className={styles.searchBarContainer}>
-              <div className={styles.searchInputWrapper}>
-                <Search size={20} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Buscar livro por título, autor, assunto ou palavra-chave..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className={styles.searchInput}
-                  id="catalog-search-input"
-                />
-                {isSearching && <Loader2 size={16} className={styles.searchSpinner} />}
-                {searchInput && (
-                  <button
-                    className={styles.clearSearchBtn}
-                    onClick={() => {
-                      setSearchInput('');
-                      setSearchTerm('');
-                    }}
-                    title="Limpar busca"
-                    aria-label="Limpar busca"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-
-              <div className={styles.searchControlsRight}>
-                <div className={styles.sortSelectWrapper}>
-                  <ArrowUpDown size={15} className={styles.sortIcon} />
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className={styles.sortSelect}
-                    aria-label="Ordenar livros"
-                  >
-                    <option value="sales">Mais Vendidos</option>
-                    <option value="price-asc">Menor Preço</option>
-                    <option value="price-desc">Maior Preço</option>
-                    <option value="rating">Melhor Avaliados</option>
-                    <option value="title">Título (A-Z)</option>
-                  </select>
-                </div>
-
-                <div className={styles.viewModeToggle} role="group" aria-label="Modo de visualização">
-                  <button
-                    type="button"
-                    className={`${styles.viewModeBtn} ${viewMode === 'grid' ? styles.viewModeBtnActive : ''}`}
-                    onClick={() => setViewMode('grid')}
-                    title="Visualização em Grade"
-                    aria-label="Visualização em Grade"
-                  >
-                    <LayoutGrid size={17} />
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.viewModeBtn} ${viewMode === 'list' ? styles.viewModeBtnActive : ''}`}
-                    onClick={() => setViewMode('list')}
-                    title="Visualização em Lista"
-                    aria-label="Visualização em Lista"
-                  >
-                    <List size={17} />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Pílulas de Filtro por Gênero */}
-            <div className={styles.genreFiltersContainer}>
-              <span className={styles.genreFilterLabel}>
-                <Filter size={14} />
-                Gênero:
-              </span>
-              <div className={styles.genrePillsList}>
-                {AVAILABLE_GENRES.map((g) => (
-                  <button
-                    key={g.id}
-                    className={`${styles.genrePill} ${selectedGenre === g.id ? styles.genrePillActive : ''}`}
-                    onClick={() => {
-                      setSelectedGenre(g.id);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <span>{g.name}</span>
-                    {selectedGenre === g.id && (
-                      <span className={styles.genrePillCount}>{filteredBooks.length}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Renderização do Acervo (Heading, Grid/List, Paginação) */}
-            {renderBooksContent()}
-          </div>
-        )}
+          {/* Renderização do Acervo (Heading, Grid/List, Paginação) */}
+          {renderBooksContent()}
+        </div>
       </main>
 
       {/* ===== MODAL DE DETALHES DO LIVRO ===== */}
@@ -1687,37 +1454,8 @@ export default function CatalogoPage({ auth }) {
         }}
       />
 
-      {/* Footer */}
-      <footer
-        style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          padding: '2.5rem 0',
-          marginTop: 'auto',
-          background: 'rgba(0, 0, 0, 0.2)'
-        }}
-      >
-        <div className={styles.container} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              marginBottom: '0.75rem'
-            }}
-          >
-            <Library size={20} color="var(--color-gold-accent, #c69238)" />
-            <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>BIBLIOTECH</strong>
-          </div>
-          <p style={{ fontSize: '0.85rem', maxWidth: '500px', margin: '0 auto 1rem' }}>
-            A sua livraria e clube de leitura inteligente. Conectando pessoas através de histórias
-            inesquecíveis.
-          </p>
-          <span style={{ fontSize: '0.8rem' }}>
-            © {new Date().getFullYear()} Bibliotech Livraria Online. Todos os direitos reservados.
-          </span>
-        </div>
-      </footer>
+      {/* Footer Moderno & Viking */}
+      <Footer />
     </div>
   );
 }
