@@ -98,6 +98,97 @@
   box-shadow: 0 0 12px rgba(229, 179, 82, 0.25);
 }
 
+.navRightGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.audioBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #f7f1e5;
+  border: 1.5px solid rgba(140, 86, 39, 0.35);
+  color: var(--color-text-secondary);
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(140, 86, 39, 0.08);
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.audioBtn:hover {
+  transform: translateY(-2px);
+  border-color: #c69238;
+  color: #8e1f1f;
+  box-shadow: 0 4px 12px rgba(140, 86, 39, 0.16);
+}
+
+:global([data-theme="dark"]) .audioBtn {
+  background: #241c16;
+  border: 1.5px solid rgba(229, 179, 82, 0.35);
+  color: #ede2cd;
+}
+
+:global([data-theme="dark"]) .audioBtn:hover {
+  color: #e5b352;
+  border-color: #e5b352;
+  box-shadow: 0 0 12px rgba(229, 179, 82, 0.25);
+}
+
+.audioBtnPlaying {
+  border-color: #c69238 !important;
+  color: #8e1f1f !important;
+  background: rgba(198, 146, 56, 0.15) !important;
+}
+
+:global([data-theme="dark"]) .audioBtnPlaying {
+  border-color: #e5b352 !important;
+  color: #f7ce7a !important;
+  background: rgba(229, 179, 82, 0.15) !important;
+  box-shadow: 0 0 14px rgba(229, 179, 82, 0.3);
+}
+
+.audioLabel {
+  font-size: 0.8rem;
+}
+
+.audioWaveBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.audioWaveBars span {
+  display: block;
+  width: 2.5px;
+  background: currentColor;
+  border-radius: 1px;
+  animation: audioWave 0.8s ease-in-out infinite alternate;
+}
+
+.bar1 { height: 5px; animation-delay: 0s !important; }
+.bar2 { height: 12px; animation-delay: 0.25s !important; }
+.bar3 { height: 7px; animation-delay: 0.5s !important; }
+
+@keyframes audioWave {
+  0% { height: 3px; }
+  100% { height: 12px; }
+}
+
+@media (max-width: 600px) {
+  .audioLabel {
+    display: none;
+  }
+}
+
 /* Main Container */
 .mainContent {
   flex: 1;

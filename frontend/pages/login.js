@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Library,
   Mail,
@@ -16,7 +16,9 @@ import {
   BookOpen,
   Sparkles,
   KeyRound,
-  ShieldCheck
+  ShieldCheck,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import ThemeToggle from '../components/menu/ThemeToggle';
 import styles from '../styles/login.module.css';
@@ -28,6 +30,62 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Instância de áudio dedicada e exclusiva da tela de login
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Carrega o tema nórdico/viking em loop
+    const audio = new Audio('/audio/viking-theme.mp3');
+    audio.loop = true;
+    audio.volume = 0.30; // Volume ambiente confortável
+    audioRef.current = audio;
+
+    // Tentativa inicial de reprodução automática
+    audio.play()
+      .then(() => setIsPlaying(true))
+      .catch(() => {
+        // Bloqueio de autoplay do navegador: inicia suavemente no primeiro clique do usuário
+        setIsPlaying(false);
+      });
+
+    const handleFirstUserInteraction = () => {
+      if (audioRef.current && audioRef.current.paused) {
+        audioRef.current.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {});
+      }
+      window.removeEventListener('click', handleFirstUserInteraction);
+      window.removeEventListener('keydown', handleFirstUserInteraction);
+    };
+
+    window.addEventListener('click', handleFirstUserInteraction);
+    window.addEventListener('keydown', handleFirstUserInteraction);
+
+    // CRÍTICO: Desliga e encerra o áudio imediatamente ao sair da tela de login
+    return () => {
+      window.removeEventListener('click', handleFirstUserInteraction);
+      window.removeEventListener('keydown', handleFirstUserInteraction);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.warn('Erro ao tocar áudio:', err));
+    }
+  };
 
   // Estados dos formulários
   const [loginForm, setLoginForm] = useState({
@@ -304,7 +362,34 @@ export default function LoginPage() {
           <ArrowLeft size={18} />
           <span>Voltar ao Catálogo</span>
         </Link>
-        <ThemeToggle />
+        
+        <div className={styles.navRightGroup}>
+          <button
+            type="button"
+            onClick={toggleAudio}
+            className={`${styles.audioBtn} ${isPlaying ? styles.audioBtnPlaying : ''}`}
+            title={isPlaying ? 'Pausar música do tema' : 'Tocar música do tema viking'}
+            aria-label="Controle de música ambiente"
+          >
+            {isPlaying ? (
+              <>
+                <Volume2 size={16} />
+                <span className={styles.audioLabel}>Música Ambiente</span>
+                <span className={styles.audioWaveBars}>
+                  <span className={styles.bar1}></span>
+                  <span className={styles.bar2}></span>
+                  <span className={styles.bar3}></span>
+                </span>
+              </>
+            ) : (
+              <>
+                <VolumeX size={16} />
+                <span className={styles.audioLabel}>Música Ambiente</span>
+              </>
+            )}
+          </button>
+          <ThemeToggle />
+        </div>
       </nav>
 
       {/* Main Content Area */}
